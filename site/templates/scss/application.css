@@ -1,0 +1,566 @@
+/*
+@font-face {
+	font-family: 'arrows';
+	src:url('/site/templates/styles/fonts/arrows/arrows.eot');
+	src:url('/site/templates/styles/fonts/arrows/arrows.eot?#iefix') format('embedded-opentype'),
+		url('/site/templates/styles/fonts/arrows/arrows.woff') format('woff'),
+		url('/site/templates/styles/fonts/arrows/arrows.ttf') format('truetype'),
+		url('/site/templates/styles/fonts/arrows/arrows.svg#arrows') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+*/
+@-webkit-keyframes spriteWindRightKF {
+  from {
+    background-position: 0 50%; }
+  to {
+    background-position: 0 100%; } }
+@-moz-keyframes spriteWindRightKF {
+  from {
+    background-position: 0 50%; }
+  to {
+    background-position: 0 100%; } }
+@-o-keyframes spriteWindRightKF {
+  from {
+    background-position: 0 50%; }
+  to {
+    background-position: 0 100%; } }
+@keyframes spriteWindRightKF {
+  from {
+    background-position: 0 50%; }
+  to {
+    background-position: 0 100%; } }
+@-webkit-keyframes spriteWindRightRevKF {
+  from {
+    background-position: 0 100%; }
+  to {
+    background-position: 0 50%; } }
+@-moz-keyframes spriteWindRightRevKF {
+  from {
+    background-position: 0 100%; }
+  to {
+    background-position: 0 50%; } }
+@-o-keyframes spriteWindRightRevKF {
+  from {
+    background-position: 0 100%; }
+  to {
+    background-position: 0 50%; } }
+@keyframes spriteWindRightRevKF {
+  from {
+    background-position: 0 100%; }
+  to {
+    background-position: 0 50%; } }
+.spriteWindRight {
+  -webkit-animation: spriteWindRightKF 0.8s steps(3) 0s forwards;
+  -moz-animation: spriteWindRightKF 0.8s steps(3) 0s forwards;
+  -o-animation: spriteWindRightKF 0.8s steps(3) 0s forwards;
+  animation: spriteWindRightKF 0.8s steps(3) 0s forwards; }
+
+.spriteWindRightRev {
+  -webkit-animation: spriteWindRightRevKF 0.8s steps(3) 0.4s forwards;
+  -moz-animation: spriteWindRightRevKF 0.8s steps(3) 0.4s forwards;
+  -o-animation: spriteWindRightRevKF 0.8s steps(3) 0.4s forwards;
+  animation: spriteWindRightRevKF 0.8s steps(3) 0.4s forwards; }
+
+@-webkit-keyframes spriteWindLeftKF {
+  from {
+    background-position: 0 50%; }
+  to {
+    background-position: 0 0%; } }
+@-moz-keyframes spriteWindLeftKF {
+  from {
+    background-position: 0 50%; }
+  to {
+    background-position: 0 0%; } }
+@-o-keyframes spriteWindLeftKF {
+  from {
+    background-position: 0 50%; }
+  to {
+    background-position: 0 0%; } }
+@keyframes spriteWindLeftKF {
+  from {
+    background-position: 0 50%; }
+  to {
+    background-position: 0 0%; } }
+@-webkit-keyframes spriteWindLeftRevKF {
+  from {
+    background-position: 0 0%; }
+  to {
+    background-position: 0 50%; } }
+@-moz-keyframes spriteWindLeftRevKF {
+  from {
+    background-position: 0 0%; }
+  to {
+    background-position: 0 50%; } }
+@-o-keyframes spriteWindLeftRevKF {
+  from {
+    background-position: 0 0%; }
+  to {
+    background-position: 0 50%; } }
+@keyframes spriteWindLeftRevKF {
+  from {
+    background-position: 0 0%; }
+  to {
+    background-position: 0 50%; } }
+.spriteWindLeft {
+  -webkit-animation: spriteWindLeftKF 0.8s steps(3) 0s forwards;
+  -moz-animation: spriteWindLeftKF 0.8s steps(3) 0s forwards;
+  -o-animation: spriteWindLeftKF 0.8s steps(3) 0s forwards;
+  animation: spriteWindLeftKF 0.8s steps(3) 0s forwards; }
+
+.spriteWindLeftRev {
+  -webkit-animation: spriteWindLeftRevKF 0.8s steps(3) 0.4s forwards;
+  -moz-animation: spriteWindLeftRevKF 0.8s steps(3) 0.4s forwards;
+  -o-animation: spriteWindLeftRevKF 0.8s steps(3) 0.4s forwards;
+  animation: spriteWindLeftRevKF 0.8s steps(3) 0.4s forwards; }
+
+@-webkit-keyframes spriteMoveLeftKF {
+  from {
+    background-position: 0 50%; }
+  to {
+    background-position: 0 16.66667%; } }
+@-moz-keyframes spriteMoveLeftKF {
+  from {
+    background-position: 0 50%; }
+  to {
+    background-position: 0 16.66667%; } }
+@-o-keyframes spriteMoveLeftKF {
+  from {
+    background-position: 0 50%; }
+  to {
+    background-position: 0 16.66667%; } }
+@keyframes spriteMoveLeftKF {
+  from {
+    background-position: 0 50%; }
+  to {
+    background-position: 0 16.66667%; } }
+@-webkit-keyframes spriteMoveLeftRevKF {
+  from {
+    background-position: 0 16.66667%; }
+  to {
+    background-position: 0 50%; } }
+@-moz-keyframes spriteMoveLeftRevKF {
+  from {
+    background-position: 0 16.66667%; }
+  to {
+    background-position: 0 50%; } }
+@-o-keyframes spriteMoveLeftRevKF {
+  from {
+    background-position: 0 16.66667%; }
+  to {
+    background-position: 0 50%; } }
+@keyframes spriteMoveLeftRevKF {
+  from {
+    background-position: 0 16.66667%; }
+  to {
+    background-position: 0 50%; } }
+.spriteMoveLeft {
+  -webkit-animation: spriteMoveLeftKF 800ms steps(1) 0s forwards;
+  -moz-animation: spriteMoveLeftKF 800ms steps(1) 0s forwards;
+  -o-animation: spriteMoveLeftKF 800ms steps(1) 0s forwards;
+  animation: spriteMoveLeftKF 800ms steps(1) 0s forwards; }
+
+.spriteMoveLeftRev {
+  -webkit-animation: spriteMoveLeftRevKF 450ms steps(1) 0s forwards;
+  -moz-animation: spriteMoveLeftRevKF 450ms steps(1) 0s forwards;
+  -o-animation: spriteMoveLeftRevKF 450ms steps(1) 0s forwards;
+  animation: spriteMoveLeftRevKF 450ms steps(1) 0s forwards; }
+
+@-webkit-keyframes spriteMoveRightKF {
+  from {
+    background-position: 0 50%; }
+  to {
+    background-position: 0 83.33333%; } }
+@-moz-keyframes spriteMoveRightKF {
+  from {
+    background-position: 0 50%; }
+  to {
+    background-position: 0 83.33333%; } }
+@-o-keyframes spriteMoveRightKF {
+  from {
+    background-position: 0 50%; }
+  to {
+    background-position: 0 83.33333%; } }
+@keyframes spriteMoveRightKF {
+  from {
+    background-position: 0 50%; }
+  to {
+    background-position: 0 83.33333%; } }
+@-webkit-keyframes spriteMoveRightRevKF {
+  from {
+    background-position: 0 83.33333%; }
+  to {
+    background-position: 0 50%; } }
+@-moz-keyframes spriteMoveRightRevKF {
+  from {
+    background-position: 0 83.33333%; }
+  to {
+    background-position: 0 50%; } }
+@-o-keyframes spriteMoveRightRevKF {
+  from {
+    background-position: 0 83.33333%; }
+  to {
+    background-position: 0 50%; } }
+@keyframes spriteMoveRightRevKF {
+  from {
+    background-position: 0 83.33333%; }
+  to {
+    background-position: 0 50%; } }
+.spriteMoveRight {
+  -webkit-animation: spriteMoveRightKF 800ms steps(1) 0s forwards;
+  -moz-animation: spriteMoveRightKF 800ms steps(1) 0s forwards;
+  -o-animation: spriteMoveRightKF 800ms steps(1) 0s forwards;
+  animation: spriteMoveRightKF 800ms steps(1) 0s forwards; }
+
+.spriteMoveRightRev {
+  -webkit-animation: spriteMoveRightRevKF 450ms steps(1) 0s forwards;
+  -moz-animation: spriteMoveRightRevKF 450ms steps(1) 0s forwards;
+  -o-animation: spriteMoveRightRevKF 450ms steps(1) 0s forwards;
+  animation: spriteMoveRightRevKF 450ms steps(1) 0s forwards; }
+
+svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1; }
+
+#paper {
+  pointer-events: none; }
+
+body {
+  overflow: hidden; }
+
+.background {
+  z-index: -1000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("/site/templates/images/front-page/background.jpg") no-repeat right bottom fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover; }
+
+.blockingDiv {
+  display: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 999; }
+
+.plank-sprites {
+  z-index: 3; }
+
+.wl-sprites {
+  z-index: -3; }
+
+#backarrow {
+  pointer-events: bounding-box; }
+
+.shadow {
+  position: relative;
+  height: 100%;
+  z-index: -1;
+  -webkit-filter: blur(1px);
+  filter: blur(1px);
+  opacity: 0.70;
+  -ms-transform-origin: 50% 0;
+  /* IE 9 */
+  -webkit-transform-origin: 50% 0;
+  /* Chrome, Safari, Opera */
+  transform-origin: 50% 0; }
+
+.gourd, .gourd1 {
+  -ms-transform-origin: 60% 9px;
+  /* IE 9 */
+  -webkit-transform-origin: 60% 9px;
+  /* Chrome, Safari, Opera */
+  transform-origin: 60% 9px; }
+
+.gourd {
+  z-index: 2; }
+
+.silk {
+  z-index: 1; }
+
+.staff {
+  -ms-transform-origin: 75% 50%;
+  /* IE 9 */
+  -webkit-transform-origin: 75% 50%;
+  /* Chrome, Safari, Opera */
+  transform-origin: 75% 50%; }
+
+.staff-shadow {
+  bottom: -10%;
+  height: 100%;
+  width: 100%;
+  background-size: contain !important; }
+
+.bucket-shadow {
+  bottom: -90%;
+  width: 100%;
+  background-size: contain !important; }
+
+.inkwell-shadow {
+  bottom: -97%;
+  width: 70%;
+  left: 15%; }
+
+.brushholder-shadow {
+  bottom: -97%;
+  width: 80%;
+  left: 10%; }
+
+.floorgourd-wrapper {
+  transform-origin: 0% 100%; }
+
+.floorgourd-shadow {
+  bottom: -93%;
+  width: 100%;
+  left: -4%;
+  background-size: contain !important; }
+
+.goose-wrapper {
+  -ms-transform-origin: 50% 100%;
+  /* IE 9 */
+  -webkit-transform-origin: 50% 100%;
+  /* Chrome, Safari, Opera */
+  transform-origin: 50% 100%; }
+
+.goose {
+  position: relative;
+  top: 0;
+  left: 0;
+  -ms-transform-origin: 50% 100%;
+  /* IE 9 */
+  -webkit-transform-origin: 50% 100%;
+  /* Chrome, Safari, Opera */
+  transform-origin: 50% 100%; }
+
+.goose-shadow {
+  width: 100%;
+  -ms-transform-origin: 50% 11%;
+  /* IE 9 */
+  -webkit-transform-origin: 50% 11%;
+  /* Chrome, Safari, Opera */
+  transform-origin: 50% 11%;
+  display: none; }
+
+.boat-wrapper {
+  -webkit-clip-path: url(#boatClip);
+  clip-path: url(#boatClip); }
+
+.boat {
+  transform-origin: 0% 100%; }
+
+.cloud1, .cloud2, .cloud3 {
+  position: absolute;
+  z-index: -100;
+  -webkit-filter: opacity(70%) blur(1px);
+  filter: blur(1px);
+  opacity: 0.75; }
+
+.silk-link, .silk1-link {
+  position: relative;
+  display: block;
+  margin-left: 31%;
+  margin-top: 2%;
+  height: 95%;
+  width: 25%; }
+
+#bb-wrapper {
+  position: absolute;
+  width: 90%;
+  margin-left: 5%;
+  height: 100%;
+  top: 0;
+  left: 0; }
+
+.bb-bookblock {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  display: none;
+  perspective: 2000px;
+  backface-visibility: hidden; }
+
+.bb-item {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0; }
+
+#bb-background {
+  z-index: -1000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("/site/templates/images/tabletop.jpg") no-repeat right bottom fixed;
+  background-size: 100% 100%; }
+
+#bb-openbook {
+  position: absolute;
+  width: 90%;
+  margin-left: 3%;
+  height: 90%;
+  background: url("/site/templates/images/book.png") no-repeat center center;
+  background-size: contain; }
+
+#bb-description {
+  position: relative;
+  width: 50%;
+  float: left;
+  height: 100%; }
+
+#bb-cover {
+  position: relative;
+  height: 100%;
+  width: 43%;
+  margin-right: 3%;
+  float: right;
+  box-shadow: 0 0 2px 2px white inset; }
+
+.bb-image {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  box-shadow: 0 0 4px 4px white inset; }
+
+.bb-page {
+  position: absolute;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  -webkit-transition-property: -webkit-transform;
+  transition-property: transform;
+  width: 50%;
+  height: 100%;
+  left: 50%;
+  -webkit-transform-origin: left center;
+  transform-origin: left center; }
+
+.bb-page > div,
+.bb-outer,
+.bb-content,
+.bb-inner {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden; }
+
+.bb-content {
+  width: 200%;
+  background: white; }
+
+.bb-page > div {
+  width: 100%;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d; }
+
+.bb-back {
+  -webkit-transform: rotateY(-180deg);
+  transform: rotateY(-180deg); }
+
+.bb-outer {
+  width: 100%;
+  overflow: hidden;
+  z-index: 999; }
+
+.bb-overlay,
+.bb-flipoverlay {
+  background-color: rgba(0, 0, 0, 0.7);
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  opacity: 0; }
+
+.bb-flipoverlay {
+  background-color: rgba(0, 0, 0, 0.2); }
+
+.bb-bookblock > div.bb-page:first-child,
+.bb-bookblock > div.bb-page:first-child .bb-back {
+  -webkit-transform: rotateY(180deg);
+  transform: rotateY(180deg); }
+
+.bb-front .bb-content {
+  left: -100%; }
+
+/* Flipping classes */
+.bb-flip-next,
+.bb-flip-initial {
+  -webkit-transform: rotateY(-180deg);
+  transform: rotateY(-180deg); }
+
+.bb-flip-prev {
+  -webkit-transform: rotateY(0deg);
+  transform: rotateY(0deg); }
+
+.bb-flip-next-end {
+  -webkit-transform: rotateY(-15deg);
+  transform: rotateY(-15deg); }
+
+.bb-flip-prev-end {
+  -webkit-transform: rotateY(-165deg);
+  transform: rotateY(-165deg); }
+
+#bb-nav {
+  width: 100%;
+  height: 40px;
+  position: fixed;
+  bottom: 20px;
+  z-index: 1000;
+  text-align: center; }
+
+#bb-nav a {
+  width: 40px;
+  height: 40px;
+  display: inline-block;
+  text-align: center;
+  border-radius: 2px;
+  background: #1baede;
+  color: #fff;
+  font-size: 0;
+  margin: 2px; }
+
+#bb-nav a:hover {
+  opacity: 0.6; }
+
+#bb-nav a img {
+  width: 100%;
+  height: 100%; }
+
+.bb-icon-home, .bb-icon-first, .bb-icon-last, .bb-icon-arrow-left, .bb-icon-arrow-right {
+  display: inline-block; }
+
+/* No JS */
+.no-js .bb-bookblock,
+.no-js ul.bb-custom-grid li {
+  width: auto;
+  height: auto; }
+
+.no-js .bb-item {
+  display: block;
+  position: relative; }
+
+.no-js #bb-wrapper {
+  height: auto; }
+
+.no-js .bb-custom-content {
+  height: 470px; }
+
+/*# sourceMappingURL=application.css.map */

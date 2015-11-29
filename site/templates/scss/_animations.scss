@@ -1,0 +1,74 @@
+
+@include keyframes(spriteWindRightKF) {
+    from { background-position: 0 50%; }
+    to { background-position: 0 100%; }
+}
+
+@include keyframes(spriteWindRightRevKF) {
+  from { background-position: 0 100%; }
+    to { background-position: 0 50%; }
+}
+
+.spriteWindRight {
+    @include spriteAnimation(spriteWindRightKF, 3, .8s, 0s, forwards)
+} 
+
+.spriteWindRightRev {
+    @include spriteAnimation(spriteWindRightRevKF, 3, .8s, .4s, forwards)
+}
+
+
+@include keyframes(spriteWindLeftKF) {
+    from { background-position: 0 50%; }
+    to { background-position: 0 0%; }
+}
+
+@include keyframes(spriteWindLeftRevKF) {
+  from { background-position: 0 0%; }
+    to { background-position: 0 50%; }
+}
+
+.spriteWindLeft {
+    @include spriteAnimation(spriteWindLeftKF, 3, .8s, 0s,  forwards)
+} 
+
+.spriteWindLeftRev {
+    @include spriteAnimation(spriteWindLeftRevKF, 3, .8s, .4s, forwards)
+}
+
+@include keyframes(spriteMoveLeftKF) {
+    from { background-position: 0 50%; }
+    to { background-position: 0 percentage((100/6)/100); }
+}
+
+@include keyframes(spriteMoveLeftRevKF) {
+  from { background-position: 0 percentage((100/6)/100); }
+    to { background-position: 0 50%; }
+}
+
+.spriteMoveLeft {
+    @include spriteAnimation(spriteMoveLeftKF, 1, 800ms, 0s, forwards)
+} 
+
+.spriteMoveLeftRev {
+    @include spriteAnimation(spriteMoveLeftRevKF, 1, 450ms, 0s, forwards)
+}
+
+@include keyframes(spriteMoveRightKF) {
+    from { background-position: 0 50%; }
+    to { background-position: 0 percentage((100 - (100/6))/100); }
+}
+
+@include keyframes(spriteMoveRightRevKF) {
+  from { background-position: 0 percentage((100 - (100/6))/100); }
+    to { background-position: 0 50%; }
+}
+
+.spriteMoveRight {
+    @include spriteAnimation(spriteMoveRightKF, 1, 800ms, 0s, forwards)
+} 
+
+.spriteMoveRightRev {
+    @include spriteAnimation(spriteMoveRightRevKF, 1, 450ms, 0s, forwards)
+}
+
