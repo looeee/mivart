@@ -1,61 +1,103 @@
+'use strict';
+
 var projectname 	= "mivart",
 	template_path	= "site/templates/",
+	scss_path 		= template_path + 'scss/**/*.scss',
+	es2015_path 	= template_path + 'es2015/**/*.js',
+	styles_path 	= template_path + 'styles',
+	scripts_path 	= template_path + 'scripts',
 	gulp 			= require('gulp'),
-	//uglify 			= require('gulp-uglify'),
 	sass        	= require('gulp-sass'),
 	watch 			= require('gulp-watch'),
-	sourcemaps   = require('gulp-sourcemaps'),
-	postcss      = require('gulp-postcss'),
-	livereload = require('gulp-livereload'),
-	lr = require('tiny-lr'),
-	autoprefixer	= require('autoprefixer-core');
-	//jshint 			= require('gulp-jshint'),
-	//concat 			= require('gulp-concat');
+	postcss      	= require('gulp-postcss'),
+	autoprefixer	= require('gulp-autoprefixer'),
+	postcss      	= require('gulp-postcss'),
+	concat 			= require('gulp-concat'),
+	sourcemaps 		= require('gulp-sourcemaps'),
+	minify 			= require('gulp-minify'),
+	uglify 			= require('gulp-uglify'),
+	//livereload 	= require('gulp-livereload'),
+	babel 			= require('gulp-babel'),
+	minifyCss 		= require('gulp-minify-css');
 
-/* This will concatenate js files into one minifide file
-gulp.task('js', function () {
-	return gulp.src([
-			template_path + 'js/lib/jquery-2.1.1.min.js',
-			template_path + 'js/lib/highlight.js',
-			template_path + 'js/app/main.js'
-		])
-		.pipe(uglify())
-		.pipe(concat(projectname + '.js'))
-		.pipe(gulp.dest(template_path + 'build/js'));
+// Add debounce to gulp watch for FTP
+(function ftp_debounce_fix(){
+  
+  var watch = gulp.watch;
+  
+  // Overwrite the local gulp.watch function
+  gulp.watch = function(glob, opt, fn){
+    var _this = this, _fn, timeout;
+    
+    // This is taken from the gulpjs file, but needed to
+    // qualify the "fn" variable
+    if ( typeof opt === 'function' || Array.isArray(opt) ) {
+      fn = opt;
+      opt = null;
+    }
+    
+    // Make a copy of the callback function for reference
+    _fn = fn;
+    
+    // Create a new delayed callback function
+    fn = function(){
+      
+      if( timeout ){
+        clearTimeout( timeout );
+      }
+      
+      timeout = setTimeout( Array.isArray(_fn) ? function(){
+        _this.start.call(_this, _fn);
+      } : _fn, 150 );
+      
+    };
+    
+    return watch.call( this, glob, opt, fn );
+  };
+  
+})();
+
+//Put all css tasks here
+gulp.task('css', function() {
+	return gulp.src(scss_path)
+		.pipe(sass().on('error', sass.logError))
+		.pipe(autoprefixer({
+            browsers: ['last 3 version' , "ie 9"],
+            cascade: true,
+        }))
+        //.pipe(sourcemaps.init())
+    	.pipe(minifyCss())
+    	//.pipe(sourcemaps.write())
+        .pipe(gulp.dest(styles_path))
+        //.pipe(livereload({ start: true }));
 });
-*/
 
-
-gulp.task('sass', function() {
-	return gulp.src(template_path + 'scss/*.scss')
-		.pipe(sass({
-		    compass: true,
-			//style: 'compressed',
-			lineNumbers: false
-		}))
-		//.pipe(concat(projectname + '.css'))
-		.pipe(gulp.dest(template_path + 'styles'))
-		.pipe(postcss([ autoprefixer({ browsers: ['last 3 version' , "ie 9"] }) ]))
-        .pipe(sourcemaps.write('.'))
-		.pipe(livereload());
+//Put all javascript tasks here
+gulp.task('js', function() { 
+	return gulp.src(es2015_path)
+        .pipe(babel({
+            presets: ['es2015']
+        }))
+        //.pipe(concat('application.js'))
+        //.pipe(sourcemaps.write('.'))
+        .pipe(uglify())
+        .pipe(gulp.dest(scripts_path));
+        //.pipe(livereload({ start: true }));
 });
 
-gulp.task('autoprefixer', function () {
-    var postcss      = require('gulp-postcss');
-    var sourcemaps   = require('gulp-sourcemaps');
-    var autoprefixer = require('autoprefixer-core');
-
-    return gulp.src(template_path + 'styles/*.css')
-        .pipe(sourcemaps.init())
-        .pipe(postcss([ autoprefixer({ browsers: ['last 2 version' , "ie 9"] }) ]))
-        .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest(template_path + 'styles/autoprefixed'));
+//embed livereload
+gulp.task('embedlr',  function() { 
+	gulp.src(template_path + 'header.php')
+    .pipe(embedlr())
+    .pipe(gulp.dest(template_path));
 });
 
 
-gulp.task('default', ['sass', 'autoprefixer'], function() {
-	gulp.watch(template_path + 'scss/*.scss', ['sass']);
-	//gulp.watch(template_path + 'js/**/*.js', ['js']);
+//default task
+gulp.task('default', ['css', 'js'] , function() {
+	//livereload.listen();
+	gulp.watch(scss_path, ['css']);
+	gulp.watch(es2015_path, ['js']);
 });
 
-gulp.task('build', ['sass','autoprefixer']);
+gulp.task('build', ['css', 'js']);

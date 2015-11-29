@@ -1,24 +1,137 @@
-
-/*
-@font-face {
-	font-family: 'arrows';
-	src:url('/site/templates/styles/fonts/arrows/arrows.eot');
-	src:url('/site/templates/styles/fonts/arrows/arrows.eot?#iefix') format('embedded-opentype'),
-		url('/site/templates/styles/fonts/arrows/arrows.woff') format('woff'),
-		url('/site/templates/styles/fonts/arrows/arrows.ttf') format('truetype'),
-		url('/site/templates/styles/fonts/arrows/arrows.svg#arrows') format('svg');
-	font-weight: normal;
-	font-style: normal;
+body { 
+  position: absolute;
+  top:0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  z-index: -9999;
 }
-*/
 
-//Sitewide Styling
-@import "mixins";
-@import "animations";
+.avoidClicks {
+  pointer-events: none;
+}
 
-//Page specific Styling
-@import "front-page";
-@import "book";
+.info{
+  position: absolute;
+  //top: 0;
+  background-color: red;
+  display: none;
+  z-index: 9999;
+}
 
+#infoLeft{
+  width: 7%;
+  height: 100%;
+  left: 0;
+  background: linear-gradient(to right, rgba(0,0,0,.75) 0%, rgba(255,255,255,.75) 100%);
+  border-right: solid 1px black;
+}
 
+#infoRight{
+  width: 7%;
+  height: 100%;
+  right: 0;
+  background: linear-gradient(to left, rgba(0,0,0,.75) 0%, rgba(255,255,255,.75) 100%);
+  border-left: solid 1px black;
+}
 
+#infoBottom{
+  width: 100%;
+  height: 7%;
+  bottom: 0;
+  background: linear-gradient(to top, rgba(0,0,0,.75) 0%, rgba(255,255,255,.75) 100%);
+  border-top: solid 1px black;
+}
+
+.infoText{
+	position: absolute;
+}
+
+#infoLeftText{
+  top: 50%;
+  left: 0;
+  transform: rotate(90deg);
+  //transform-origin: right top 0;
+  //float: left;
+}
+
+#infoRightText{
+  right: 0;
+  top: 50%;
+  height: 100%;
+  transform: rotate(-90deg);
+  transform-origin: left top 0;
+  text-align: center;
+}
+
+#infoBottomText{ 
+  width: 100%;
+  margin-top: 2%;
+  text-align: center;
+}
+
+#silk, #silk1{
+   z-index: 1;
+}
+#silkTrigger, #silk1Trigger{
+  position: relative;
+  display: block;
+  margin-left: 31%;
+  margin-top: 2%;
+  height: 95%;
+  width: 25%;
+}
+
+#gourd, #gourd1{
+  z-index: 2;
+  -ms-transform-origin: 60% 8px; /* IE 9 */
+    -webkit-transform-origin: 60% 8px; /* Chrome, Safari, Opera */
+    transform-origin: 60% 8px;
+}
+
+#clouds > div {
+  z-index: -100;
+  -webkit-filter:  opacity(90%) blur(0.8px); 
+  filter: blur(0.8px);
+  opacity: 0.75;
+}
+
+#boatWrapper{
+  -webkit-clip-path: url(#boatClip);
+  clip-path: url(#boatClip);
+}
+
+#boat{
+  transform-origin: 50% 100%;
+  z-index: -10;
+}
+
+#staff{
+  transform-origin: 50% 50%;
+}
+
+.shadow{
+  position: relative;
+  //height: 100%;
+  z-index: -1;
+  -webkit-filter: blur(1px); 
+  filter:  blur(1px);
+  opacity: 0.70;
+  -ms-transform-origin: 50% 0; /* IE 9 */
+  -webkit-transform-origin: 50% 0; /* Chrome, Safari, Opera */
+  transform-origin: 50% 0;
+}
+
+//CHANGED IN MEDIA QUERIES
+#background{
+    z-index: -1000;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url("/mivart/site/templates/images/frontPage/background.jpg") 0 no-repeat  fixed;
+    background-size: 100% 100%;
+}
