@@ -6,19 +6,16 @@ var projectname 	= "mivart",
 	es2015_path 	= template_path + 'es2015/**/*.js',
 	styles_path 	= template_path + 'styles',
 	scripts_path 	= template_path + 'scripts',
-	gulp 			= require('gulp'),
+	gulp 			    = require('gulp'),
 	sass        	= require('gulp-sass'),
-	watch 			= require('gulp-watch'),
-	postcss      	= require('gulp-postcss'),
+	watch 			  = require('gulp-watch'),
 	autoprefixer	= require('gulp-autoprefixer'),
-	postcss      	= require('gulp-postcss'),
-	concat 			= require('gulp-concat'),
-	sourcemaps 		= require('gulp-sourcemaps'),
-	minify 			= require('gulp-minify'),
-	uglify 			= require('gulp-uglify'),
-	//livereload 	= require('gulp-livereload'),
-	babel 			= require('gulp-babel'),
-	minifyCss 		= require('gulp-minify-css');
+	//sourcemaps 		= require('gulp-sourcemaps'),
+	uglify 			  = require('gulp-uglify'),
+  babelify      = require('babelify'),
+  browserify    = require('browserify'),
+	minifyCss 		= require('gulp-minify-css'),
+  through2      = require('through2');
 
 // Add debounce to gulp watch for FTP
 (function ftp_debounce_fix(){
@@ -48,7 +45,7 @@ var projectname 	= "mivart",
       
       timeout = setTimeout( Array.isArray(_fn) ? function(){
         _this.start.call(_this, _fn);
-      } : _fn, 150 );
+      } : _fn, 2000 );
       
     };
     
@@ -56,6 +53,7 @@ var projectname 	= "mivart",
   };
   
 })();
+
 
 //Put all css tasks here
 gulp.task('css', function() {
@@ -66,30 +64,25 @@ gulp.task('css', function() {
             cascade: true,
         }))
         //.pipe(sourcemaps.init())
-    	.pipe(minifyCss())
+    	//.pipe(minifyCss())
     	//.pipe(sourcemaps.write())
         .pipe(gulp.dest(styles_path))
-        //.pipe(livereload({ start: true }));
 });
 
 //Put all javascript tasks here
-gulp.task('js', function() { 
-	return gulp.src(es2015_path)
-        .pipe(babel({
-            presets: ['es2015']
+gulp.task('js', function () {
+    return gulp.src(es2015_path)
+        .pipe(through2.obj(function (file, enc, next) {
+            browserify(file.path)
+                .transform(babelify, {presets: ['es2015']})
+                .bundle(function (err, res) {
+                    if (err) { return next(err); }
+                    file.contents = res;
+                    next(null, file);
+                })
         }))
-        //.pipe(concat('application.js'))
-        //.pipe(sourcemaps.write('.'))
-        .pipe(uglify())
+        //.pipe(uglify())
         .pipe(gulp.dest(scripts_path));
-        //.pipe(livereload({ start: true }));
-});
-
-//embed livereload
-gulp.task('embedlr',  function() { 
-	gulp.src(template_path + 'header.php')
-    .pipe(embedlr())
-    .pipe(gulp.dest(template_path));
 });
 
 
@@ -100,4 +93,4 @@ gulp.task('default', ['css', 'js'] , function() {
 	gulp.watch(es2015_path, ['js']);
 });
 
-gulp.task('build', ['css', 'js']);
+

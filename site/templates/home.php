@@ -8,12 +8,19 @@
 	<body>
 		
 		<div id="lineSprites">
-		  <div id="silk">
-		    <div id="silkTrigger"></div>
-		  </div>
-		  <div id="silk1">
-		    <div id="silk1Trigger"></div>
-		  </div>
+
+		  	<div id="silk">
+		    	<div id="silkTrigger"></div>
+		  	</div>
+
+			<div id="silk1">
+				<div id="silk1Trigger"></div>
+			</div>
+		
+			 <div id="sheet">
+		  		<div id="sheetContents"></div>
+		  	</div>
+		 
 		</div>
 
 		<div id="infoLeft" class="info">

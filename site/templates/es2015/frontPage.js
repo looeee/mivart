@@ -3,31 +3,34 @@
 		wlAnimSpeed: 4,
 		windSpeed: 0.8,
 	}
+	
 	const WW = $(window).outerWidth(true);
 	const WH = $(window).outerHeight(true);
 	const $window = $(window);
-	const $body = $('body');
+	const $body = $("body");
 	const $document = $(document);
 
-	const $infoLeft = $("#infoLeft");
-	const $infoRight = $("#infoRight");
-	const $infoBottom = $("#infoBottom");
-	const $infoLeftText = $("#infoLeftText");
-	const $infoRightText = $("#infoRightText");
-	const $infoBottomText = $("#infoBottomText");
+	const infoLeftText = document.getElementById("infoLeftText");
+	const infoRightText = document.getElementById("infoRightText");
+	const infoBottomText = document.getElementById("infoBottomText");
+	
+
+	const sheetContents =document.getElementById("sheetContents");
 	
 	//prevent touch scrolling
 	document.body.addEventListener('touchmove', (e) => { e.preventDefault(); });
 
-	//refresh page on browser resize
-	 $window.resize( () => {
+	//refresh page on browser resize (Breaks fullscreen video)
+	/*
+	window.onresize = () => {
 		if (window.RT) { clearTimeout(window.RT); }
 
 		window.RT = setTimeout( () => {
 			window.location.href = window.location.href;
-			location.reload(false);/* false to get page from cache */
+			location.reload(false); // false to get page from cache 
 		}, 180);
-	});
+	}
+	*/
   
 	// * ***********************************************************************
 	// *
@@ -47,6 +50,10 @@
 	let randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
 	let randomFloat = (min, max) => Math.random() * (max - min) + min;
+
+	let animateOpacity = (elem, speed, opacity) => {
+		TweenLite.to(elem, speed, {opacity: opacity});
+	}
 
 	// * ***********************************************************************
 	// *
@@ -96,7 +103,7 @@
 
 			this.lineElem = $('#'+lineElem);
 
-			this.lineElem.hide();
+			this.lineElem.css({opacity: 0})
 
 			this.p1 = {
 				x: xPercentToPx(p1.x),
@@ -124,8 +131,9 @@
 			});
 
 			//any calculations that need to be done after the images have loaded go here
-			$window.load( ()=> { 
-				this.lineElem.fadeIn();
+			window.addEventListener("load", ()=> { 
+				let fadeSpeed = randomFloat(0.2,0.4);
+				animateOpacity("#line", fadeSpeed,1);
 			});
 		}
 
@@ -165,6 +173,18 @@
 
 			this.performanceTL = new TimelineMax(options);
 			this.performanceTL.add("middle", config.wlAnimSpeed/2);
+
+			this.sheetTL = new TimelineMax(options);
+			this.sheetTL.add("middle", config.wlAnimSpeed/2);
+
+			this.timelines = [
+				this.centreTL, 
+				this.booksTL, 
+				this.clothingTL, 
+				this.craftsTL, 
+				this.performanceTL, 
+				this.sheetTL
+			]
 		}
 
 		onComplete(){
@@ -194,6 +214,9 @@
 
 	  		//set the the timeline for this
 	  		switch( sprite.group ) {
+	  			case "Sheet":
+	  		       	this.sheetTL.add(tween, 0);
+	  		        break;
 	  		    case "Books":
 	  		       	this.booksTL.add(tween, 0);
 	  		        break;
@@ -210,6 +233,26 @@
 	  		        this.centreTL.add(tween, 0);
 	  		}
 	  	}
+
+	  	bringSheetOnscreen(){
+			for(let timeline of this.timelines){
+				let progress = timeline.progress();
+				if( progress != 1 && progress != 0){
+					timeline.play();
+				}
+			}
+			this.sheetTL.tweenTo("middle");
+		}
+
+		home(){
+			for(let timeline of this.timelines){
+				let progress = timeline.progress();
+				if( progress != 1 && progress != 0){
+					timeline.play();
+				}
+			}
+			this.centreTL.progress(0).tweenTo("middle");	
+		}
 	}
 
 	let lineTimelines = new WashingLineTimelines();
@@ -237,7 +280,7 @@
 			this.gusts();
 
 			//any calculations that need to be done after the images have loaded go here
-			$window.load( ()=> { 
+			window.addEventListener("load", ()=> { 
 				
 			});
 		}
@@ -248,7 +291,7 @@
 			if(this.gustsTimer){
 				clearTimeout( this.gustsTimer )
 			}
-			//otherwise choose an direction at random
+			//otherwise choose a direction at random
 			let frame = ( randomInt( 0, 1 ) ) ? 1 : 5; 
 			this.gustsTimer = setTimeout(() => {
 				this.tweenTo( frame );
@@ -276,7 +319,6 @@
     
     	tweenTo( frameNum ){
       		this.timeline.tweenTo("frame" + frameNum);
-      		console.log(frameNum);
     	}
 	}
 
@@ -331,14 +373,12 @@
 					spec.parentDiv.append("<div id='" + spec.name + "'></div>");
 				}
 			}
-			//set variables:
+
 			this.spriteElem = $("#" + spec.name);
 			this.name = spec.name;
 
-			//set the dimensions
 			this.setDims(spec);
 
-			//set the background image
 			this.setBackground();
 		}
 
@@ -421,7 +461,7 @@
 
 		setPosition(spec){
 			if(!spec.type){ spec.type = "absolute"; }
-			this.spriteElem.hide(); //hide the sprite until the image has loaded
+			animateOpacity("#" + this.name, 0, 0); //hide the sprite until the image has loaded
 
 			this.spriteElem.css({
 				position: spec.type
@@ -445,12 +485,6 @@
 					bottom: yPercentToPx(spec.yPos) + "px"
 				});
 			}
-
-			//fade in the sprite after everything has loaded
-			 $window.load( ()=> { 
-				let fadeSpeed = randomInt(300,800);
-				this.spriteElem.fadeIn(fadeSpeed); 
-			});
 		}
 	}
 
@@ -488,7 +522,6 @@
 	    	this.progressMin = spec.progressMin || 0.26;
 	    	this.progressMax = spec.progressMax || 0.72;
 
-	    	//set the the timeline for this
 	    	switch( this.group ) {
 	    	    case "Books":
 	    	       	this.timeline = lineTimelines.booksTL;
@@ -502,12 +535,19 @@
 	    	    case "Performance":
 	    	        this.timeline = lineTimelines.performanceTL;
 	    	        break;
+	    	    case "Sheet":
+	    	        this.timeline = lineTimelines.sheetTL;
+	    	        break;
 	    	    default:
 	    	        this.timeline = lineTimelines.centreTL;
 	    	}
+	    	
 
 	    	//set the the timeline for the next group of sprites
 	    	switch( this.nextGroup ) {
+	    		case "Sheet":
+	    	       	this.nextTimeline = lineTimelines.sheetTL;
+	    	        break;
 	    	    case "Books":
 	    	       	this.nextTimeline = lineTimelines.booksTL;
 	    	        break;
@@ -525,14 +565,14 @@
 	    	}
 
 	    	//hide the sprite until it has been positioned
-	    	this.spriteElem.hide();
+	    	animateOpacity("#" + this.name, 0, 0);
 
 			wind.addTween( this );
 
 			this.makeDraggable();
 	    	
 	    	//any calculations that need to be done after the image has loaded go here
-			$window.load( ()=> { 
+			window.addEventListener("load", ()=> { 
 				this.width = this.spriteElem.width();
 				this.setPosition(spec);
 				lineTimelines.addTween( this );
@@ -573,8 +613,9 @@
 			});
 				
 			//now that the sprite has been positioned show it
-			let fadeSpeed = randomInt(300,800);
-			this.spriteElem.fadeIn(fadeSpeed);
+			let fadeSpeed = randomInt(0.2,0.4);
+			animateOpacity("#" + this.name, fadeSpeed , 1);
+
 			this.xPos = point.x;
 			this.yPos = point.y;
 	  	}
@@ -582,7 +623,6 @@
 	  	//note: "this" refers to the draggable event here, pass sprites "this" as "sprite"
 	  	onDrag( sprite ){
 			return function(){
-				
 				let change = sprite.xPos - this.pointerX;
   
 				sprite.direction = this.pointerX 
@@ -609,23 +649,22 @@
 
 				//set the progress of the washing line as we drag the sprite
 				let progress = (change > 0 ) 
-								? 0.5 + ( change/sprite.xPos/2 ) * sprite.xPos/WW
-								: 0.5 + ( change/(WW-sprite.xPos)/2 ) * ( 1 - sprite.xPos/WW );
-				
+								? 0.5 + ( change/this.pointerX/2 ) * this.pointerX/WW
+								: 0.5 + ( change/(WW-this.pointerX)/2 ) * ( 1 - this.pointerX/WW );
 				sprite.timeline.progress( progress ); 	
 
 				//show the next page divs if dragged far enough
 				if(sprite.timeline.progress() > sprite.progressMax){
-					$infoLeftText.html(sprite.nextGroup);
-					$infoLeft.fadeIn();
+					infoLeftText.innerHTML = sprite.nextGroup;
+					animateOpacity("#infoLeft", 0.2, 1);
 				}
 				else if( sprite.timeline.progress() < sprite.progressMin ){
-					$infoRightText.html(sprite.nextGroup);
-					$infoRight.fadeIn();
+					infoRightText.innerHTML = sprite.nextGroup;
+					animateOpacity("#infoRight", 0.2, 1);
 				}
 				else{
-					$infoLeft.fadeOut();
-					$infoRight.fadeOut();
+					animateOpacity("#infoLeft", 0.2, 0);
+					animateOpacity("#infoRight", 0.2, 0);
 				}
 			}
 		}
@@ -651,7 +690,7 @@
 					sprite.timeline.play();
 					//set the next group to the start of its timeline then play to the middle
 					sprite.nextTimeline.progress(0).tweenTo("middle");
-					$infoLeft.fadeOut();
+					animateOpacity("#infoLeft", 0.2, 0);
 					sprite.animateSecondary();
 				}
 				else if( sprite.timeline.progress() < sprite.progressMin ){
@@ -659,7 +698,7 @@
 					sprite.timeline.reverse();
 					//set the next group to the end of its timeline then reverse to the middle
 					sprite.nextTimeline.progress(1).tweenTo("middle");
-					$infoRight.fadeOut();
+					animateOpacity("#infoRight", 0.2, 0);
 					sprite.animateSecondary();
 				}
 				else{
@@ -721,6 +760,12 @@
 			this.shadow(spec.shadowImg);
 
 			this.rotated = false;
+
+			//fade in the sprite after everything has loaded
+			window.addEventListener("load", ()=> { 
+				let fadeSpeed = randomFloat(0.2,0.4);
+				animateOpacity("#" + this.name, fadeSpeed, 1);
+			});
 		}
 
 		shadow(shadowImg){
@@ -730,7 +775,7 @@
 
 			this.shadow = $("#" + this.name + "-shadow");
 			this.shadow.addClass("shadow");
-			this.shadow.hide();
+			animateOpacity("#" + this.name +"-shadow", 0, 0);
 
 			$document.on("mousemove", (e) => {
 				let pageXPercent = (e.pageX * 100)/WW;
@@ -751,7 +796,7 @@
 
 			this.shadowYOffset = -100 + this.shadowYOffset;
 
-			$window.load( () => { 
+			window.addEventListener("load", () => { 
 				let width = parseFloat(this.spriteElem.css("width"));
 				//slightly more accurate calculation of spriteMid now that we know the width
 				spriteMid = (parseFloat(this.spriteElem.css("left")) + width/2)/WW*100;
@@ -765,8 +810,8 @@
 					transform: "skew(25deg)",
 				});
 
-				let fadeSpeed = randomInt(300,800);
-				this.shadow.fadeIn(fadeSpeed); 
+				let fadeSpeed = randomFloat(0.2,0,4);
+				animateOpacity("#" + this.name +"-shadow", fadeSpeed, 0.7); 
 			});
 		}
 	}
@@ -955,8 +1000,15 @@
 			spec.xType = "left";
 			spec.yType = "bottom";
 			spec.parentDiv = 'clouds';
+
 			$('#clouds').css({width: '100%'})
 			super(spec);
+
+			//fade in the sprite after everything has loaded
+			window.addEventListener("load", ()=> { 
+				let fadeSpeed = randomFloat(0.2,0.4);
+				animateOpacity("#" + this.name, fadeSpeed, 0.7);
+			});
 
 			this.setPosition(spec);
 
@@ -1011,6 +1063,12 @@
 			this.setPosition(spec);
 			this.clipPath();
 			this.animate();
+
+			//fade in the sprite after everything has loaded
+			window.addEventListener("load", ()=> { 
+				let fadeSpeed = randomFloat(0.2,0.4);
+				animateOpacity("#" + this.name, fadeSpeed, 1);
+			});
 		}
 
 		clipPath(){
@@ -1178,6 +1236,31 @@
 		trigger: "silkTrigger",
 	}, silkSpec));
 
+
+	// *********************************************************************
+	// * SHEET SPRITE USED TO DISPLY INFORMATION
+	// *********************************************************************
+	
+	let sheet = new LineSprite({
+		name: "sheet",
+		imageURL: imagesUrl + "sheet.png",
+		group: "Sheet",
+		offset: 1,
+		xPos: 20,
+		progressMin: 0.37,
+		progressMax: 0.6,
+		rotate: true,
+		frames: 1,
+		maxH: 70, 
+		maxW: 90, 
+		minH: 50, 
+		minW: 25,
+	});
+
+	$("#sheetContents").css({ 
+		transform: 'rotate(-' + washingLine.slopeDegrees + 'deg)',
+	});
+
 	// *********************************************************************
 	// *SPRITES THAT ANIMATE ONTO SCREEN (FROM LEFT) AFTER CLICKING BOOK
 	// *********************************************************************
@@ -1247,7 +1330,6 @@
 		xPos: 70,
 	}, gourdSpec));
 
-
 	// *********************************************************************
 	// *SPRITE THAT ANIMATEs ONTO SCREEN (FROM LEFT) AFTER CLICKING SILK
 	// *********************************************************************
@@ -1258,6 +1340,20 @@
 		group: "Performance",
 		trigger: "silk1Trigger",
 	}, silkSpec));
+
+	silk1.spriteElem.click( () => { 
+		let videoString = '<iframe width="';
+		videoString += '100%';
+		videoString += '" height="';
+		videoString += '100%';
+		videoString += '" src="https://www.youtube.com/embed/vYJpy7jMAAU'
+		videoString += '?wmode=opaque?rel=0?autoplay=1&html5=1"';
+		videoString += ' frameborder="0" allowfullscreen></iframe>'
+
+		sheetContents.innerHTML = videoString;
+		lineTimelines.bringSheetOnscreen();
+	});
+
 
 	let poi = new LineSprite({
 		frames: 7,
@@ -1280,6 +1376,16 @@
 	// *
 	// *
 	// * ***********************************************************************
+	
+	//when the mouse hovers over display info
+	let linksHover = function(text){
+		infoBottomText.innerHTML = text;
+		animateOpacity("#infoBottom", 0.2, 1);
+	}
+	//when the hover ends hide info
+	let linksHoverEnd = () => {
+		animateOpacity("#infoBottom", 0.2, 0);
+	}
 
 	let bucket = new shadowSprite({
 		parentDiv: 'plankSprites',
@@ -1298,15 +1404,12 @@
 		shadowWidth: 100, 
 	});
 	bucket.spriteElem.hover(
-		() => { //on hover
-			$infoBottomText.html("Home");
-			$infoBottom.stop().fadeIn();
-		},
-		() => { //on hover end
-			$infoBottom.stop().fadeOut();
-		}
+		() => { linksHover("Home"); },
+		() => { linksHoverEnd(); }
 	);
-
+	bucket.spriteElem.click( () => { 
+		lineTimelines.home();
+	});
 
 	let brushholder = new shadowSprite({
 		parentDiv: 'plankSprites',
@@ -1325,14 +1428,13 @@
 		shadowWidth: 100, 
 	});
 	brushholder.spriteElem.hover(
-		() => { //on hover
-			$infoBottomText.html("Biography");
-			$infoBottom.stop().fadeIn();
-		},
-		() => { //on hover end
-			$infoBottom.stop().fadeOut();
-		}
+		() => { linksHover("Biography"); },
+		() => { linksHoverEnd(); }
 	);
+	brushholder.spriteElem.click( () => { 
+		lineTimelines.bringSheetOnscreen();
+		sheetContents.innerHTML = "Biography";
+	});
 
 	let inkwell = new shadowSprite({
 		parentDiv: 'plankSprites',
@@ -1351,14 +1453,13 @@
 		shadowWidth: 65, 
 	});
 	inkwell.spriteElem.hover(
-		() => { //on hover
-			$infoBottomText.html("Contact");
-			$infoBottom.stop().fadeIn();
-		},
-		() => { //on hover end
-			$infoBottom.stop().fadeOut();
-		}
+		() => { linksHover("Contact"); },
+		() => { linksHoverEnd(); }
 	);
+	inkwell.spriteElem.click( () => { 
+		lineTimelines.bringSheetOnscreen();
+		sheetContents.innerHTML = "Contact";
+	});
 
 	let goose = new Goose({
 		name: "goose",
@@ -1454,7 +1555,7 @@
 	// *   FINAL SETUP
 	// *
 	// *************************************************************************
-	$window.load( ()=> { 
+	window.addEventListener("load", ()=> { 
 		lineTimelines.centreTL.progress( 0.5 ); //.tweenTo( "middle" );
 		wind.timeline.progress( 0.5 );
 

@@ -1,1 +1,140 @@
-.info,.infoText,body{position:absolute}#background,body{top:0;left:0;width:100%;height:100%}body{margin:0;overflow:hidden;z-index:-9999}.avoidClicks{pointer-events:none}.info{background-color:red;display:none;z-index:9999}#infoLeft{width:7%;height:100%;left:0;background:linear-gradient(to right,rgba(0,0,0,.75) 0,rgba(255,255,255,.75) 100%);border-right:solid 1px #000}#infoRight{width:7%;height:100%;right:0;background:linear-gradient(to left,rgba(0,0,0,.75) 0,rgba(255,255,255,.75) 100%);border-left:solid 1px #000}#infoBottom{width:100%;height:7%;bottom:0;background:linear-gradient(to top,rgba(0,0,0,.75) 0,rgba(255,255,255,.75) 100%);border-top:solid 1px #000}#infoLeftText{top:50%;left:0;-webkit-transform:rotate(90deg);-ms-transform:rotate(90deg);transform:rotate(90deg)}#infoRightText{right:0;top:50%;height:100%;-webkit-transform:rotate(-90deg);-ms-transform:rotate(-90deg);transform:rotate(-90deg);-webkit-transform-origin:left top 0;-ms-transform-origin:left top 0;transform-origin:left top 0;text-align:center}#infoBottomText{width:100%;margin-top:2%;text-align:center}#silk,#silk1{z-index:1}#silk1Trigger,#silkTrigger{position:relative;display:block;margin-left:31%;margin-top:2%;height:95%;width:25%}#gourd,#gourd1{z-index:2;-ms-transform-origin:60% 8px;-webkit-transform-origin:60% 8px;transform-origin:60% 8px}#clouds>div{z-index:-100;-webkit-filter:opacity(90%) blur(.8px);filter:blur(.8px);opacity:.75}#boatWrapper{-webkit-clip-path:url(#boatClip);clip-path:url(#boatClip)}#boat{-webkit-transform-origin:50% 100%;-ms-transform-origin:50% 100%;transform-origin:50% 100%;z-index:-10}#staff{-webkit-transform-origin:50% 50%;-ms-transform-origin:50% 50%;transform-origin:50% 50%}.shadow{position:relative;z-index:-1;-webkit-filter:blur(1px);filter:blur(1px);opacity:.7;-ms-transform-origin:50% 0;-webkit-transform-origin:50% 0;transform-origin:50% 0}#background{z-index:-1000;position:absolute;background:url(/mivart/site/templates/images/frontPage/background.jpg) 0 no-repeat fixed;background-size:100% 100%}
+body {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  z-index: -9999; }
+
+.avoidClicks {
+  pointer-events: none; }
+
+.info {
+  position: absolute;
+  background-color: red;
+  opacity: 0;
+  z-index: 9999; }
+
+#infoLeft {
+  width: 7%;
+  height: 100%;
+  left: 0;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.75) 0%, rgba(255, 255, 255, 0.75) 100%);
+  border-right: solid 1px black; }
+
+#infoRight {
+  width: 7%;
+  height: 100%;
+  right: 0;
+  background: linear-gradient(to left, rgba(0, 0, 0, 0.75) 0%, rgba(255, 255, 255, 0.75) 100%);
+  border-left: solid 1px black; }
+
+#infoBottom {
+  width: 100%;
+  height: 7%;
+  bottom: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, rgba(255, 255, 255, 0.75) 100%);
+  border-top: solid 1px black; }
+
+.infoText {
+  position: absolute; }
+
+#infoLeftText {
+  top: 50%;
+  left: 0;
+  -webkit-transform: rotate(90deg);
+      -ms-transform: rotate(90deg);
+          transform: rotate(90deg); }
+
+#infoRightText {
+  right: 0;
+  top: 50%;
+  height: 100%;
+  -webkit-transform: rotate(-90deg);
+      -ms-transform: rotate(-90deg);
+          transform: rotate(-90deg);
+  -webkit-transform-origin: left top 0;
+      -ms-transform-origin: left top 0;
+          transform-origin: left top 0;
+  text-align: center; }
+
+#infoBottomText {
+  width: 100%;
+  margin-top: 2%;
+  text-align: center; }
+
+#silk, #silk1 {
+  z-index: 1; }
+
+#silkTrigger, #silk1Trigger {
+  position: relative;
+  display: block;
+  margin-left: 31%;
+  margin-top: 2%;
+  height: 95%;
+  width: 25%; }
+
+#gourd, #gourd1 {
+  z-index: 2;
+  -ms-transform-origin: 60% 8px;
+  /* IE 9 */
+  -webkit-transform-origin: 60% 8px;
+  /* Chrome, Safari, Opera */
+  transform-origin: 60% 8px; }
+
+#sheet {
+  z-index: 1; }
+
+#sheetContents {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 80%;
+  height: 65%;
+  margin-left: 10%;
+  margin-top: 10%; }
+
+#clouds > div {
+  z-index: -100;
+  -webkit-filter: opacity(90%) blur(0.8px);
+  filter: blur(0.8px);
+  opacity: 0.75; }
+
+#boatWrapper {
+  -webkit-clip-path: url(#boatClip);
+  clip-path: url(#boatClip); }
+
+#boat {
+  -webkit-transform-origin: 50% 100%;
+      -ms-transform-origin: 50% 100%;
+          transform-origin: 50% 100%;
+  z-index: -10; }
+
+#staff {
+  -webkit-transform-origin: 50% 50%;
+      -ms-transform-origin: 50% 50%;
+          transform-origin: 50% 50%; }
+
+.shadow {
+  position: relative;
+  z-index: -1;
+  -webkit-filter: blur(1px);
+  filter: blur(1px);
+  opacity: 0.70;
+  -ms-transform-origin: 50% 0;
+  /* IE 9 */
+  -webkit-transform-origin: 50% 0;
+  /* Chrome, Safari, Opera */
+  transform-origin: 50% 0; }
+
+#background {
+  z-index: -1000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("/mivart/site/templates/images/frontPage/background.jpg") 0 no-repeat fixed;
+  background-size: 100% 100%; }
