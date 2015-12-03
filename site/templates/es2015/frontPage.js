@@ -3,7 +3,7 @@
 		wlAnimSpeed: 4,
 		windSpeed: 0.8,
 	}
-	
+
 	const WW = $(window).outerWidth(true);
 	const WH = $(window).outerHeight(true);
 	const $window = $(window);
@@ -12,9 +12,10 @@
 
 	const infoLeftText = document.getElementById("infoLeftText");
 	const infoRightText = document.getElementById("infoRightText");
-	const infoBottomText = document.getElementById("infoBottomText");
+	const padInfo = $("#padInfo");
 
 	//sheet info elements
+	const sheetContent = $("#sheetContents");
 	const craftsGallery = $("#craftsGallery");
 	const clothingGallery = $("#clothingGallery");
 	const performanceGallery = $("#performanceGallery");
@@ -24,6 +25,7 @@
 	const book4Gallery = $("#book4Gallery");
 	const biography = $("#biography");
 	const contact = $("#contact");
+	const silksVideo = $("#silksVideo");
 	
 	//prevent touch scrolling
 	document.body.addEventListener('touchmove', (e) => { e.preventDefault(); });
@@ -537,7 +539,7 @@
 	    	this.frames = spec.frames;
 	    	this.trigger = spec.trigger || spec.name; //allow setting of a different element as trigger
 	    	this.group = spec.group;
-	    	this.nextGroup = spec.nextGroup || "Back";
+	    	this.nextGroup = spec.nextGroup || "Sheet";
 	    	this.progressMin = spec.progressMin || 0.26;
 	    	this.progressMax = spec.progressMax || 0.72;
 
@@ -560,7 +562,6 @@
 	    	    default:
 	    	        this.timeline = lineTimelines.centreTL;
 	    	}
-	    	
 
 	    	//set the the timeline for the next group of sprites
 	    	switch( this.nextGroup ) {
@@ -579,8 +580,9 @@
 	    	    case "Performance":
 	    	        this.nextTimeline = lineTimelines.performanceTL;
 	    	        break;
-	    	    default:
+	    	    case "Home":
 	    	        this.nextTimeline = lineTimelines.centreTL;
+	    	       	break;
 	    	}
 
 	    	//hide the sprite until it has been positioned
@@ -637,6 +639,39 @@
 
 			this.xPos = point.x;
 			this.yPos = point.y;
+	  	}
+
+	  	//Display information on the sheet
+	  	sheetContents(){
+	    	switch( this.name ) {
+	    		case "book1":
+	    			book1Gallery.show();
+	    	        break;
+	    	    case "book2":
+	    			book2Gallery.show();
+	    	        break;
+	    	    case "book3":
+	    			book3Gallery.show();
+	    	        break;
+	    	    case "book4":
+	    			book4Gallery.show();
+	    	        break;
+	    	    case "gourd1":
+	    			craftsGallery.show();
+	    	        break;
+	    	    case "poi":
+	    			performanceGallery.show();
+	    	        break;
+	    	    case "silks1":
+	    			silksVideo.show();
+	    	        break;
+	    	    case "dress":
+	    			clothingGallery.show();
+	    	        break;
+	    	    case "scarf":
+	    			clothingGallery.show();
+	    	        break;
+	    	}
 	  	}
 	  	
 	  	//note: "this" refers to the draggable event here, pass sprites "this" as "sprite"
@@ -705,6 +740,8 @@
 				clearTimeout(sprite.timer);
 
 				if(sprite.timeline.progress() > sprite.progressMax){
+					//show the sheet contents for this sprite
+					sprite.sheetContents();
 					//moving left
 					sprite.timeline.play();
 					//set the next group to the start of its timeline then play to the middle
@@ -713,6 +750,8 @@
 					sprite.animateSecondary();
 				}
 				else if( sprite.timeline.progress() < sprite.progressMin ){
+					//show the sheet contents for this sprite
+					sprite.sheetContents();
 					//moving right
 					sprite.timeline.reverse();
 					//set the next group to the end of its timeline then reverse to the middle
@@ -1264,6 +1303,7 @@
 		name: "sheet",
 		imageURL: imagesUrl + "sheet.png",
 		group: "Sheet",
+		nextGroup: "Home",
 		offset: 1,
 		xPos: 20,
 		progressMin: 0.37,
@@ -1290,10 +1330,6 @@
 		progressMin: 0.22,
 		progressMax: 0.64,
 	}, bookSpec));
-	book1.spriteElem.click( () => {
-		book1Gallery.show();
-		lineTimelines.bringSheetOnscreen();
-	});
 
 	let book2 = new LineSprite(_.extend({
 		name: "book2",
@@ -1302,10 +1338,6 @@
 		progressMin: 0.30,
 		progressMax: 0.70,
 	}, bookSpec));
-	book2.spriteElem.click( () => {
-		book2Gallery.show();
-		lineTimelines.bringSheetOnscreen();
-	});
 
 	let book3 = new LineSprite(_.extend({
 		name: "book3",
@@ -1314,10 +1346,6 @@
 		progressMin: 0.36,
 		progressMax: 0.79,
 	}, bookSpec));
-	book3.spriteElem.click( () => {
-		book3Gallery.show();
-		lineTimelines.bringSheetOnscreen();
-	});
 
 	let book4 = new LineSprite(_.extend({
 		name: "book4",
@@ -1326,10 +1354,6 @@
 		progressMin: 0.45,
 		progressMax: 0.86,
 	}, bookSpec));
-	book4.spriteElem.click( () => {
-		book4Gallery.show();
-		lineTimelines.bringSheetOnscreen();
-	});
 
 	// *********************************************************************
 	// *SPRITES THAT ANIMATE ONTO SCREEN (FROM RIGHT) AFTER CLICKING TSHIRT
@@ -1344,10 +1368,6 @@
 		progressMin: 0.28,
 		progressMax: 0.70,
 	}, clothingSpec));
-	dress.spriteElem.click( () => {
-		clothingGallery.show();
-		lineTimelines.bringSheetOnscreen();
-	});
 
 	let scarf = new LineSprite(_.extend({
 		name: "scarf",
@@ -1358,10 +1378,6 @@
 		progressMin: 0.34,
 		progressMax: 0.78,
 	}, clothingSpec));
-	scarf.spriteElem.click( () => {
-		clothingGallery.show();
-		lineTimelines.bringSheetOnscreen();
-	});
 
 	// *********************************************************************
 	// *SPRITE THAT ANIMATEs ONTO SCREEN (FROM LEFT) AFTER CLICKING GOURD
@@ -1373,10 +1389,6 @@
 		xPos: 70,
 	}, gourdSpec));
 
-	gourd1.spriteElem.click( () => {
-		craftsGallery.show();
-		lineTimelines.bringSheetOnscreen();
-	});
 	// *********************************************************************
 	// *SPRITE THAT ANIMATEs ONTO SCREEN (FROM LEFT) AFTER CLICKING SILK
 	// *********************************************************************
@@ -1387,20 +1399,6 @@
 		group: "Performance",
 		trigger: "silk1Trigger",
 	}, silkSpec));
-
-	silk1.spriteElem.click( () => { 
-		let videoString = '<iframe width="';
-		videoString += '100%';
-		videoString += '" height="';
-		videoString += '100%';
-		videoString += '" src="https://www.youtube.com/embed/vYJpy7jMAAU'
-		videoString += '?wmode=opaque?rel=0?autoplay=1&html5=1"';
-		videoString += ' frameborder="0" allowfullscreen></iframe>'
-
-		sheetContents.innerHTML = videoString;
-		lineTimelines.bringSheetOnscreen();
-	});
-
 
 	let poi = new LineSprite({
 		frames: 7,
@@ -1416,10 +1414,6 @@
 		progressMin: 0.36,
 		progressMax: 0.75,
 	});
-	poi.spriteElem.click( () => {
-		poiGallery.show();
-		lineTimelines.bringSheetOnscreen();
-	});
 
 	// * ***********************************************************************
 	// *
@@ -1430,12 +1424,12 @@
 	
 	//when the mouse hovers over display info
 	let linksHover = function(text){
-		infoBottomText.innerHTML = text;
-		animateOpacity("#infoBottom", 0.2, 1);
+		padInfo.html(text);
+		animateOpacity("#padInfo", 0.2, 1);
 	}
 	//when the hover ends hide info
 	let linksHoverEnd = () => {
-		animateOpacity("#infoBottom", 0.2, 0);
+		animateOpacity("#padInfo", 0.2, 0);
 	}
 
 	let bucket = new shadowSprite({
@@ -1530,6 +1524,23 @@
 			lineTimelines.bringSheetOnscreen();
 			contact.show();
 		}
+	});
+
+	let pad = new shadowSprite({
+		parentDiv: 'plankSprites',
+		name: "pad",
+		imageURL: imagesUrl + "pad.png",
+		maxH: 18, 
+		maxW: 18, 
+		minH: 16, 
+		minW: 16, 
+		xPos: 27,
+		yPos: 5,
+		yType: "bottom",
+		//shadowImg: imagesUrl + "inkwell-shadow.png",
+		shadowYOffset: 5, 
+		shadowXOffset: 10, 
+		shadowWidth: 65, 
 	});
 
 	let goose = new Goose({

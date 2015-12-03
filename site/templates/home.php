@@ -31,6 +31,7 @@
 			 		sheetGallery('performance', $pages);
 			 		biography($pages);
 			 		contact($pages);
+			 		silksVideo();
 				?> 
 		  	</div>
 		 
@@ -44,14 +45,15 @@
 		  <div id="infoRightText" class="infoText">Books</div>
 		</div>
 
-		<div id="infoBottom" class="info">
-		  <div id="infoBottomText" class="infoText">Home</div>
-		</div>
-
-
 		<div id="clouds"></div>
 
-		<div id="plankSprites"></div>
+		<div id="plankSprites">
+			<div id="pad">
+				<div id="padInfo">
+					Home
+				</div>
+			</div>
+		</div>
 
 		<div id="boatWrapper"></div>
 

@@ -23,9 +23,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 	var infoLeftText = document.getElementById("infoLeftText");
 	var infoRightText = document.getElementById("infoRightText");
-	var infoBottomText = document.getElementById("infoBottomText");
+	var padInfo = $("#padInfo");
 
 	//sheet info elements
+	var sheetContent = $("#sheetContents");
 	var craftsGallery = $("#craftsGallery");
 	var clothingGallery = $("#clothingGallery");
 	var performanceGallery = $("#performanceGallery");
@@ -35,6 +36,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	var book4Gallery = $("#book4Gallery");
 	var biography = $("#biography");
 	var contact = $("#contact");
+	var silksVideo = $("#silksVideo");
 
 	//prevent touch scrolling
 	document.body.addEventListener('touchmove', function (e) {
@@ -657,7 +659,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			_this3.frames = spec.frames;
 			_this3.trigger = spec.trigger || spec.name; //allow setting of a different element as trigger
 			_this3.group = spec.group;
-			_this3.nextGroup = spec.nextGroup || "Back";
+			_this3.nextGroup = spec.nextGroup || "Sheet";
 			_this3.progressMin = spec.progressMin || 0.26;
 			_this3.progressMax = spec.progressMax || 0.72;
 
@@ -698,8 +700,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				case "Performance":
 					_this3.nextTimeline = lineTimelines.performanceTL;
 					break;
-				default:
+				case "Home":
 					_this3.nextTimeline = lineTimelines.centreTL;
+					break;
 			}
 
 			//hide the sprite until it has been positioned
@@ -759,6 +762,42 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 				this.xPos = point.x;
 				this.yPos = point.y;
+			}
+
+			//Display information on the sheet
+
+		}, {
+			key: "sheetContents",
+			value: function sheetContents() {
+				switch (this.name) {
+					case "book1":
+						book1Gallery.show();
+						break;
+					case "book2":
+						book2Gallery.show();
+						break;
+					case "book3":
+						book3Gallery.show();
+						break;
+					case "book4":
+						book4Gallery.show();
+						break;
+					case "gourd1":
+						craftsGallery.show();
+						break;
+					case "poi":
+						performanceGallery.show();
+						break;
+					case "silks1":
+						silksVideo.show();
+						break;
+					case "dress":
+						clothingGallery.show();
+						break;
+					case "scarf":
+						clothingGallery.show();
+						break;
+				}
 			}
 
 			//note: "this" refers to the draggable event here, pass sprites "this" as "sprite"
@@ -828,6 +867,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					clearTimeout(sprite.timer);
 
 					if (sprite.timeline.progress() > sprite.progressMax) {
+						//show the sheet contents for this sprite
+						sprite.sheetContents();
 						//moving left
 						sprite.timeline.play();
 						//set the next group to the start of its timeline then play to the middle
@@ -835,6 +876,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 						animateOpacity("#infoLeft", 0.2, 0);
 						sprite.animateSecondary();
 					} else if (sprite.timeline.progress() < sprite.progressMin) {
+						//show the sheet contents for this sprite
+						sprite.sheetContents();
 						//moving right
 						sprite.timeline.reverse();
 						//set the next group to the end of its timeline then reverse to the middle
@@ -1444,6 +1487,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		name: "sheet",
 		imageURL: imagesUrl + "sheet.png",
 		group: "Sheet",
+		nextGroup: "Home",
 		offset: 1,
 		xPos: 20,
 		progressMin: 0.37,
@@ -1470,10 +1514,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		progressMin: 0.22,
 		progressMax: 0.64
 	}, bookSpec));
-	book1.spriteElem.click(function () {
-		book1Gallery.show();
-		lineTimelines.bringSheetOnscreen();
-	});
 
 	var book2 = new LineSprite(_.extend({
 		name: "book2",
@@ -1482,10 +1522,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		progressMin: 0.30,
 		progressMax: 0.70
 	}, bookSpec));
-	book2.spriteElem.click(function () {
-		book2Gallery.show();
-		lineTimelines.bringSheetOnscreen();
-	});
 
 	var book3 = new LineSprite(_.extend({
 		name: "book3",
@@ -1494,10 +1530,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		progressMin: 0.36,
 		progressMax: 0.79
 	}, bookSpec));
-	book3.spriteElem.click(function () {
-		book3Gallery.show();
-		lineTimelines.bringSheetOnscreen();
-	});
 
 	var book4 = new LineSprite(_.extend({
 		name: "book4",
@@ -1506,10 +1538,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		progressMin: 0.45,
 		progressMax: 0.86
 	}, bookSpec));
-	book4.spriteElem.click(function () {
-		book4Gallery.show();
-		lineTimelines.bringSheetOnscreen();
-	});
 
 	// *********************************************************************
 	// *SPRITES THAT ANIMATE ONTO SCREEN (FROM RIGHT) AFTER CLICKING TSHIRT
@@ -1524,10 +1552,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		progressMin: 0.28,
 		progressMax: 0.70
 	}, clothingSpec));
-	dress.spriteElem.click(function () {
-		clothingGallery.show();
-		lineTimelines.bringSheetOnscreen();
-	});
 
 	var scarf = new LineSprite(_.extend({
 		name: "scarf",
@@ -1538,10 +1562,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		progressMin: 0.34,
 		progressMax: 0.78
 	}, clothingSpec));
-	scarf.spriteElem.click(function () {
-		clothingGallery.show();
-		lineTimelines.bringSheetOnscreen();
-	});
 
 	// *********************************************************************
 	// *SPRITE THAT ANIMATEs ONTO SCREEN (FROM LEFT) AFTER CLICKING GOURD
@@ -1553,10 +1573,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		xPos: 70
 	}, gourdSpec));
 
-	gourd1.spriteElem.click(function () {
-		craftsGallery.show();
-		lineTimelines.bringSheetOnscreen();
-	});
 	// *********************************************************************
 	// *SPRITE THAT ANIMATEs ONTO SCREEN (FROM LEFT) AFTER CLICKING SILK
 	// *********************************************************************
@@ -1567,19 +1583,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		group: "Performance",
 		trigger: "silk1Trigger"
 	}, silkSpec));
-
-	silk1.spriteElem.click(function () {
-		var videoString = '<iframe width="';
-		videoString += '100%';
-		videoString += '" height="';
-		videoString += '100%';
-		videoString += '" src="https://www.youtube.com/embed/vYJpy7jMAAU';
-		videoString += '?wmode=opaque?rel=0?autoplay=1&html5=1"';
-		videoString += ' frameborder="0" allowfullscreen></iframe>';
-
-		sheetContents.innerHTML = videoString;
-		lineTimelines.bringSheetOnscreen();
-	});
 
 	var poi = new LineSprite({
 		frames: 7,
@@ -1595,10 +1598,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		progressMin: 0.36,
 		progressMax: 0.75
 	});
-	poi.spriteElem.click(function () {
-		poiGallery.show();
-		lineTimelines.bringSheetOnscreen();
-	});
 
 	// * ***********************************************************************
 	// *
@@ -1609,12 +1608,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 	//when the mouse hovers over display info
 	var linksHover = function linksHover(text) {
-		infoBottomText.innerHTML = text;
-		animateOpacity("#infoBottom", 0.2, 1);
+		padInfo.html(text);
+		animateOpacity("#padInfo", 0.2, 1);
 	};
 	//when the hover ends hide info
 	var linksHoverEnd = function linksHoverEnd() {
-		animateOpacity("#infoBottom", 0.2, 0);
+		animateOpacity("#padInfo", 0.2, 0);
 	};
 
 	var bucket = new shadowSprite({
@@ -1712,6 +1711,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				lineTimelines.bringSheetOnscreen();
 				contact.show();
 			}
+	});
+
+	var pad = new shadowSprite({
+		parentDiv: 'plankSprites',
+		name: "pad",
+		imageURL: imagesUrl + "pad.png",
+		maxH: 18,
+		maxW: 18,
+		minH: 16,
+		minW: 16,
+		xPos: 27,
+		yPos: 5,
+		yType: "bottom",
+		//shadowImg: imagesUrl + "inkwell-shadow.png",
+		shadowYOffset: 5,
+		shadowXOffset: 10,
+		shadowWidth: 65
 	});
 
 	var goose = new Goose({

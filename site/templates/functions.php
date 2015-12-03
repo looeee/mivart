@@ -36,4 +36,10 @@
 		echo '<div id="email">'.$contactPage->email.'</div>';
 		echo '</div>';
 	}
+
+	function silksVideo(){
+		echo '<div id="silksVideo" class="sheetContents">';  ;
+		echo 	'<iframe width="100%" height="100%" src="https://www.youtube.com/embed/vYJpy7jMAAU?wmode=opaque?rel=0?autoplay=1&html5=1" frameborder="0" allowfullscreen></iframe>';
+		echo '</div>';
+	}
 ?>

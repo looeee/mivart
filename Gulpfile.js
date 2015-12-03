@@ -56,11 +56,18 @@ var projectname  = "mivart",
   
 })();
 
+//beep on error
+var onError = function (err) {  
+  console.log(err.toString())
+};
+
 //Put all css tasks here
 gulp.task('css', function() {
 	return gulp.src(scss_path)
-    .pipe(plumber())
-		.pipe(sass().on('error', sass.logError))
+    .pipe(plumber({
+      errorHandler: onError
+    }))
+		.pipe(sass())//.on('error', sass.logError))
 		.pipe(autoprefixer({
             browsers: ['last 3 version' , "ie 9"],
             cascade: true,
@@ -75,7 +82,9 @@ gulp.task('css', function() {
 //Put all javascript tasks here
 gulp.task('js', function () {
     return gulp.src(es2015_path)
-        .pipe(plumber())
+        .pipe(plumber({
+          errorHandler: onError
+        }))
         .pipe(through2.obj(function (file, enc, next) {
             browserify(file.path)
                 .transform(babelify, {presets: ['es2015']})
