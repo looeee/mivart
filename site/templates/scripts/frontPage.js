@@ -25,7 +25,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	var infoRightText = document.getElementById("infoRightText");
 	var infoBottomText = document.getElementById("infoBottomText");
 
-	var sheetContents = document.getElementById("sheetContents");
+	//sheet info elements
+	var craftsGallery = $("#craftsGallery");
+	var clothingGallery = $("#clothingGallery");
+	var performanceGallery = $("#performanceGallery");
+	var book1Gallery = $("#book1Gallery");
+	var book2Gallery = $("#book2Gallery");
+	var book3Gallery = $("#book3Gallery");
+	var book4Gallery = $("#book4Gallery");
+	var biography = $("#biography");
+	var contact = $("#contact");
 
 	//prevent touch scrolling
 	document.body.addEventListener('touchmove', function (e) {
@@ -211,7 +220,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			this.performanceTL = new TimelineMax(options);
 			this.performanceTL.add("middle", config.wlAnimSpeed / 2);
 
-			this.sheetTL = new TimelineMax(options);
+			this.sheetTL = new TimelineMax({
+				paused: true,
+				onComplete: this.sheetComplete,
+				onReverseComplete: this.sheetComplete,
+				onStart: this.onStart
+			});
 			this.sheetTL.add("middle", config.wlAnimSpeed / 2);
 
 			this.timelines = [this.centreTL, this.booksTL, this.clothingTL, this.craftsTL, this.performanceTL, this.sheetTL];
@@ -221,6 +235,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			key: "onComplete",
 			value: function onComplete() {
 				wind.tweenTo(3);
+			}
+		}, {
+			key: "sheetComplete",
+			value: function sheetComplete() {
+				wind.tweenTo(3);
+				var sheetDivs = $("#sheet").children("div");
+				sheetDivs.hide();
 			}
 		}, {
 			key: "onStart",
@@ -1449,6 +1470,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		progressMin: 0.22,
 		progressMax: 0.64
 	}, bookSpec));
+	book1.spriteElem.click(function () {
+		book1Gallery.show();
+		lineTimelines.bringSheetOnscreen();
+	});
 
 	var book2 = new LineSprite(_.extend({
 		name: "book2",
@@ -1457,6 +1482,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		progressMin: 0.30,
 		progressMax: 0.70
 	}, bookSpec));
+	book2.spriteElem.click(function () {
+		book2Gallery.show();
+		lineTimelines.bringSheetOnscreen();
+	});
 
 	var book3 = new LineSprite(_.extend({
 		name: "book3",
@@ -1465,6 +1494,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		progressMin: 0.36,
 		progressMax: 0.79
 	}, bookSpec));
+	book3.spriteElem.click(function () {
+		book3Gallery.show();
+		lineTimelines.bringSheetOnscreen();
+	});
 
 	var book4 = new LineSprite(_.extend({
 		name: "book4",
@@ -1473,6 +1506,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		progressMin: 0.45,
 		progressMax: 0.86
 	}, bookSpec));
+	book4.spriteElem.click(function () {
+		book4Gallery.show();
+		lineTimelines.bringSheetOnscreen();
+	});
 
 	// *********************************************************************
 	// *SPRITES THAT ANIMATE ONTO SCREEN (FROM RIGHT) AFTER CLICKING TSHIRT
@@ -1487,6 +1524,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		progressMin: 0.28,
 		progressMax: 0.70
 	}, clothingSpec));
+	dress.spriteElem.click(function () {
+		clothingGallery.show();
+		lineTimelines.bringSheetOnscreen();
+	});
 
 	var scarf = new LineSprite(_.extend({
 		name: "scarf",
@@ -1497,6 +1538,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		progressMin: 0.34,
 		progressMax: 0.78
 	}, clothingSpec));
+	scarf.spriteElem.click(function () {
+		clothingGallery.show();
+		lineTimelines.bringSheetOnscreen();
+	});
 
 	// *********************************************************************
 	// *SPRITE THAT ANIMATEs ONTO SCREEN (FROM LEFT) AFTER CLICKING GOURD
@@ -1508,6 +1553,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		xPos: 70
 	}, gourdSpec));
 
+	gourd1.spriteElem.click(function () {
+		craftsGallery.show();
+		lineTimelines.bringSheetOnscreen();
+	});
 	// *********************************************************************
 	// *SPRITE THAT ANIMATEs ONTO SCREEN (FROM LEFT) AFTER CLICKING SILK
 	// *********************************************************************
@@ -1545,6 +1594,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		group: "Performance",
 		progressMin: 0.36,
 		progressMax: 0.75
+	});
+	poi.spriteElem.click(function () {
+		poiGallery.show();
+		lineTimelines.bringSheetOnscreen();
 	});
 
 	// * ***********************************************************************
@@ -1611,8 +1664,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		linksHoverEnd();
 	});
 	brushholder.spriteElem.click(function () {
-		lineTimelines.bringSheetOnscreen();
-		sheetContents.innerHTML = "Biography";
+		var p = lineTimelines.sheetTL.progress();
+		//sheet is onscreen
+		if (p < sheet.progressMax && p > sheet.progressMin) {
+			var sheetDivs = $("#sheet").children("div");
+			sheetDivs.fadeOut();
+			biography.fadeIn();
+		}
+		//sheet is offscreen
+		else {
+				lineTimelines.bringSheetOnscreen();
+				biography.show();
+			}
 	});
 
 	var inkwell = new shadowSprite({
@@ -1637,8 +1700,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		linksHoverEnd();
 	});
 	inkwell.spriteElem.click(function () {
-		lineTimelines.bringSheetOnscreen();
-		sheetContents.innerHTML = "Contact";
+		var p = lineTimelines.sheetTL.progress();
+		//sheet is onscreen
+		if (p < sheet.progressMax && p > sheet.progressMin) {
+			var sheetDivs = $("#sheet").children("div");
+			sheetDivs.fadeOut();
+			contact.fadeIn();
+		}
+		//sheet is offscreen
+		else {
+				lineTimelines.bringSheetOnscreen();
+				contact.show();
+			}
 	});
 
 	var goose = new Goose({

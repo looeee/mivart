@@ -1,6 +1,8 @@
 <?php 
+	include("./functions.php");
+
+	//Header file includes everyting up to opening <body>
     include("./header.php"); 
-    //Header file includes everyting up to opening <body>
 ?>    
 		<script src="//cdnjs.cloudflare.com/ajax/libs/gsap/1.18.0/TweenMax.min.js"></script>
 		<script src="//cdnjs.cloudflare.com/ajax/libs/gsap/latest/utils/Draggable.min.js"></script>
@@ -19,12 +21,17 @@
 		
 			 <div id="sheet">
 			 	<?php 
-					include("./craftsGallery.php"); 
+			 		sheetGallery('book1', $pages);
+			 		sheetGallery('book2', $pages);
+			 		sheetGallery('book3', $pages);
+			 		sheetGallery('book4', $pages);
+			 		sheetGallery('crafts', $pages);
+			 		sheetGallery('clothing', $pages);
+			 		sheetGallery('performance', $pages);
 				?> 
-		  		<div id="sheetContents">
-		  			
+		  		<div id="contact">CONTACT DETAILS GO HERE</div>
+		  		<div id="biography">BIOGRAPHY GOES HERE</div>
 
-		  		</div>
 		  	</div>
 		 
 		</div>

@@ -6,16 +6,17 @@ var projectname 	= "mivart",
 	es2015_path 	= template_path + 'es2015/**/*.js',
 	styles_path 	= template_path + 'styles',
 	scripts_path 	= template_path + 'scripts',
-	gulp 			    = require('gulp'),
+	gulp 			= require('gulp'),
 	sass        	= require('gulp-sass'),
-	watch 			  = require('gulp-watch'),
+	watch 			= require('gulp-watch'),
 	autoprefixer	= require('gulp-autoprefixer'),
-	//sourcemaps 		= require('gulp-sourcemaps'),
-	uglify 			  = require('gulp-uglify'),
-  babelify      = require('babelify'),
-  browserify    = require('browserify'),
+	//sourcemaps 	= require('gulp-sourcemaps'),
+	uglify 			= require('gulp-uglify'),
+  	babelify      	= require('babelify'),
+  	browserify    	= require('browserify'),
 	minifyCss 		= require('gulp-minify-css'),
-  through2      = require('through2');
+	livereload 		= require('gulp-livereload'),
+  	through2      	= require('through2');
 
 // Add debounce to gulp watch for FTP
 (function ftp_debounce_fix(){
@@ -54,7 +55,6 @@ var projectname 	= "mivart",
   
 })();
 
-
 //Put all css tasks here
 gulp.task('css', function() {
 	return gulp.src(scss_path)
@@ -67,6 +67,7 @@ gulp.task('css', function() {
     	//.pipe(minifyCss())
     	//.pipe(sourcemaps.write())
     .pipe(gulp.dest(styles_path))
+    .pipe(livereload());
 });
 
 //Put all javascript tasks here
@@ -82,13 +83,14 @@ gulp.task('js', function () {
                 })
         }))
         //.pipe(uglify())
-        .pipe(gulp.dest(scripts_path));
+        .pipe(gulp.dest(scripts_path))
+        .pipe(livereload());
 });
 
 
 //default task
 gulp.task('default', ['css', 'js'] , function() {
-	//livereload.listen();
+	livereload.listen();
 	gulp.watch(scss_path, ['css']);
 	gulp.watch(es2015_path, ['js']);
 });

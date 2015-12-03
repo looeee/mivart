@@ -1,5 +1,5 @@
 <?php 
-	$craftsPage = $pages->get("name=crafts");
+	$craftsPage = $pages->get("name=crafts, include=all");
 	echo '<div id="craftsGallery" class="sheetGallery">';  
 	if(count($craftsPage->images)) {
         foreach($craftsPage->images as $image) {            
@@ -19,10 +19,10 @@
 
     // using a callback and a fancier selector
     //----------------------------------------------
-    $('#craftsGallery').photobox('li > a.family',{ time:0 }, callback);
-    function callback(){
-       console.log('image has been loaded');
-    }
+    //$('#craftsGallery').photobox('li > a.family',{ time:0 }, callback);
+    //function callback(){
+    //   console.log('image has been loaded');
+    //}
 
     // destroy the plugin on a certain gallery:
     //-----------------------------------------------

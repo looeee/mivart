@@ -13,9 +13,17 @@
 	const infoLeftText = document.getElementById("infoLeftText");
 	const infoRightText = document.getElementById("infoRightText");
 	const infoBottomText = document.getElementById("infoBottomText");
-	
 
-	const sheetContents =document.getElementById("sheetContents");
+	//sheet info elements
+	const craftsGallery = $("#craftsGallery");
+	const clothingGallery = $("#clothingGallery");
+	const performanceGallery = $("#performanceGallery");
+	const book1Gallery = $("#book1Gallery");
+	const book2Gallery = $("#book2Gallery");
+	const book3Gallery = $("#book3Gallery");
+	const book4Gallery = $("#book4Gallery");
+	const biography = $("#biography");
+	const contact = $("#contact");
 	
 	//prevent touch scrolling
 	document.body.addEventListener('touchmove', (e) => { e.preventDefault(); });
@@ -174,7 +182,12 @@
 			this.performanceTL = new TimelineMax(options);
 			this.performanceTL.add("middle", config.wlAnimSpeed/2);
 
-			this.sheetTL = new TimelineMax(options);
+			this.sheetTL = new TimelineMax({
+				paused:true, 
+				onComplete: this.sheetComplete, 
+				onReverseComplete: this.sheetComplete,
+				onStart: this.onStart,
+			});
 			this.sheetTL.add("middle", config.wlAnimSpeed/2);
 
 			this.timelines = [
@@ -189,6 +202,12 @@
 
 		onComplete(){
 			wind.tweenTo(3);
+		}
+
+		sheetComplete(){
+			wind.tweenTo(3);
+			let sheetDivs = $("#sheet").children("div");
+			sheetDivs.hide();
 		}
 
 		onStart(){
@@ -1271,6 +1290,10 @@
 		progressMin: 0.22,
 		progressMax: 0.64,
 	}, bookSpec));
+	book1.spriteElem.click( () => {
+		book1Gallery.show();
+		lineTimelines.bringSheetOnscreen();
+	});
 
 	let book2 = new LineSprite(_.extend({
 		name: "book2",
@@ -1279,6 +1302,10 @@
 		progressMin: 0.30,
 		progressMax: 0.70,
 	}, bookSpec));
+	book2.spriteElem.click( () => {
+		book2Gallery.show();
+		lineTimelines.bringSheetOnscreen();
+	});
 
 	let book3 = new LineSprite(_.extend({
 		name: "book3",
@@ -1287,6 +1314,10 @@
 		progressMin: 0.36,
 		progressMax: 0.79,
 	}, bookSpec));
+	book3.spriteElem.click( () => {
+		book3Gallery.show();
+		lineTimelines.bringSheetOnscreen();
+	});
 
 	let book4 = new LineSprite(_.extend({
 		name: "book4",
@@ -1295,6 +1326,10 @@
 		progressMin: 0.45,
 		progressMax: 0.86,
 	}, bookSpec));
+	book4.spriteElem.click( () => {
+		book4Gallery.show();
+		lineTimelines.bringSheetOnscreen();
+	});
 
 	// *********************************************************************
 	// *SPRITES THAT ANIMATE ONTO SCREEN (FROM RIGHT) AFTER CLICKING TSHIRT
@@ -1309,6 +1344,10 @@
 		progressMin: 0.28,
 		progressMax: 0.70,
 	}, clothingSpec));
+	dress.spriteElem.click( () => {
+		clothingGallery.show();
+		lineTimelines.bringSheetOnscreen();
+	});
 
 	let scarf = new LineSprite(_.extend({
 		name: "scarf",
@@ -1319,6 +1358,10 @@
 		progressMin: 0.34,
 		progressMax: 0.78,
 	}, clothingSpec));
+	scarf.spriteElem.click( () => {
+		clothingGallery.show();
+		lineTimelines.bringSheetOnscreen();
+	});
 
 	// *********************************************************************
 	// *SPRITE THAT ANIMATEs ONTO SCREEN (FROM LEFT) AFTER CLICKING GOURD
@@ -1330,6 +1373,10 @@
 		xPos: 70,
 	}, gourdSpec));
 
+	gourd1.spriteElem.click( () => {
+		craftsGallery.show();
+		lineTimelines.bringSheetOnscreen();
+	});
 	// *********************************************************************
 	// *SPRITE THAT ANIMATEs ONTO SCREEN (FROM LEFT) AFTER CLICKING SILK
 	// *********************************************************************
@@ -1368,6 +1415,10 @@
 		group: "Performance",
 		progressMin: 0.36,
 		progressMax: 0.75,
+	});
+	poi.spriteElem.click( () => {
+		poiGallery.show();
+		lineTimelines.bringSheetOnscreen();
 	});
 
 	// * ***********************************************************************
@@ -1432,8 +1483,18 @@
 		() => { linksHoverEnd(); }
 	);
 	brushholder.spriteElem.click( () => { 
-		lineTimelines.bringSheetOnscreen();
-		sheetContents.innerHTML = "Biography";
+		let p = lineTimelines.sheetTL.progress();
+		//sheet is onscreen
+		if( p < sheet.progressMax &&  p > sheet.progressMin ){
+			let sheetDivs = $("#sheet").children("div");
+			sheetDivs.fadeOut();
+			biography.fadeIn();
+		}
+		//sheet is offscreen
+		else{
+			lineTimelines.bringSheetOnscreen();
+			biography.show();
+		}
 	});
 
 	let inkwell = new shadowSprite({
@@ -1457,8 +1518,18 @@
 		() => { linksHoverEnd(); }
 	);
 	inkwell.spriteElem.click( () => { 
-		lineTimelines.bringSheetOnscreen();
-		sheetContents.innerHTML = "Contact";
+		let p = lineTimelines.sheetTL.progress();
+		//sheet is onscreen
+		if( p < sheet.progressMax &&  p > sheet.progressMin ){
+			let sheetDivs = $("#sheet").children("div");
+			sheetDivs.fadeOut();
+			contact.fadeIn();
+		}
+		//sheet is offscreen
+		else{
+			lineTimelines.bringSheetOnscreen();
+			contact.show();
+		}
 	});
 
 	let goose = new Goose({
