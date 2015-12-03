@@ -1,22 +1,23 @@
 'use strict';
 
-var projectname 	= "mivart",
-	template_path	= "site/templates/",
-	scss_path 		= template_path + 'scss/**/*.scss',
-	es2015_path 	= template_path + 'es2015/**/*.js',
-	styles_path 	= template_path + 'styles',
-	scripts_path 	= template_path + 'scripts',
-	gulp 			= require('gulp'),
-	sass        	= require('gulp-sass'),
-	watch 			= require('gulp-watch'),
-	autoprefixer	= require('gulp-autoprefixer'),
-	//sourcemaps 	= require('gulp-sourcemaps'),
-	uglify 			= require('gulp-uglify'),
-  	babelify      	= require('babelify'),
-  	browserify    	= require('browserify'),
-	minifyCss 		= require('gulp-minify-css'),
-	livereload 		= require('gulp-livereload'),
-  	through2      	= require('through2');
+var projectname  = "mivart",
+	template_path	 = "site/templates/",
+	scss_path 		 = template_path + 'scss/**/*.scss',
+	es2015_path    = template_path + 'es2015/**/*.js',
+	styles_path 	 = template_path + 'styles',
+	scripts_path 	 = template_path + 'scripts',
+	gulp           = require('gulp'),
+	sass        	 = require('gulp-sass'),
+	watch 			   = require('gulp-watch'),
+	autoprefixer	 = require('gulp-autoprefixer'),
+	//sourcemaps 	 = require('gulp-sourcemaps'),
+	uglify 			   = require('gulp-uglify'),
+  babelify       = require('babelify'),
+  browserify     = require('browserify'),
+	minifyCss 		 = require('gulp-minify-css'),
+	livereload 		 = require('gulp-livereload'),
+  plumber        = require('gulp-plumber'),
+  through2       = require('through2');
 
 // Add debounce to gulp watch for FTP
 (function ftp_debounce_fix(){
@@ -58,6 +59,7 @@ var projectname 	= "mivart",
 //Put all css tasks here
 gulp.task('css', function() {
 	return gulp.src(scss_path)
+    .pipe(plumber())
 		.pipe(sass().on('error', sass.logError))
 		.pipe(autoprefixer({
             browsers: ['last 3 version' , "ie 9"],
@@ -73,6 +75,7 @@ gulp.task('css', function() {
 //Put all javascript tasks here
 gulp.task('js', function () {
     return gulp.src(es2015_path)
+        .pipe(plumber())
         .pipe(through2.obj(function (file, enc, next) {
             browserify(file.path)
                 .transform(babelify, {presets: ['es2015']})

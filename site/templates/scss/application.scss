@@ -84,7 +84,7 @@ body {
   text-align: center;
 }
 
-#silk, #silk1. #dress, #scarf{
+#silk, #silk1, #dress, #scarf{
    z-index: 1;
 }
 #silkTrigger, #silk1Trigger{
@@ -101,21 +101,6 @@ body {
   -ms-transform-origin: 60% 8px; /* IE 9 */
     -webkit-transform-origin: 60% 8px; /* Chrome, Safari, Opera */
     transform-origin: 60% 8px;
-}
-
-#sheet{
-  z-index: 1;
-}
-
-#sheetContents{
-  position: relative;
-  top: 0;
-  left: 0;
-  width: 80%;
-  height: 65%;
-  margin-left: 10%;
-  margin-top: 10%;
-
 }
 
 #clouds > div {
@@ -154,11 +139,18 @@ body {
   transform-origin: 50% 0;
 }
 
-.sheetGallery{
-  display: none;
+#sheet{
+  z-index: 1;
 }
 
-#biography, #contact{
+.sheetContents{
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 80%;
+  height: 65%;
+  margin-left: 10%;
+  margin-top: 10%;
   display: none;
 }
 

@@ -1,4 +1,5 @@
 <?php 
+
 	include("./functions.php");
 
 	//Header file includes everyting up to opening <body>
@@ -28,10 +29,9 @@
 			 		sheetGallery('crafts', $pages);
 			 		sheetGallery('clothing', $pages);
 			 		sheetGallery('performance', $pages);
+			 		biography($pages);
+			 		contact($pages);
 				?> 
-		  		<div id="contact">CONTACT DETAILS GO HERE</div>
-		  		<div id="biography">BIOGRAPHY GOES HERE</div>
-
 		  	</div>
 		 
 		</div>

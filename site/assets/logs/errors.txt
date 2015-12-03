@@ -15,3 +15,5 @@
 2015-12-03 04:24:03	admin	http://vps222373.ovh.net/mivart/	Error: 	Call to a member function get() on null (line 3 of /var/www/html/mivart/site/templates/functions.php)
 2015-12-03 04:25:02	admin	http://vps222373.ovh.net/mivart/	Error: 	Call to a member function get() on null (line 3 of /var/www/html/mivart/site/templates/functions.php)
 2015-12-03 04:25:41	admin	http://vps222373.ovh.net/mivart/	Parse Error: 	syntax error, unexpected '$pages' (T_VARIABLE) (line 2 of /var/www/html/mivart/site/templates/functions.php)
+2015-12-03 14:15:40	admin	http://vps222373.ovh.net/mivart/	Parse Error: 	syntax error, unexpected '}', expecting ',' or ';' (line 27 of /var/www/html/mivart/site/templates/functions.php)
+2015-12-03 14:34:04	admin	http://vps222373.ovh.net/mivart/	Parse Error: 	syntax error, unexpected '/' (line 28 of /var/www/html/mivart/site/templates/functions.php)
