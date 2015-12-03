@@ -1,0 +1,7 @@
+2015-12-03 00:32:10	admin	http://vps222373.ovh.net/mivart/	Unknown Selector operator: '' -- was your selector value properly escaped?  (in /wire/core/Selectors.php line 283)
+2015-12-03 00:32:48	admin	http://vps222373.ovh.net/mivart/	Unknown Selector operator: '' -- was your selector value properly escaped?  (in /wire/core/Selectors.php line 283)
+2015-12-03 00:33:11	admin	http://vps222373.ovh.net/mivart/	Unknown Selector operator: '' -- was your selector value properly escaped?  (in /wire/core/Selectors.php line 283)
+2015-12-03 00:33:20	admin	http://vps222373.ovh.net/mivart/	Unknown Selector operator: '' -- was your selector value properly escaped?  (in /wire/core/Selectors.php line 283)
+2015-12-03 00:33:28	admin	http://vps222373.ovh.net/mivart/	Unknown Selector operator: '' -- was your selector value properly escaped?  (in /wire/core/Selectors.php line 283)
+2015-12-03 00:35:53	admin	http://vps222373.ovh.net/mivart/	Unknown Selector operator: '' -- was your selector value properly escaped?  (in /wire/core/Selectors.php line 283)
+2015-12-03 00:38:09	admin	http://vps222373.ovh.net/mivart/	Unknown Selector operator: '' -- was your selector value properly escaped?  (in /wire/core/Selectors.php line 283)

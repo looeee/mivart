@@ -1,3 +1,6 @@
+//include styles for photobox plugin
+@import "photobox";
+
 body { 
   position: absolute;
   top:0;
@@ -53,8 +56,6 @@ body {
   top: 50%;
   left: 0;
   transform: rotate(90deg);
-  //transform-origin: right top 0;
-  //float: left;
 }
 
 #infoRightText{

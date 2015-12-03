@@ -63,10 +63,10 @@ gulp.task('css', function() {
             browsers: ['last 3 version' , "ie 9"],
             cascade: true,
         }))
-        //.pipe(sourcemaps.init())
+      //.pipe(sourcemaps.init())
     	//.pipe(minifyCss())
     	//.pipe(sourcemaps.write())
-        .pipe(gulp.dest(styles_path))
+    .pipe(gulp.dest(styles_path))
 });
 
 //Put all javascript tasks here

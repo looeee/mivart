@@ -4,9 +4,9 @@
 ?>    
 		<script src="//cdnjs.cloudflare.com/ajax/libs/gsap/1.18.0/TweenMax.min.js"></script>
 		<script src="//cdnjs.cloudflare.com/ajax/libs/gsap/latest/utils/Draggable.min.js"></script>
+		<script src="<?php echo $config->urls->templates?>scripts/vendor/jquery.photobox.js"></script>
 	</head>
 	<body>
-		
 		<div id="lineSprites">
 
 		  	<div id="silk">
@@ -18,7 +18,13 @@
 			</div>
 		
 			 <div id="sheet">
-		  		<div id="sheetContents"></div>
+			 	<?php 
+					include("./craftsGallery.php"); 
+				?> 
+		  		<div id="sheetContents">
+		  			
+
+		  		</div>
 		  	</div>
 		 
 		</div>
