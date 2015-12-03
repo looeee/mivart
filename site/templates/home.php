@@ -37,14 +37,6 @@
 		 
 		</div>
 
-		<div id="infoLeft" class="info">
-		  <div id="infoLeftText" class="infoText">Books</div>
-		</div>
-
-		<div id="infoRight" class="info">
-		  <div id="infoRightText" class="infoText">Books</div>
-		</div>
-
 		<div id="clouds"></div>
 
 		<div id="plankSprites">

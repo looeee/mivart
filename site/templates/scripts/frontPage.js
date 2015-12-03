@@ -831,15 +831,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					sprite.timeline.progress(progress);
 
 					//show the next page divs if dragged far enough
-					if (sprite.timeline.progress() > sprite.progressMax) {
-						infoLeftText.innerHTML = sprite.nextGroup;
-						animateOpacity("#infoLeft", 0.2, 1);
-					} else if (sprite.timeline.progress() < sprite.progressMin) {
-						infoRightText.innerHTML = sprite.nextGroup;
-						animateOpacity("#infoRight", 0.2, 1);
+					var p = sprite.timeline.progress();
+					if (p > sprite.progressMax || p < sprite.progressMin || isNaN(p)) {
+						padInfo.html(sprite.nextGroup);
+						animateOpacity("#padInfo", 0.2, 1);
 					} else {
-						animateOpacity("#infoLeft", 0.2, 0);
-						animateOpacity("#infoRight", 0.2, 0);
+						animateOpacity("#padInfo", 0.2, 0);
 					}
 				};
 			}
@@ -863,21 +860,28 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			key: "onDragEnd",
 			value: function onDragEnd(sprite) {
 				return function () {
+					console.log(sprite.direction);
 					//clear the animation timer
 					clearTimeout(sprite.timer);
 
-					if (sprite.timeline.progress() > sprite.progressMax) {
-						//show the sheet contents for this sprite
-						sprite.sheetContents();
+					var p = sprite.timeline.progress();
+
+					if (p > sprite.progressMax || isNaN(p)) {
+						//show the sheet contents for this sprite if relevant
+						if (sprite.nextGroup === "Sheet") {
+							sprite.sheetContents();
+						}
 						//moving left
 						sprite.timeline.play();
 						//set the next group to the start of its timeline then play to the middle
 						sprite.nextTimeline.progress(0).tweenTo("middle");
 						animateOpacity("#infoLeft", 0.2, 0);
 						sprite.animateSecondary();
-					} else if (sprite.timeline.progress() < sprite.progressMin) {
-						//show the sheet contents for this sprite
-						sprite.sheetContents();
+					} else if (p < sprite.progressMin) {
+						//show the sheet contents for this sprite if relevant
+						if (sprite.nextGroup === "Sheet") {
+							sprite.sheetContents();
+						}
 						//moving right
 						sprite.timeline.reverse();
 						//set the next group to the end of its timeline then reverse to the middle

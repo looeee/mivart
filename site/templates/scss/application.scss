@@ -39,63 +39,6 @@ body {
   pointer-events: none;
 }
 
-.info{
-  position: absolute;
-  //top: 0;
-  background-color: red;
-  opacity: 0;
-  z-index: 9999;
-}
-
-#infoLeft{
-  width: 7%;
-  height: 100%;
-  left: 0;
-  background: linear-gradient(to right, rgba(0,0,0,.75) 0%, rgba(255,255,255,.75) 100%);
-  border-right: solid 1px black;
-}
-
-#infoRight{
-  width: 7%;
-  height: 100%;
-  right: 0;
-  background: linear-gradient(to left, rgba(0,0,0,.75) 0%, rgba(255,255,255,.75) 100%);
-  border-left: solid 1px black;
-}
-
-#infoBottom{
-  width: 100%;
-  height: 7%;
-  bottom: 0;
-  background: linear-gradient(to top, rgba(0,0,0,.75) 0%, rgba(255,255,255,.75) 100%);
-  border-top: solid 1px black;
-}
-
-.infoText{
-	position: absolute;
-}
-
-#infoLeftText{
-  top: 50%;
-  left: 0;
-  transform: rotate(90deg);
-}
-
-#infoRightText{
-  right: 0;
-  top: 50%;
-  height: 100%;
-  transform: rotate(-90deg);
-  transform-origin: left top 0;
-  text-align: center;
-}
-
-#infoBottomText{ 
-  width: 100%;
-  margin-top: 2%;
-  text-align: center;
-}
-
 #silk, #silk1, #dress, #scarf{
    z-index: 1;
 }
