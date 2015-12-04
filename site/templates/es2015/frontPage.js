@@ -4,6 +4,8 @@
 		windSpeed: 0.8,
 	}
 
+	let padWriting;
+
 	const WW = $(window).outerWidth(true);
 	const WH = $(window).outerHeight(true);
 	const $window = $(window);
@@ -115,14 +117,8 @@
 			this.ctx = document.querySelector("canvas").getContext("2d");
 			this.width = this.ctx.canvas.width;
 			this.height = this.ctx.canvas.height;
-			// dash-length for off-range
-			this.dashLen = 120;
-			// we'll update this, initialize
-			this.dashOffset = this.dashLen;
+			
 			this.speed = 10;
-			// start position for x and iterator
-			this.x = 0, 
-			this.i = 0;
 
 			//~30px font for 1280px screen width, adjust accordingly for others.
 			let fontSize = this.width/5;
@@ -140,12 +136,24 @@
 			// set color (black)
 			this.ctx.strokeStyle = this.ctx.fillStyle = "#000";
 
-			this.txt = "Home";
+			this.txt = "";
 		}
 
-		write(text=this.txt){
-			this.txt=text;
-			this.loop();
+		write(text){
+			//if we are trying to write a different word change the writing
+			//otherwise do nothing
+			if(text != this.txt){
+				// start position for x and iterator
+				this.x = 0, 
+				this.i = 0;
+				// dash-length for off-range
+				this.dashLen = 120;
+				// we'll update this, initialize
+				this.dashOffset = this.dashLen;
+				this.erase();
+				this.txt=text;
+				this.loop();
+			}
 		}
 
 		loop(){
@@ -186,6 +194,11 @@
 				// if we still have chars left, loop animation again for this char
 				if (this.i < this.txt.length) requestAnimationFrame(this.loop.bind(this));
 			}
+		}
+
+		//if there is writing on the pad, erase it.
+		erase(){
+			this.ctx.clearRect(0, 0, this.width, this.height);
 		}
 	}
 
@@ -805,11 +818,12 @@
 				//show the next page divs if dragged far enough
 				let p =sprite.timeline.progress();
 				if(p > sprite.progressMax ||  p< sprite.progressMin || isNaN(p)){
-					padInfo.html(sprite.nextGroup);
-					animateOpacity("#padInfo", 0.2, 1);
-				}
-				else{
-					animateOpacity("#padInfo", 0.2, 0);
+					if(sprite.nextGroup!="Sheet"){
+						padWriting.write(sprite.nextGroup);
+					}
+					else{
+						padWriting.write(sprite.name);
+					}
 				}
 			}
 		}
@@ -1515,16 +1529,6 @@
 	// *
 	// *
 	// * ***********************************************************************
-	
-	//when the mouse hovers over display info
-	let linksHover = function(text){
-		padInfo.html(text);
-		animateOpacity("#padInfo", 0.2, 1);
-	}
-	//when the hover ends hide info
-	let linksHoverEnd = () => {
-		animateOpacity("#padInfo", 0.2, 0);
-	}
 
 	let bucket = new shadowSprite({
 		parentDiv: 'plankSprites',
@@ -1543,8 +1547,7 @@
 		shadowWidth: 100, 
 	});
 	bucket.spriteElem.hover(
-		() => { linksHover("Home"); },
-		() => { linksHoverEnd(); }
+		() => { padWriting.write("Home"); }
 	);
 	bucket.spriteElem.click( () => { 
 		lineTimelines.home();
@@ -1567,8 +1570,7 @@
 		shadowWidth: 100, 
 	});
 	brushholder.spriteElem.hover(
-		() => { linksHover("Biography"); },
-		() => { linksHoverEnd(); }
+		() => { padWriting.write("Biography"); }
 	);
 	brushholder.spriteElem.click( () => { 
 		let p = lineTimelines.sheetTL.progress();
@@ -1602,8 +1604,7 @@
 		shadowWidth: 65, 
 	});
 	inkwell.spriteElem.hover(
-		() => { linksHover("Contact"); },
-		() => { linksHoverEnd(); }
+		() => { padWriting.write("Contact"); }
 	);
 	inkwell.spriteElem.click( () => { 
 		let p = lineTimelines.sheetTL.progress();
@@ -1631,7 +1632,6 @@
 		xPos: 27,
 		yPos: 5,
 		yType: "bottom",
-		//shadowImg: imagesUrl + "inkwell-shadow.png",
 		shadowYOffset: 5, 
 		shadowXOffset: 10, 
 		shadowWidth: 65, 
@@ -1734,8 +1734,7 @@
 	window.addEventListener("load", ()=> { 
 		lineTimelines.centreTL.progress( 0.5 ); //.tweenTo( "middle" );
 		wind.timeline.progress( 0.5 );
-		let padWriting = new Handwriting(pad.width *0.6, pad.height *0.7);
-		padWriting.write("dfsdfsdfsdgsdgsdg");
+		padWriting = new Handwriting(pad.width *0.6, pad.height *0.7);
 	}); //end window.load
 
 })();

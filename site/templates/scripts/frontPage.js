@@ -15,6 +15,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		windSpeed: 0.8
 	};
 
+	var padWriting = undefined;
+
 	var WW = $(window).outerWidth(true);
 	var WH = $(window).outerHeight(true);
 	var $window = $(window);
@@ -146,13 +148,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			this.ctx = document.querySelector("canvas").getContext("2d");
 			this.width = this.ctx.canvas.width;
 			this.height = this.ctx.canvas.height;
-			// dash-length for off-range
-			this.dashLen = 120;
-			// we'll update this, initialize
-			this.dashOffset = this.dashLen;
+
 			this.speed = 10;
-			// start position for x and iterator
-			this.x = 0, this.i = 0;
 
 			//~30px font for 1280px screen width, adjust accordingly for others.
 			var fontSize = this.width / 5;
@@ -170,16 +167,25 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			// set color (black)
 			this.ctx.strokeStyle = this.ctx.fillStyle = "#000";
 
-			this.txt = "Home";
+			this.txt = "";
 		}
 
 		_createClass(Handwriting, [{
 			key: "write",
-			value: function write() {
-				var text = arguments.length <= 0 || arguments[0] === undefined ? this.txt : arguments[0];
-
-				this.txt = text;
-				this.loop();
+			value: function write(text) {
+				//if we are trying to write a different word change the writing
+				//otherwise do nothing
+				if (text != this.txt) {
+					// start position for x and iterator
+					this.x = 0, this.i = 0;
+					// dash-length for off-range
+					this.dashLen = 120;
+					// we'll update this, initialize
+					this.dashOffset = this.dashLen;
+					this.erase();
+					this.txt = text;
+					this.loop();
+				}
 			}
 		}, {
 			key: "loop",
@@ -220,6 +226,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					// if we still have chars left, loop animation again for this char
 					if (this.i < this.txt.length) requestAnimationFrame(this.loop.bind(this));
 				}
+			}
+
+			//if there is writing on the pad, erase it.
+
+		}, {
+			key: "erase",
+			value: function erase() {
+				this.ctx.clearRect(0, 0, this.width, this.height);
 			}
 		}]);
 
@@ -942,10 +956,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					//show the next page divs if dragged far enough
 					var p = sprite.timeline.progress();
 					if (p > sprite.progressMax || p < sprite.progressMin || isNaN(p)) {
-						padInfo.html(sprite.nextGroup);
-						animateOpacity("#padInfo", 0.2, 1);
-					} else {
-						animateOpacity("#padInfo", 0.2, 0);
+						if (sprite.nextGroup != "Sheet") {
+							padWriting.write(sprite.nextGroup);
+						} else {
+							padWriting.write(sprite.name);
+						}
 					}
 				};
 			}
@@ -1721,16 +1736,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	// *
 	// * ***********************************************************************
 
-	//when the mouse hovers over display info
-	var linksHover = function linksHover(text) {
-		padInfo.html(text);
-		animateOpacity("#padInfo", 0.2, 1);
-	};
-	//when the hover ends hide info
-	var linksHoverEnd = function linksHoverEnd() {
-		animateOpacity("#padInfo", 0.2, 0);
-	};
-
 	var bucket = new shadowSprite({
 		parentDiv: 'plankSprites',
 		name: "bucket",
@@ -1748,9 +1753,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		shadowWidth: 100
 	});
 	bucket.spriteElem.hover(function () {
-		linksHover("Home");
-	}, function () {
-		linksHoverEnd();
+		padWriting.write("Home");
 	});
 	bucket.spriteElem.click(function () {
 		lineTimelines.home();
@@ -1773,9 +1776,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		shadowWidth: 100
 	});
 	brushholder.spriteElem.hover(function () {
-		linksHover("Biography");
-	}, function () {
-		linksHoverEnd();
+		padWriting.write("Biography");
 	});
 	brushholder.spriteElem.click(function () {
 		var p = lineTimelines.sheetTL.progress();
@@ -1809,9 +1810,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		shadowWidth: 65
 	});
 	inkwell.spriteElem.hover(function () {
-		linksHover("Contact");
-	}, function () {
-		linksHoverEnd();
+		padWriting.write("Contact");
 	});
 	inkwell.spriteElem.click(function () {
 		var p = lineTimelines.sheetTL.progress();
@@ -1839,7 +1838,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		xPos: 27,
 		yPos: 5,
 		yType: "bottom",
-		//shadowImg: imagesUrl + "inkwell-shadow.png",
 		shadowYOffset: 5,
 		shadowXOffset: 10,
 		shadowWidth: 65
@@ -1942,8 +1940,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	window.addEventListener("load", function () {
 		lineTimelines.centreTL.progress(0.5); //.tweenTo( "middle" );
 		wind.timeline.progress(0.5);
-		var padWriting = new Handwriting(pad.width * 0.6, pad.height * 0.7);
-		padWriting.write("dfsdfsdfsdgsdgsdg");
+		padWriting = new Handwriting(pad.width * 0.6, pad.height * 0.7);
 	}); //end window.load
 })();
 
