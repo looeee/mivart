@@ -119,6 +119,115 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 	// * ***********************************************************************
 	// *
+	// *   	HANDWRITING CLASS
+	// *   	Animated handwritten effect using ctx     
+	// *   	Based on
+	// *	www.codementor.io/javascript/tutorial/how-to-make-a-write-on-effect-using-html5-ctx-and-javascript-only
+	// *
+	// *************************************************************************
+
+	var Handwriting = (function () {
+		function Handwriting() {
+			var width = arguments.length <= 0 || arguments[0] === undefined ? "600" : arguments[0];
+			var height = arguments.length <= 1 || arguments[1] === undefined ? "150" : arguments[1];
+			var parentElem = arguments.length <= 2 || arguments[2] === undefined ? $('#pad') : arguments[2];
+			var id = arguments.length <= 3 || arguments[3] === undefined ? "padInfo" : arguments[3];
+
+			_classCallCheck(this, Handwriting);
+
+			if (parentElem.length === 0) {
+				console.log("Handwriting parentElem does not exist");
+				return;
+			}
+			if ($('#' + id).length === 0) {
+				parentElem.append('<canvas id="' + id + '" width="' + width + '" height="' + height + '"></canvas>');
+			}
+
+			this.ctx = document.querySelector("canvas").getContext("2d");
+			this.width = this.ctx.canvas.width;
+			this.height = this.ctx.canvas.height;
+			// dash-length for off-range
+			this.dashLen = 120;
+			// we'll update this, initialize
+			this.dashOffset = this.dashLen;
+			this.speed = 10;
+			// start position for x and iterator
+			this.x = 0, this.i = 0;
+
+			//~30px font for 1280px screen width, adjust accordingly for others.
+			var fontSize = this.width / 5;
+			this.ctx.font = fontSize + "px sans-serif";
+
+			// line thickness
+			this.ctx.lineWidth = 2;
+
+			//join each line with a round joint
+			this.ctx.lineJoin = "round";
+
+			// slight opacity
+			this.ctx.globalAlpha = 2 / 3;
+
+			// set color (black)
+			this.ctx.strokeStyle = this.ctx.fillStyle = "#000";
+
+			this.txt = "Home";
+		}
+
+		_createClass(Handwriting, [{
+			key: "write",
+			value: function write() {
+				var text = arguments.length <= 0 || arguments[0] === undefined ? this.txt : arguments[0];
+
+				this.txt = text;
+				this.loop();
+			}
+		}, {
+			key: "loop",
+			value: function loop() {
+				// clear ctx for each frame
+				this.ctx.clearRect(this.x, 0, this.width, this.height);
+
+				// calculate and set current line-dash for this char
+				this.ctx.setLineDash([this.dashLen - this.dashOffset, this.dashOffset - this.speed]);
+
+				// reduce length of off-dash
+				this.dashOffset -= this.speed;
+
+				// draw char to ctx with current dash-length
+				this.ctx.strokeText(this.txt[this.i], this.x, this.height * 2 / 3, this.width);
+
+				// char done? no, then loop
+				if (this.dashOffset > 0) {
+					requestAnimationFrame(this.loop.bind(this));
+				} else {
+					// ok, outline done, lets fill its interior before next
+					this.ctx.fillText(this.txt[this.i], this.x, this.height * 2 / 3, this.width);
+
+					// reset line-dash length
+					this.dashOffset = this.dashLen;
+
+					// get x position to next char by measuring what we have drawn
+					// notice we offset it a little by random to increase realism
+					this.x += this.ctx.measureText(this.txt[this.i++]).width + this.ctx.lineWidth * Math.random();
+
+					// lets use an absolute transform to randomize y-position a little
+					this.ctx.setTransform(1, 0, 0, 1, 0, 2 * Math.random());
+
+					// and just cause we can, rotate it a little too to make it even
+					// more realistic
+					this.ctx.rotate(Math.random() * 0.005);
+
+					// if we still have chars left, loop animation again for this char
+					if (this.i < this.txt.length) requestAnimationFrame(this.loop.bind(this));
+				}
+			}
+		}]);
+
+		return Handwriting;
+	})();
+
+	// * ***********************************************************************
+	// *
 	// *   LINE CLASS
 	//	Draw a horizontal line over the whole screen given 2 points
 	//  p1 = {    p2 = {
@@ -952,7 +1061,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			_this4.shadowXOffset = spec.shadowXOffset || 0;
 			_this4.shadowWidth = spec.shadowWidth || 100;
 
-			_this4.shadow(spec.shadowImg);
+			if (spec.shadowImg) {
+				_this4.shadow(spec.shadowImg);
+			}
 
 			_this4.rotated = false;
 
@@ -1831,6 +1942,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	window.addEventListener("load", function () {
 		lineTimelines.centreTL.progress(0.5); //.tweenTo( "middle" );
 		wind.timeline.progress(0.5);
+		var padWriting = new Handwriting(pad.width * 0.6, pad.height * 0.7);
+		padWriting.write("dfsdfsdfsdgsdgsdg");
 	}); //end window.load
 })();
 

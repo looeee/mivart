@@ -24,16 +24,12 @@ body {
 }
 
 #padInfo{
-  opacity: 0;
-  position: relative;
-  width: 100%;
-  text-align: center;
-  top:25%;
+  //opacity: 0;
+  position: absolute;
+  left: 20%;
+  top: 10%;
   transform: skew(-25deg) rotateZ(6deg) rotateX(45deg);
-  font-size: 200%;
-  font-weight: bolder;
 }
-
 
 .avoidClicks {
   pointer-events: none;

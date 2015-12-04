@@ -652,15 +652,11 @@ body {
   background-size: 100% 100%; }
 
 #padInfo {
-  opacity: 0;
-  position: relative;
-  width: 100%;
-  text-align: center;
-  top: 25%;
+  position: absolute;
+  left: 20%;
+  top: 10%;
   -webkit-transform: skew(-25deg) rotateZ(6deg) rotateX(45deg);
-          transform: skew(-25deg) rotateZ(6deg) rotateX(45deg);
-  font-size: 200%;
-  font-weight: bolder; }
+          transform: skew(-25deg) rotateZ(6deg) rotateX(45deg); }
 
 .avoidClicks {
   pointer-events: none; }
