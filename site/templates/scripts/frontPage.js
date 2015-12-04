@@ -23,19 +23,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	var $body = $("body");
 	var $document = $(document);
 
-	var infoLeftText = document.getElementById("infoLeftText");
-	var infoRightText = document.getElementById("infoRightText");
 	var padInfo = $("#padInfo");
 
 	//sheet info elements
-	var sheetContent = $("#sheetContents");
-	var craftsGallery = $("#craftsGallery");
-	var clothingGallery = $("#clothingGallery");
-	var performanceGallery = $("#performanceGallery");
-	var book1Gallery = $("#book1Gallery");
-	var book2Gallery = $("#book2Gallery");
-	var book3Gallery = $("#book3Gallery");
-	var book4Gallery = $("#book4Gallery");
+	var sheetElem = $("#sheet");
 	var biography = $("#biography");
 	var contact = $("#contact");
 	var silksVideo = $("#silksVideo");
@@ -149,8 +140,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			this.width = this.ctx.canvas.width;
 			this.height = this.ctx.canvas.height;
 
-			this.speed = 10;
-
 			//~30px font for 1280px screen width, adjust accordingly for others.
 			var fontSize = this.width / 5;
 			this.ctx.font = fontSize + "px sans-serif";
@@ -176,6 +165,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				//if we are trying to write a different word change the writing
 				//otherwise do nothing
 				if (text != this.txt) {
+					this.txt = text;
+					this.speed = 10;
 					// start position for x and iterator
 					this.x = 0, this.i = 0;
 					// dash-length for off-range
@@ -183,13 +174,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					// we'll update this, initialize
 					this.dashOffset = this.dashLen;
 					this.erase();
-					this.txt = text;
+
 					this.loop();
 				}
 			}
 		}, {
 			key: "loop",
 			value: function loop() {
+				//test for length not working properly below, don't continue if
+				//we have reached the end of the word
+				if (this.i > this.txt.length - 1) {
+					return;
+				}
 				// clear ctx for each frame
 				this.ctx.clearRect(this.x, 0, this.width, this.height);
 
@@ -365,8 +361,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			key: "sheetComplete",
 			value: function sheetComplete() {
 				wind.tweenTo(3);
-				var sheetDivs = $("#sheet").children("div");
-				sheetDivs.hide();
+				sheetElem.empty();
 			}
 		}, {
 			key: "onStart",
@@ -894,33 +889,47 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			value: function sheetContents() {
 				switch (this.name) {
 					case "book1":
-						book1Gallery.show();
+						this.loadGallery("books/book1");
 						break;
 					case "book2":
-						book2Gallery.show();
+						this.loadGallery("books/book2");
 						break;
 					case "book3":
-						book3Gallery.show();
+						this.loadGallery("books/book3");
 						break;
 					case "book4":
-						book4Gallery.show();
+						this.loadGallery("books/book4");
 						break;
 					case "gourd1":
-						craftsGallery.show();
+						this.loadGallery("crafts");
 						break;
 					case "poi":
-						performanceGallery.show();
+						this.loadGallery("performance");
 						break;
 					case "silks1":
 						silksVideo.show();
 						break;
 					case "dress":
-						clothingGallery.show();
+						this.loadGallery("clothing");
 						break;
 					case "scarf":
-						clothingGallery.show();
+						this.loadGallery("clothing");
 						break;
 				}
+			}
+
+			//empty the sheet then load a gallery with ajax
+
+		}, {
+			key: "loadGallery",
+			value: function loadGallery(page) {
+				sheetElem.empty();
+				$.get(rootUrl + page, function (data) {
+					console.log(data);
+					sheetElem.append(data);
+				}).always(function () {
+					$("#sheetGallery").photobox("a", { time: 0 });
+				});
 			}
 
 			//note: "this" refers to the draggable event here, pass sprites "this" as "sprite"
@@ -955,12 +964,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 					//show the next page divs if dragged far enough
 					var p = sprite.timeline.progress();
-					if (p > sprite.progressMax || p < sprite.progressMin || isNaN(p)) {
+					if (p > sprite.progressMax || isNaN(p)) {
+						animateOpacity("#overlayLeft", 0.4, 1);
 						if (sprite.nextGroup != "Sheet") {
 							padWriting.write(sprite.nextGroup);
 						} else {
 							padWriting.write(sprite.name);
 						}
+					} else if (p < sprite.progressMin) {
+						animateOpacity("#overlayRight", 0.4, 1);
+						if (sprite.nextGroup != "Sheet") {
+							padWriting.write(sprite.nextGroup);
+						} else {
+							padWriting.write(sprite.name);
+						}
+					} else {
+						animateOpacity("#overlayLeft", 0.4, 0);
+						animateOpacity("#overlayRight", 0.4, 0);
 					}
 				};
 			}
@@ -984,7 +1004,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			key: "onDragEnd",
 			value: function onDragEnd(sprite) {
 				return function () {
-					console.log(sprite.direction);
+					animateOpacity("#overlayLeft", 0.4, 0);
+					animateOpacity("#overlayRight", 0.4, 0);
 					//clear the animation timer
 					clearTimeout(sprite.timer);
 

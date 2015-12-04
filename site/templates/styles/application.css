@@ -723,5 +723,23 @@ body {
   width: 80%;
   height: 65%;
   margin-left: 10%;
-  margin-top: 10%;
-  display: none; }
+  margin-top: 10%; }
+
+#overlayLeft {
+  left: 0;
+  background-image: linear-gradient(to right, black 0%, rgba(255, 255, 255, 0) 100%);
+  opacity: 0; }
+
+#overlayRight {
+  right: 0;
+  background-image: linear-gradient(to left, black 0%, rgba(255, 255, 255, 0) 100%);
+  opacity: 0; }
+
+.overlay {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  margin: 0;
+  width: 15%;
+  height: 100%;
+  z-index: 9999; }

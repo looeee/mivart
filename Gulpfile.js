@@ -1,23 +1,23 @@
 'use strict';
 
 var projectname  = "mivart",
-	template_path	 = "site/templates/",
-	scss_path 		 = template_path + 'scss/**/*.scss',
-	es2015_path    = template_path + 'es2015/**/*.js',
-	styles_path 	 = template_path + 'styles',
-	scripts_path 	 = template_path + 'scripts',
-	gulp           = require('gulp'),
-	sass        	 = require('gulp-sass'),
-	watch 			   = require('gulp-watch'),
-	autoprefixer	 = require('gulp-autoprefixer'),
-	//sourcemaps 	 = require('gulp-sourcemaps'),
-	uglify 			   = require('gulp-uglify'),
-  babelify       = require('babelify'),
-  browserify     = require('browserify'),
-	minifyCss 		 = require('gulp-minify-css'),
-	livereload 		 = require('gulp-livereload'),
-  plumber        = require('gulp-plumber'),
-  through2       = require('through2');
+	template_path = "site/templates/",
+	scss_path = template_path + 'scss/**/*.scss',
+	es2015_path = template_path + 'es2015/**/*.js',
+	styles_path = template_path + 'styles',
+	scripts_path = template_path + 'scripts',
+	gulp = require('gulp'),
+	sass = require('gulp-sass'),
+	watch = require('gulp-watch'),
+	autoprefixer = require('gulp-autoprefixer'),
+	//sourcemaps = require('gulp-sourcemaps'),
+	uglify = require('gulp-uglify'),
+  	babelify = require('babelify'),
+  	browserify = require('browserify'),
+	minifyCss = require('gulp-minify-css'),
+	livereload = require('gulp-livereload'),
+  	plumber = require('gulp-plumber'),
+  	through2 = require('through2');
 
 // Add debounce to gulp watch for FTP
 (function ftp_debounce_fix(){
@@ -64,9 +64,9 @@ var onError = function (err) {
 //Put all css tasks here
 gulp.task('css', function() {
 	return gulp.src(scss_path)
-    .pipe(plumber({
-      errorHandler: onError
-    }))
+    //.pipe(plumber({
+    //  errorHandler: onError
+    //}))
 		.pipe(sass())//.on('error', sass.logError))
 		.pipe(autoprefixer({
             browsers: ['last 3 version' , "ie 9"],
@@ -76,15 +76,15 @@ gulp.task('css', function() {
     	//.pipe(minifyCss())
     	//.pipe(sourcemaps.write())
     .pipe(gulp.dest(styles_path))
-    .pipe(livereload());
+    //.pipe(livereload());
 });
 
 //Put all javascript tasks here
 gulp.task('js', function () {
     return gulp.src(es2015_path)
-        .pipe(plumber({
-          errorHandler: onError
-        }))
+        //.pipe(plumber({
+        //  errorHandler: onError
+        //}))
         .pipe(through2.obj(function (file, enc, next) {
             browserify(file.path)
                 .transform(babelify, {presets: ['es2015']})
@@ -96,12 +96,24 @@ gulp.task('js', function () {
         }))
         //.pipe(uglify())
         .pipe(gulp.dest(scripts_path))
-        .pipe(livereload());
+        //.pipe(livereload());
+});
+
+//livereload on any file changes
+gulp.task('livereload', function() {
+  livereload({start: true});
+
+  var livereloadPage = function () {
+    // Reload the whole page
+    livereload.reload();
+  };
+  //watch for any file changes in template directory. 
+   gulp.watch(template_path + '/**/*.*', livereloadPage);
 });
 
 
 //default task
-gulp.task('default', ['css', 'js'] , function() {
+gulp.task('default', ['css', 'js', 'livereload'] , function() {
 	livereload.listen();
 	gulp.watch(scss_path, ['css']);
 	gulp.watch(es2015_path, ['js']);

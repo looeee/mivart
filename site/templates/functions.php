@@ -1,12 +1,18 @@
 <?php
+
+	//image processing options
+	$options = array(
+	  'upscaling' => false,
+	);
+
 	function sheetGallery($name, $pages) {
 		$galleryPage = $pages->get('name='.$name);
 
 		echo '<div id="'.$name.'Gallery" class="sheetContents">';  
 		if(count($galleryPage->images)) {
 	        foreach($galleryPage->images as $image) {            
-	            echo '<a href="'.$image->url.'">
-	            	<img src="'.$image->height(100)->url.'" title="'.$image->description.'" alt="'.$image->description.'"/>
+	            echo '<a href="'.$image->width(1280, $options)->url.'">
+	            	<img src="'.$image->height(100, $options)->url.'" title="'.$image->description.'" alt="'.$image->description.'"/>
 	            </a>';
 	        }    
 	     }    

@@ -1,5 +1,4 @@
 <?php 
-
 	include("./functions.php");
 
 	//Header file includes everyting up to opening <body>
@@ -8,10 +7,13 @@
 	<script src="//cdnjs.cloudflare.com/ajax/libs/gsap/1.18.0/TweenMax.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/gsap/latest/utils/Draggable.min.js"></script>
 	<script src="<?php echo $config->urls->templates?>scripts/vendor/jquery.photobox.js"></script>
+	<script defer src="<?php echo $config->urls->templates?>scripts/frontPage.js"></script>
 
 </head>
 <body>
-	
+	<div id="overlayLeft" class="overlay"></div>
+	<div id="overlayRight" class="overlay"></div>
+
 	<div id="lineSprites">
 
 	  	<div id="silk">
@@ -24,6 +26,7 @@
 	
 		 <div id="sheet">
 		 	<?php 
+		 	/*
 		 		sheetGallery('book1', $pages);
 		 		sheetGallery('book2', $pages);
 		 		sheetGallery('book3', $pages);
@@ -34,6 +37,7 @@
 		 		biography($pages);
 		 		contact($pages);
 		 		silksVideo();
+		 		*/
 			?> 
 	  	</div>
 	 
@@ -64,11 +68,10 @@
 	    //URL for images folder in templates directory
 	    var imagesUrl = "<?php echo $config->urls->templates?>images/frontPage/";
 	    var soundsUrl = "<?php echo $config->urls->templates?>sounds/";
+	    var templateUrl = "<?php echo $config->urls->templates?>";
+	    var rootUrl = "<?php echo $config->urls->root?>";
 	    
 	</script>
-	<script src="<?php echo $config->urls->templates?>scripts/frontPage.js"></script>
-	<script src="<?php echo $config->urls->templates?>scripts/frontPage.js"></script>
-	
 	
 	<?php
 	    //Footer includes everything after closing </body>
