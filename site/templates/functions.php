@@ -30,7 +30,7 @@
 	}
 
 	function resizedImage($page, $name, $width){
-		echo $page->images->get("description=".$name)->width($width, $options)->url;
+		echo $page->images->get("description=".$name)->size($width, 0, $options)->url;
 
 		//$page->setOutputFormatting(false);
 		//$page->images->add($url); 

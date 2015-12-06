@@ -69,6 +69,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		return WW / 100 * x;
 	};
 
+	var xPxToPercent = function xPxToPercent(x) {
+		return 100 * x / WW;
+	};
+
 	var randomInt = function randomInt(min, max) {
 		return Math.floor(Math.random() * (max - min + 1)) + min;
 	};
@@ -353,6 +357,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		}, {
 			key: "onStart",
 			value: function onStart() {
+
 				if (this.reversed()) {
 					wind.tweenTo(0);
 				} else {
@@ -578,6 +583,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			if (!spec.frames) {
 				spec.frames = 1;
 			}
+			this.frames = spec.frames;
 
 			//if no parentDiv supplied add sprite to body
 			if (spec.parentDiv == null) {
@@ -598,93 +604,21 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				}
 			}
 
+			animateOpacity("#" + this.name, 0, 0); //hide the sprite until the image has loaded
+
 			this.spriteElem = $("#" + spec.name);
 			this.name = spec.name;
 
-			this.setDims(spec);
+			//convert the percentage heights to pixels
+			spec.maxH = yPercentToPx(spec.maxH);
+			spec.maxW = xPercentToPx(spec.maxW);
+
+			this.width = spec.maxW; //and the maxW as a percentage of screen width
 
 			this.setBackground();
 		}
 
 		_createClass(ResponsiveSprite, [{
-			key: "setDims",
-			value: function setDims(spec) {
-				var _this2 = this;
-
-				if (!spec.minH) {
-					//if minH/minW are not provided set them to 0
-					spec.minH = 0;
-				}
-				if (!spec.minW) {
-					spec.minW = 0;
-				}
-
-				spec.maxH = yPercentToPx(spec.maxH);
-				spec.maxW = xPercentToPx(spec.maxW);
-				spec.minH = yPercentToPx(spec.minH);
-				spec.minW = xPercentToPx(spec.minW);
-
-				this.height = spec.maxH; //initially set maxH as a percentage of screen height
-				this.width = spec.maxW; //and the maxW as a percentage of screen width
-
-				this.imgH = 0;
-				this.imgW = 0;
-
-				this.spriteImage = this.selectImage(spec.imageURL, function (w, h) {
-					_this2.imgH = h;
-					_this2.imgW = w;
-					//After the image has loaded, initialize the width based on maxH
-					_this2.width = _this2.imgW / (_this2.imgH / spec.frames / _this2.height);
-
-					_this2.calcSize(spec); //now calculate the sprite's size and apply it to the spriteElem
-				});
-			}
-		}, {
-			key: "calcSize",
-			value: function calcSize(spec) {
-				//increase width if too narrow
-				if (this.width < spec.maxW || this.width < spec.minW) {
-					while (this.width < spec.maxW && this.height < spec.maxH) {
-						this.height = this.height + 5;
-						this.width = this.imgW / (this.imgH / spec.frames / this.height);
-					}
-				}
-
-				//decrease width if too wide
-				if (this.width > spec.maxW && this.width > spec.minW) {
-					while (this.width > spec.maxW && this.height <= spec.maxH) {
-						this.height = this.height - 5;
-						this.width = this.imgW / (this.imgH / spec.frames / this.height);
-					}
-				}
-
-				//decrease height if too tall
-				if (this.height > spec.maxH && this.height > spec.minH) {
-					this.height = spec.maxH;
-					this.width = this.imgW / (this.imgH / spec.frames / this.height);
-				}
-
-				//Set the new width and height
-				this.spriteElem.css({
-					height: this.height + "px",
-					width: this.width + "px"
-				});
-			}
-		}, {
-			key: "setBackground",
-			value: function setBackground() {
-				var _this3 = this;
-
-				//get an resized version of the image that matches the calcualted image width
-				//NOT WORKING FOR GOOSE OR STAFF!
-				$.get(rootUrl, { image: this.name, width: this.width }, function (data, resizedURL) {
-					_this3.spriteElem.css({
-						background: "url('" + data + "') no-repeat 0 0%",
-						"background-size": "100%"
-					});
-				});
-			}
-		}, {
 			key: "selectImage",
 			value: function selectImage(imageURL, callback) {
 				var img = new Image();
@@ -697,13 +631,30 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				return img;
 			}
 		}, {
+			key: "setBackground",
+			value: function setBackground() {
+				var _this2 = this;
+
+				//get an resized version of the image that matches the calcualted image width
+				//images must have a description set in Processwire that matches the sprites name
+				$.get(rootUrl, { image: this.name, width: this.width }, function (data, test) {
+					_this2.spriteImage = _this2.selectImage(data, function (w, h) {
+						_this2.spriteElem.css({
+							background: "url('" + data + "') no-repeat 0 0%",
+							"background-size": "100%",
+							height: h / _this2.frames + "px",
+							width: w + "px"
+						});
+						_this2.height = h / _this2.frames;
+					});
+				});
+			}
+		}, {
 			key: "setPosition",
 			value: function setPosition(spec) {
 				if (!spec.type) {
 					spec.type = "absolute";
 				}
-				animateOpacity("#" + this.name, 0, 0); //hide the sprite until the image has loaded
-
 				this.spriteElem.css({
 					position: spec.type
 				});
@@ -763,72 +714,72 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 			//set variables
 
-			var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(LineSprite).call(this, spec));
+			var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(LineSprite).call(this, spec));
 
-			_this4.frames = spec.frames;
-			_this4.trigger = spec.trigger || spec.name; //allow setting of a different element as trigger
-			_this4.group = spec.group;
-			_this4.nextGroup = spec.nextGroup || "Sheet";
-			_this4.progressMin = spec.progressMin || 0.26;
-			_this4.progressMax = spec.progressMax || 0.72;
+			_this3.frames = spec.frames;
+			_this3.trigger = spec.trigger || spec.name; //allow setting of a different element as trigger
+			_this3.group = spec.group;
+			_this3.nextGroup = spec.nextGroup || "Sheet";
+			_this3.progressMin = spec.progressMin || 0.26;
+			_this3.progressMax = spec.progressMax || 0.72;
 
-			switch (_this4.group) {
+			switch (_this3.group) {
 				case "Books":
-					_this4.timeline = lineTimelines.booksTL;
+					_this3.timeline = lineTimelines.booksTL;
 					break;
 				case "Crafts":
-					_this4.timeline = lineTimelines.craftsTL;
+					_this3.timeline = lineTimelines.craftsTL;
 					break;
 				case "Clothing":
-					_this4.timeline = lineTimelines.clothingTL;
+					_this3.timeline = lineTimelines.clothingTL;
 					break;
 				case "Performance":
-					_this4.timeline = lineTimelines.performanceTL;
+					_this3.timeline = lineTimelines.performanceTL;
 					break;
 				case "Sheet":
-					_this4.timeline = lineTimelines.sheetTL;
+					_this3.timeline = lineTimelines.sheetTL;
 					break;
 				default:
-					_this4.timeline = lineTimelines.centreTL;
+					_this3.timeline = lineTimelines.centreTL;
 			}
 
 			//set the the timeline for the next group of sprites
-			switch (_this4.nextGroup) {
+			switch (_this3.nextGroup) {
 				case "Sheet":
-					_this4.nextTimeline = lineTimelines.sheetTL;
+					_this3.nextTimeline = lineTimelines.sheetTL;
 					break;
 				case "Books":
-					_this4.nextTimeline = lineTimelines.booksTL;
+					_this3.nextTimeline = lineTimelines.booksTL;
 					break;
 				case "Crafts":
-					_this4.nextTimeline = lineTimelines.craftsTL;
+					_this3.nextTimeline = lineTimelines.craftsTL;
 					break;
 				case "Clothing":
-					_this4.nextTimeline = lineTimelines.clothingTL;
+					_this3.nextTimeline = lineTimelines.clothingTL;
 					break;
 				case "Performance":
-					_this4.nextTimeline = lineTimelines.performanceTL;
+					_this3.nextTimeline = lineTimelines.performanceTL;
 					break;
 				case "Home":
-					_this4.nextTimeline = lineTimelines.centreTL;
+					_this3.nextTimeline = lineTimelines.centreTL;
 					break;
 			}
 
 			//hide the sprite until it has been positioned
-			animateOpacity("#" + _this4.name, 0, 0);
+			animateOpacity("#" + _this3.name, 0, 0);
 
-			wind.addTween(_this4);
+			wind.addTween(_this3);
 
-			_this4.makeDraggable();
+			_this3.makeDraggable();
 
 			//any calculations that need to be done after the image has loaded go here
 			window.addEventListener("load", function () {
-				_this4.width = _this4.spriteElem.width();
-				_this4.setPosition(spec);
-				lineTimelines.addTween(_this4);
-				_this4.xPos = _this4.xPos + _this4.width / 2;
+				_this3.width = _this3.spriteElem.width();
+				_this3.setPosition(spec);
+				lineTimelines.addTween(_this3);
+				_this3.xPos = _this3.xPos + _this3.width / 2;
 			});
-			return _this4;
+			return _this3;
 		}
 
 		_createClass(LineSprite, [{
@@ -1035,8 +986,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			key: "animateSecondary",
 			value: function animateSecondary() {
 				if (this.nextGroup === "Performance" || this.group === "Performance") {
+					if (typeof staff === 'undefined') {
+						staff = new Staff(staffSpec);
+					}
 					staff.animate();
 				} else if (this.nextGroup === "Crafts" || this.group === "Crafts") {
+					if (typeof goose === 'undefined') {
+						goose = new Goose(gooseSpec);
+					}
 					goose.animate();
 				}
 			}
@@ -1079,32 +1036,32 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 			spec.xType = "left";
 
-			var _this5 = _possibleConstructorReturn(this, Object.getPrototypeOf(shadowSprite).call(this, spec));
+			var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(shadowSprite).call(this, spec));
 
-			_this5.setPosition(spec);
+			_this4.setPosition(spec);
 
-			_this5.shadowYOffset = spec.shadowYOffset || 5;
-			_this5.shadowXOffset = spec.shadowXOffset || 0;
-			_this5.shadowWidth = spec.shadowWidth || 100;
+			_this4.shadowYOffset = spec.shadowYOffset || 5;
+			_this4.shadowXOffset = spec.shadowXOffset || 0;
+			_this4.shadowWidth = spec.shadowWidth || 100;
 
 			if (spec.shadowImg) {
-				_this5.shadow(spec.shadowImg);
+				_this4.shadow(spec.shadowImg);
 			}
 
-			_this5.rotated = false;
+			_this4.rotated = false;
 
 			//fade in the sprite after everything has loaded
 			window.addEventListener("load", function () {
 				var fadeSpeed = randomFloat(0.2, 0.4);
-				animateOpacity("#" + _this5.name, fadeSpeed, 1);
+				animateOpacity("#" + _this4.name, fadeSpeed, 1);
 			});
-			return _this5;
+			return _this4;
 		}
 
 		_createClass(shadowSprite, [{
 			key: "shadow",
 			value: function shadow(shadowImg) {
-				var _this6 = this;
+				var _this5 = this;
 
 				var spriteMid = parseFloat(this.spriteElem.css("left")) / WW * 100;
 				this.spriteElem.append("<div id='" + this.name + "Shadow' class='shadow'></div>");
@@ -1126,13 +1083,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					var pageXPercent = e.pageX * 100 / WW;
 					var skew = 0;
 					if (pageXPercent < spriteMid) {
-						if (_this6.rotated) {
+						if (_this5.rotated) {
 							skew = 0.5 - 0.5 / (spriteMid - 100) * (spriteMid - pageXPercent);
 						} else {
 							skew = 0.5 + 0.5 / spriteMid * (spriteMid - pageXPercent);
 						}
 					} else {
-						if (_this6.rotated) {
+						if (_this5.rotated) {
 							skew = 0.5 + 0.5 / spriteMid * (spriteMid - pageXPercent);
 						} else {
 							skew = 0.5 - 0.5 / (spriteMid - 100) * (spriteMid - pageXPercent);
@@ -1144,20 +1101,20 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				this.shadowYOffset = -100 + this.shadowYOffset;
 
 				window.addEventListener("load", function () {
-					var width = parseFloat(_this6.spriteElem.css("width"));
+					var width = parseFloat(_this5.spriteElem.css("width"));
 					//slightly more accurate calculation of spriteMid now that we know the width
-					spriteMid = (parseFloat(_this6.spriteElem.css("left")) + width / 2) / WW * 100;
+					spriteMid = (parseFloat(_this5.spriteElem.css("left")) + width / 2) / WW * 100;
 
-					_this6.shadow.css({
+					_this5.shadow.css({
 						background: "url('" + shadowImg + "') 0 0% / contain no-repeat",
-						height: _this6.height + "px",
-						width: _this6.shadowWidth + "%",
-						bottom: _this6.shadowYOffset + "%",
-						left: _this6.shadowXOffset + "%"
+						height: _this5.height + "px",
+						width: _this5.shadowWidth + "%",
+						bottom: _this5.shadowYOffset + "%",
+						left: _this5.shadowXOffset + "%"
 					});
 
 					var fadeSpeed = randomFloat(0.2, 0, 4);
-					animateOpacity("#" + _this6.name + "Shadow", fadeSpeed, 0.7);
+					animateOpacity("#" + _this5.name + "Shadow", fadeSpeed, 0.7);
 				});
 			}
 		}]);
@@ -1188,11 +1145,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			spec.originalName = spec.name;
 			spec.name = spec.name + "Wrapper";
 
-			var _this7 = _possibleConstructorReturn(this, Object.getPrototypeOf(movingShadowSprite).call(this, spec));
+			var _this6 = _possibleConstructorReturn(this, Object.getPrototypeOf(movingShadowSprite).call(this, spec));
 
-			_this7.spriteElem.css({ background: "" });
+			_this6.spriteElem.css({ background: "" });
 
-			_this7.spriteElem.append("<div id='" + spec.originalName + "'></div>");
+			_this6.spriteElem.append("<div id='" + spec.originalName + "'></div>");
 
 			$("#" + spec.originalName).css({
 				position: 'relative',
@@ -1200,11 +1157,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				left: 0,
 				width: 'inherit',
 				height: 'inherit',
-				background: "url('" + _this7.spriteImage.src + "') no-repeat 0 0%",
+				//background: "url('" + this.spriteImage.src + "') no-repeat 0 0%",
 				"background-size": "100%"
 			});
 
-			return _this7;
+			return _this6;
 		}
 
 		return movingShadowSprite;
@@ -1224,15 +1181,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		function Goose(spec) {
 			_classCallCheck(this, Goose);
 
-			var _this8 = _possibleConstructorReturn(this, Object.getPrototypeOf(Goose).call(this, spec));
+			var _this7 = _possibleConstructorReturn(this, Object.getPrototypeOf(Goose).call(this, spec));
 
-			_this8.left = xPercentToPx(spec.xPos);
-			_this8.top = yPercentToPx(spec.yPos);
+			_this7.left = xPercentToPx(spec.xPos);
+			_this7.top = yPercentToPx(spec.yPos);
 
-			_this8.buildTimeline();
+			_this7.buildTimeline();
 
-			_this8.rotated = false;
-			return _this8;
+			_this7.rotated = false;
+			return _this7;
 		}
 
 		_createClass(Goose, [{
@@ -1273,13 +1230,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		}, {
 			key: "animate",
 			value: function animate() {
-				var _this9 = this;
+				var _this8 = this;
 
 				if (this.timeline.reversed()) {
 					this.rotated = false;
 					TweenMax.to(this.spriteElem, 0.6, { rotationY: 0, ease: Quad.easeInOut });
 					setTimeout(function () {
-						_this9.timeline.play();
+						_this8.timeline.play();
 					}, 300);
 				} else if (this.timeline.progress() === 0) {
 					this.rotated = false;
@@ -1288,7 +1245,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					this.rotated = true;
 					TweenMax.to(this.spriteElem, 0.6, { rotationY: 180, ease: Quad.easeInOut });
 					setTimeout(function () {
-						_this9.timeline.reverse();
+						_this8.timeline.reverse();
 					}, 300);
 				}
 			}
@@ -1311,10 +1268,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		function Staff(spec) {
 			_classCallCheck(this, Staff);
 
-			var _this10 = _possibleConstructorReturn(this, Object.getPrototypeOf(Staff).call(this, spec));
+			var _this9 = _possibleConstructorReturn(this, Object.getPrototypeOf(Staff).call(this, spec));
 
-			_this10.buildTimeline();
-			return _this10;
+			_this9.buildTimeline();
+			return _this9;
 		}
 
 		_createClass(Staff, [{
@@ -1377,24 +1334,24 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 			//fade in the sprite after everything has loaded
 
-			var _this11 = _possibleConstructorReturn(this, Object.getPrototypeOf(Cloud).call(this, spec));
+			var _this10 = _possibleConstructorReturn(this, Object.getPrototypeOf(Cloud).call(this, spec));
 
 			window.addEventListener("load", function () {
 				var fadeSpeed = randomFloat(0.2, 0.4);
-				animateOpacity("#" + _this11.name, fadeSpeed, 0.7);
+				animateOpacity("#" + _this10.name, fadeSpeed, 0.7);
 			});
 
-			_this11.setPosition(spec);
+			_this10.setPosition(spec);
 
-			_this11.yPos = parseFloat(_this11.spriteElem.css("bottom"));
-			_this11.animate(spec.animSpeed, spec.name, spec.startPos);
-			return _this11;
+			_this10.yPos = parseFloat(_this10.spriteElem.css("bottom"));
+			_this10.animate(spec.animSpeed, spec.name, spec.startPos);
+			return _this10;
 		}
 
 		_createClass(Cloud, [{
 			key: "animate",
 			value: function animate(speed, name, startPos) {
-				var _this12 = this;
+				var _this11 = this;
 
 				this.timeline = new TimelineMax();
 				var crossScreen = TweenMax.fromTo('#' + name, speed, { left: WW * 6 / 5, y: 0 }, { left: -WW * 1 / 5, repeat: -1, ease: Linear.easeNone, force3D: true });
@@ -1408,18 +1365,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 					var wind = function wind(x, y) {
 						//set the minimum height of clouds as a % of screen height
-						var height = parseFloat(_this12.spriteElem.css("bottom"));
+						var height = parseFloat(_this11.spriteElem.css("bottom"));
 						if (height > WH / 100 * 55) {
 							y = Math.abs(y);
 						}
-						_this12.timeline.pause();
+						_this11.timeline.pause();
 						TweenMax.to('#' + name, 2, {
 							x: x,
 							y: y,
 							ease: Sine.easeOut,
 							force3D: true,
 							onComplete: function onComplete() {
-								_this12.timeline.play();
+								_this11.timeline.play();
 							}
 						});
 					};
@@ -1448,18 +1405,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		function Boat(spec) {
 			_classCallCheck(this, Boat);
 
-			var _this13 = _possibleConstructorReturn(this, Object.getPrototypeOf(Boat).call(this, spec));
+			var _this12 = _possibleConstructorReturn(this, Object.getPrototypeOf(Boat).call(this, spec));
 
-			_this13.setPosition(spec);
-			_this13.clipPath();
-			_this13.animate();
+			_this12.setPosition(spec);
+
+			_this12.animate();
 
 			//fade in the sprite after everything has loaded
 			window.addEventListener("load", function () {
 				var fadeSpeed = randomFloat(0.2, 0.4);
-				animateOpacity("#" + _this13.name, fadeSpeed, 1);
+				animateOpacity("#" + _this12.name, fadeSpeed, 1);
+				_this12.clipPath();
 			});
-			return _this13;
+			return _this12;
 		}
 
 		_createClass(Boat, [{
@@ -1544,10 +1502,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	var bookSpec = {
 		imageURL: imagesUrl + "book.png",
 		frames: 1,
-		maxH: 9,
-		maxW: 9,
-		minH: 6,
-		minW: 6,
+		maxW: 6,
 		offset: 6,
 		rotate: true
 	};
@@ -1555,10 +1510,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	var tshirtSpec = {
 		frames: 7,
 		imageURL: imagesUrl + "tshirt.png",
-		maxH: 21,
-		maxW: 16,
-		minH: 17,
-		minW: 14,
+		maxW: 15,
 		offset: 7,
 		rotate: true
 	};
@@ -1566,10 +1518,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	var gourdSpec = {
 		imageURL: imagesUrl + "gourd.png",
 		frames: 1,
-		maxH: 20,
-		maxW: 20,
-		minH: 18,
-		minW: 18,
+		maxW: 3.5,
 		offset: 4,
 		progressMin: 0.40,
 		progressMax: 0.81
@@ -1579,10 +1528,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		imageURL: imagesUrl + "silk.png",
 		frames: 7,
 		link: '#',
-		maxH: 55,
-		maxW: 40,
-		minH: 55,
-		minW: 49,
+		maxW: 33,
 		offset: 0,
 		progressMin: 0.48,
 		progressMax: 0.89
@@ -1591,10 +1537,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	var clothingSpec = {
 		rotate: true,
 		frames: 1,
-		maxH: 55,
-		maxW: 30,
-		minH: 50,
-		minW: 25
+		maxW: 19
 	};
 
 	// *********************************************************************
@@ -1636,8 +1579,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	// *********************************************************************
 	// * SHEET SPRITE USED TO DISPLY INFORMATION
 	// *********************************************************************
-
-	var sheet = new LineSprite({
+	var sheetSpec = {
 		name: "sheet",
 		imageURL: imagesUrl + "sheet.png",
 		group: "Sheet",
@@ -1648,11 +1590,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		progressMax: 0.6,
 		rotate: true,
 		frames: 1,
-		maxH: 70,
-		maxW: 90,
-		minH: 50,
-		minW: 25
-	});
+		maxW: 53
+	};
+	var sheet = new LineSprite(sheetSpec);
 
 	$("#sheetContents").css({
 		transform: 'rotate(-' + washingLine.slopeDegrees + 'deg)'
@@ -1661,43 +1601,46 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	// *********************************************************************
 	// *SPRITES THAT ANIMATE ONTO SCREEN (FROM LEFT) AFTER CLICKING BOOK
 	// *********************************************************************
-	var book1 = new LineSprite(_.extend({
+	var book1Spec = _.extend({
 		name: "book1",
 		group: "Books",
 		xPos: 32,
 		progressMin: 0.22,
 		progressMax: 0.64
-	}, bookSpec));
+	}, bookSpec);
+	var book1 = new LineSprite(book1Spec);
 
-	var book2 = new LineSprite(_.extend({
+	var book2Spec = _.extend({
 		name: "book2",
 		group: "Books",
 		xPos: 47,
 		progressMin: 0.30,
 		progressMax: 0.70
-	}, bookSpec));
+	}, bookSpec);
+	var book2 = new LineSprite(book2Spec);
 
-	var book3 = new LineSprite(_.extend({
+	var book3Spec = _.extend({
 		name: "book3",
 		group: "Books",
 		xPos: 62,
 		progressMin: 0.36,
 		progressMax: 0.79
-	}, bookSpec));
+	}, bookSpec);
+	var book3 = new LineSprite(book3Spec);
 
-	var book4 = new LineSprite(_.extend({
+	var book4Spec = _.extend({
 		name: "book4",
 		group: "Books",
 		xPos: 75,
 		progressMin: 0.45,
 		progressMax: 0.86
-	}, bookSpec));
+	}, bookSpec);
+	var book4 = new LineSprite(book4Spec);
 
 	// *********************************************************************
 	// *SPRITES THAT ANIMATE ONTO SCREEN (FROM RIGHT) AFTER CLICKING TSHIRT
 	// *********************************************************************
-
-	var dress = new LineSprite(_.extend({
+	var dressSpec = _.extend({
 		name: "dress",
 		imageURL: imagesUrl + "dress.png",
 		group: "Clothing",
@@ -1705,9 +1648,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		xPos: 35,
 		progressMin: 0.28,
 		progressMax: 0.70
-	}, clothingSpec));
+	}, clothingSpec);
+	var dress = new LineSprite(dressSpec);
 
-	var scarf = new LineSprite(_.extend({
+	var scarfSpec = _.extend({
 		name: "scarf",
 		imageURL: imagesUrl + "scarf.png",
 		group: "Clothing",
@@ -1715,43 +1659,42 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		xPos: 55,
 		progressMin: 0.34,
 		progressMax: 0.78
-	}, clothingSpec));
+	}, clothingSpec);
+	var scarf = new LineSprite(scarfSpec);
 
 	// *********************************************************************
 	// *SPRITE THAT ANIMATEs ONTO SCREEN (FROM LEFT) AFTER CLICKING GOURD
 	// *********************************************************************
-
-	var gourd1 = new LineSprite(_.extend({
+	var gourd1Spec = _.extend({
 		name: "gourd1",
 		group: "Crafts",
 		xPos: 70
-	}, gourdSpec));
+	}, gourdSpec);
+	var gourd1 = new LineSprite(gourd1Spec);
 
 	// *********************************************************************
 	// *SPRITE THAT ANIMATEs ONTO SCREEN (FROM LEFT) AFTER CLICKING SILK
 	// *********************************************************************
-
-	var silk1 = new LineSprite(_.extend({
+	var silk1Spec = _.extend({
 		name: "silk1",
 		xPos: 66,
 		group: "Performance",
 		trigger: "silk1Trigger"
-	}, silkSpec));
+	}, silkSpec);
+	var silk1 = new LineSprite(silk1Spec);
 
-	var poi = new LineSprite({
+	var poiSpec = {
 		frames: 7,
 		name: "poi",
 		imageURL: imagesUrl + "poi.png",
-		maxH: 25,
-		maxW: 20,
-		minH: 22,
-		minW: 18,
+		maxW: 15.5,
 		offset: 3,
 		xPos: 45,
 		group: "Performance",
 		progressMin: 0.36,
 		progressMax: 0.75
-	});
+	};
+	var poi = new LineSprite(poiSpec);
 
 	// * ***********************************************************************
 	// *
@@ -1764,10 +1707,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		parentDiv: 'plankSprites',
 		name: "bucket",
 		imageURL: imagesUrl + "bucket.png",
-		maxH: 18,
-		maxW: 18,
-		minH: 16,
-		minW: 16,
+		maxW: 7.5,
 		xPos: 7,
 		yPos: 10,
 		yType: "bottom",
@@ -1787,10 +1727,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		parentDiv: 'plankSprites',
 		name: "brushholder",
 		imageURL: imagesUrl + "brushholder.png",
-		maxH: 18,
-		maxW: 18,
-		minH: 16,
-		minW: 16,
+		maxW: 5.5,
 		xPos: 15,
 		yPos: 10,
 		yType: "bottom",
@@ -1821,10 +1758,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		parentDiv: 'plankSprites',
 		name: "inkwell",
 		imageURL: imagesUrl + "inkwell.png",
-		maxH: 18,
-		maxW: 18,
-		minH: 16,
-		minW: 16,
+		maxW: 5.5,
 		xPos: 21,
 		yPos: 10,
 		yType: "bottom",
@@ -1855,10 +1789,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		parentDiv: 'plankSprites',
 		name: "pad",
 		imageURL: imagesUrl + "pad.png",
-		maxH: 18,
-		maxW: 18,
-		minH: 16,
-		minW: 16,
+		maxW: 20,
 		xPos: 27,
 		yPos: 5,
 		yType: "bottom",
@@ -1867,35 +1798,33 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		shadowWidth: 65
 	});
 
-	var goose = new Goose({
+	var gooseSpec = {
 		name: "goose",
 		imageURL: imagesUrl + "goose.png",
-		maxH: 25,
-		maxW: 20,
-		minH: 22,
-		minW: 18,
+		maxW: 18,
 		xPos: 110,
 		yPos: 70,
 		shadowImg: imagesUrl + "goose-shadow.png",
 		shadowYOffset: 10,
 		shadowXOffset: 0,
 		shadowWidth: 100
-	});
+	};
+	var goose = undefined;
 
-	var staff = new Staff({
+	//const goose = new Goose(gooseSpec);
+
+	var staffSpec = {
 		name: "staff",
 		imageURL: imagesUrl + "staff.png",
-		maxH: 25,
 		maxW: 40,
-		minH: 22,
-		minW: 18,
 		xPos: 60,
 		yPos: 120,
 		shadowImg: imagesUrl + "staff-shadow.png",
 		shadowYOffset: 70,
 		shadowXOffset: 3,
 		shadowWidth: 100
-	});
+	};
+	var staff = undefined;
 
 	// * ***********************************************************************
 	// *
@@ -1906,10 +1835,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	var cloud1 = new Cloud({
 		name: 'cloud1',
 		imageURL: imagesUrl + "cloud1.png",
-		maxH: 15,
-		maxW: 25,
-		minH: 14,
-		minW: 22,
+		maxW: 30,
 		xPos: 85,
 		yPos: 65,
 		animSpeed: 65,
@@ -1919,10 +1845,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	var cloud2 = new Cloud({
 		name: 'cloud2',
 		imageURL: imagesUrl + "cloud2.png",
-		maxH: 15,
-		maxW: 15,
-		minH: 12,
-		minW: 12,
+		maxW: 20,
 		xPos: 59,
 		yPos: 90,
 		animSpeed: 45,
@@ -1932,10 +1855,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	var cloud3 = new Cloud({
 		name: 'cloud3',
 		imageURL: imagesUrl + "cloud3.png",
-		maxH: 15,
 		maxW: 20,
-		minH: 12,
-		minW: 16,
 		xPos: 15,
 		yPos: 80,
 		animSpeed: 55,
@@ -1947,9 +1867,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		name: "boat",
 		imageURL: imagesUrl + "boat.png",
 		maxH: 20,
-		maxW: 20,
-		minH: 12,
-		minW: 16,
+		maxW: 13,
 		xType: "right",
 		xPos: 25,
 		yType: "bottom",
@@ -1964,6 +1882,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	window.addEventListener("load", function () {
 		lineTimelines.centreTL.progress(0.5); //.tweenTo( "middle" );
 		wind.timeline.progress(0.5);
+		console.log(pad);
 		padWriting = new Handwriting(pad.width * 0.6, pad.height * 0.7);
 	}); //end window.load
 })();

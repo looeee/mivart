@@ -18,6 +18,4 @@
     if($config->ajax) gallery($page);
     else header('Location: '.$config->urls->root); 
 
-
-	
 ?>

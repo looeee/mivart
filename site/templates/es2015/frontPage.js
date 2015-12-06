@@ -50,6 +50,8 @@
 	//Return a window width % as a pixel value
 	const xPercentToPx = (x) => WW / 100 * x;
 
+	const xPxToPercent = (x) => (100 * x)/WW;
+
 	const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
 	const randomFloat = (min, max) => Math.random() * (max - min) + min;
@@ -303,6 +305,7 @@
 		}
 
 		onStart(){
+
 			if(this.reversed()){
 				wind.tweenTo(0);
 			}
@@ -464,6 +467,7 @@
 		constructor(spec){
 			//if number of frames not specified assume 1 frame
 			if(!spec.frames){ spec.frames = 1}
+			this.frames=spec.frames;
 
 			//if no parentDiv supplied add sprite to body
 			if(spec.parentDiv == null){ spec.parentDiv = 'body'; }
@@ -483,83 +487,18 @@
 				}
 			}
 
+			animateOpacity("#" + this.name, 0, 0); //hide the sprite until the image has loaded
+
 			this.spriteElem = $("#" + spec.name);
 			this.name = spec.name;
 
-			this.setDims(spec);
-
-			this.setBackground();
-		}
-
-		setDims(spec){
-			if (!spec.minH) { //if minH/minW are not provided set them to 0
-				spec.minH = 0;
-			}
-			if (!spec.minW) {
-				spec.minW = 0;
-			}
-
+			//convert the percentage heights to pixels
 			spec.maxH = yPercentToPx(spec.maxH);
 			spec.maxW = xPercentToPx(spec.maxW);
-			spec.minH = yPercentToPx(spec.minH);
-			spec.minW = xPercentToPx(spec.minW);
 
-			this.height = spec.maxH; //initially set maxH as a percentage of screen height
 			this.width = spec.maxW; //and the maxW as a percentage of screen width
 
-			this.imgH = 0;
-			this.imgW = 0;
-
-			this.spriteImage = this.selectImage(spec.imageURL, (w, h) => {
-				this.imgH = h;
-				this.imgW = w;
-				//After the image has loaded, initialize the width based on maxH
-				this.width = this.imgW / ((this.imgH / spec.frames) / this.height);
-
-				this.calcSize(spec); //now calculate the sprite's size and apply it to the spriteElem
-			}); 
-		}
-
-		calcSize(spec){
-			//increase width if too narrow
-			if (this.width < spec.maxW || this.width < spec.minW) {
-				while (this.width < spec.maxW && this.height < spec.maxH){
-					this.height = this.height + 5;
-					this.width = this.imgW / ((this.imgH / spec.frames) / this.height);
-				}
-			}
-
-			//decrease width if too wide
-			if (this.width > spec.maxW && this.width > spec.minW) {
-				while (this.width > spec.maxW && this.height <= spec.maxH) {
-					this.height = this.height - 5;
-					this.width = this.imgW / ((this.imgH / spec.frames) / this.height);
-				}
-			}
-
-			//decrease height if too tall
-			if (this.height > spec.maxH && this.height > spec.minH) {
-				this.height = spec.maxH;
-				this.width = this.imgW / ((this.imgH / spec.frames) / this.height);
-			}
-
-			//Set the new width and height
-			this.spriteElem.css({
-				height: this.height + "px",
-				width: this.width + "px"
-			});
-		}
-
-
-		setBackground(){
-			//get an resized version of the image that matches the calcualted image width
-			//NOT WORKING FOR GOOSE OR STAFF!
-			$.get( rootUrl, { image: this.name, width: this.width }, (data, resizedURL) => {
-				this.spriteElem.css({
-					background: "url('" + data + "') no-repeat 0 0%",
-					"background-size": "100%"
-				});
-			});
+			this.setBackground();
 		}
 
 		selectImage(imageURL, callback) {
@@ -573,10 +512,24 @@
 			return img;
 		}
 
+		setBackground(){
+			//get an resized version of the image that matches the calcualted image width
+			//images must have a description set in Processwire that matches the sprites name
+			$.get( rootUrl, { image: this.name, width: this.width }, (data, test) => {
+				this.spriteImage = this.selectImage(data, (w, h) => {
+					this.spriteElem.css({
+						background: "url('" + data + "') no-repeat 0 0%",
+						"background-size": "100%",
+						height: h/(this.frames) +"px",
+						width: w + "px"
+					});
+					this.height = h/(this.frames);
+				});
+			}); 
+		}
+
 		setPosition(spec){
 			if(!spec.type){ spec.type = "absolute"; }
-			animateOpacity("#" + this.name, 0, 0); //hide the sprite until the image has loaded
-
 			this.spriteElem.css({
 				position: spec.type
 			});
@@ -888,9 +841,15 @@
 
 		animateSecondary(){
 			if(this.nextGroup === "Performance" || this.group === "Performance"){
+				if(typeof staff === 'undefined'){
+					staff = new Staff(staffSpec);
+				}
 				staff.animate();
 			}
 			else if(this.nextGroup === "Crafts" || this.group === "Crafts"){
+				if(typeof goose === 'undefined'){
+					goose = new Goose(gooseSpec);
+				}		
 				goose.animate();
 			}
 		}
@@ -1037,7 +996,7 @@
 			    left: 0,
 			    width: 'inherit',
 			    height: 'inherit',
-				background: "url('" + this.spriteImage.src + "') no-repeat 0 0%",
+				//background: "url('" + this.spriteImage.src + "') no-repeat 0 0%",
 				"background-size": "100%",
 			});
 
@@ -1094,7 +1053,7 @@
 			//let rotate = TweenMax.to(
 			//	this.spriteElem, .6, { rotation: 8, ease: Sine.easeInOut, repeat: 8, yoyo: true });
 
-			this.timeline.add(move, 0)
+			this.timeline.add(move, 0);
 						 //.add(rotate, 0)
 		}
 
@@ -1254,13 +1213,14 @@
 		constructor(spec){
 			super(spec);
 			this.setPosition(spec);
-			this.clipPath();
+			
 			this.animate();
 
 			//fade in the sprite after everything has loaded
 			window.addEventListener("load", ()=> { 
 				let fadeSpeed = randomFloat(0.2,0.4);
 				animateOpacity("#" + this.name, fadeSpeed, 1);
+				this.clipPath();
 			});
 		}
 
@@ -1340,10 +1300,7 @@
 	const bookSpec = {
 		imageURL: imagesUrl + "book.png",
 		frames: 1,
-		maxH: 9, 
-		maxW: 9, 
-		minH: 6, 
-		minW: 6, 
+		maxW: 6, 
 		offset: 6,
 		rotate: true,
 	};
@@ -1351,10 +1308,7 @@
 	const tshirtSpec = {
 		frames: 7,
 		imageURL: imagesUrl + "tshirt.png",
-		maxH: 21, 
-		maxW: 16, 
-		minH: 17, 
-		minW: 14, 
+		maxW: 15, 
 		offset: 7,
 		rotate: true,
 	};
@@ -1362,10 +1316,7 @@
 	const gourdSpec = {
 		imageURL: imagesUrl + "gourd.png",
 		frames: 1,
-		maxH: 20, 
-		maxW: 20, 
-		minH: 18, 
-		minW: 18, 
+		maxW: 3.5, 
 		offset: 4,
 		progressMin: 0.40,
 		progressMax: 0.81,
@@ -1375,10 +1326,7 @@
 		imageURL: imagesUrl + "silk.png",
 		frames: 7,
 		link: '#',
-		maxH: 55, 
-		maxW: 40, 
-		minH: 55, 
-		minW: 49, 
+		maxW: 33, 
 		offset: 0,
 		progressMin: 0.48,
 		progressMax: 0.89,
@@ -1387,10 +1335,7 @@
 	const clothingSpec = {
 		rotate: true,
 		frames: 1,
-		maxH: 55, 
-		maxW: 30, 
-		minH: 50, 
-		minW: 25, 
+		maxW: 19, 
 	};
 
 	// *********************************************************************
@@ -1433,8 +1378,7 @@
 	// *********************************************************************
 	// * SHEET SPRITE USED TO DISPLY INFORMATION
 	// *********************************************************************
-	
-	const sheet = new LineSprite({
+	const sheetSpec = {
 		name: "sheet",
 		imageURL: imagesUrl + "sheet.png",
 		group: "Sheet",
@@ -1445,11 +1389,9 @@
 		progressMax: 0.6,
 		rotate: true,
 		frames: 1,
-		maxH: 70, 
-		maxW: 90, 
-		minH: 50, 
-		minW: 25,
-	});
+		maxW: 53, 
+	};
+	const sheet = new LineSprite(sheetSpec);
 
 	$("#sheetContents").css({ 
 		transform: 'rotate(-' + washingLine.slopeDegrees + 'deg)',
@@ -1458,43 +1400,46 @@
 	// *********************************************************************
 	// *SPRITES THAT ANIMATE ONTO SCREEN (FROM LEFT) AFTER CLICKING BOOK
 	// *********************************************************************
-	const book1 = new LineSprite(_.extend({
+	const book1Spec = _.extend({
 		name: "book1",
 		group: "Books",
 		xPos: 32,
 		progressMin: 0.22,
 		progressMax: 0.64,
-	}, bookSpec));
+	}, bookSpec);
+	const book1 = new LineSprite(book1Spec);
 
-	const book2 = new LineSprite(_.extend({
+	const book2Spec = _.extend({
 		name: "book2",
 		group: "Books",
 		xPos: 47,
 		progressMin: 0.30,
 		progressMax: 0.70,
-	}, bookSpec));
+	}, bookSpec);
+	const book2 = new LineSprite(book2Spec);
 
-	const book3 = new LineSprite(_.extend({
+	const book3Spec = _.extend({
 		name: "book3",
 		group: "Books",
 		xPos: 62,
 		progressMin: 0.36,
 		progressMax: 0.79,
-	}, bookSpec));
+	}, bookSpec);
+	const book3 = new LineSprite(book3Spec);
 
-	const book4 = new LineSprite(_.extend({
+	const book4Spec = _.extend({
 		name: "book4",
 		group: "Books",
 		xPos: 75,
 		progressMin: 0.45,
 		progressMax: 0.86,
-	}, bookSpec));
+	}, bookSpec);
+	const book4 = new LineSprite(book4Spec);
 
 	// *********************************************************************
 	// *SPRITES THAT ANIMATE ONTO SCREEN (FROM RIGHT) AFTER CLICKING TSHIRT
 	// *********************************************************************
-
-	const dress = new LineSprite(_.extend({
+	const dressSpec = _.extend({
 		name: "dress",
 		imageURL: imagesUrl + "dress.png",
 		group: "Clothing",
@@ -1502,9 +1447,10 @@
 		xPos: 35,
 		progressMin: 0.28,
 		progressMax: 0.70,
-	}, clothingSpec));
+	}, clothingSpec);
+	const dress = new LineSprite(dressSpec);
 
-	const scarf = new LineSprite(_.extend({
+	const scarfSpec = _.extend({
 		name: "scarf",
 		imageURL: imagesUrl + "scarf.png",
 		group: "Clothing",
@@ -1512,43 +1458,42 @@
 		xPos: 55,
 		progressMin: 0.34,
 		progressMax: 0.78,
-	}, clothingSpec));
+	}, clothingSpec);
+	const scarf = new LineSprite(scarfSpec);
 
 	// *********************************************************************
 	// *SPRITE THAT ANIMATEs ONTO SCREEN (FROM LEFT) AFTER CLICKING GOURD
 	// *********************************************************************
-
-	const gourd1 = new LineSprite(_.extend({
+	const gourd1Spec = _.extend({
 		name: "gourd1",
 		group: "Crafts",
 		xPos: 70,
-	}, gourdSpec));
+	}, gourdSpec);
+	const gourd1 = new LineSprite(gourd1Spec);
 
 	// *********************************************************************
 	// *SPRITE THAT ANIMATEs ONTO SCREEN (FROM LEFT) AFTER CLICKING SILK
 	// *********************************************************************
-
-	const silk1 = new LineSprite(_.extend({
+	const silk1Spec = _.extend({
 		name: "silk1",
 		xPos: 66,
 		group: "Performance",
 		trigger: "silk1Trigger",
-	}, silkSpec));
+	}, silkSpec);
+	const silk1 = new LineSprite(silk1Spec);
 
-	const poi = new LineSprite({
+	const poiSpec = {
 		frames: 7,
 		name: "poi",
 		imageURL: imagesUrl + "poi.png",
-		maxH: 25, 
-		maxW: 20, 
-		minH: 22, 
-		minW: 18, 
+		maxW: 15.5,  
 		offset: 3,
 		xPos: 45,
 		group: "Performance",
 		progressMin: 0.36,
 		progressMax: 0.75,
-	});
+	}
+	const poi = new LineSprite(poiSpec);
 
 	// * ***********************************************************************
 	// *
@@ -1561,10 +1506,7 @@
 		parentDiv: 'plankSprites',
 		name: "bucket",
 		imageURL: imagesUrl + "bucket.png",
-		maxH: 18, 
-		maxW: 18, 
-		minH: 16, 
-		minW: 16, 
+		maxW: 7.5, 
 		xPos: 7,
 		yPos: 10,
 		yType: "bottom",
@@ -1584,10 +1526,7 @@
 		parentDiv: 'plankSprites',
 		name: "brushholder",
 		imageURL: imagesUrl + "brushholder.png",
-		maxH: 18, 
-		maxW: 18, 
-		minH: 16, 
-		minW: 16, 
+		maxW: 5.5, 
 		xPos: 15,
 		yPos: 10,
 		yType: "bottom",
@@ -1618,10 +1557,7 @@
 		parentDiv: 'plankSprites',
 		name: "inkwell",
 		imageURL: imagesUrl + "inkwell.png",
-		maxH: 18, 
-		maxW: 18, 
-		minH: 16, 
-		minW: 16, 
+		maxW: 5.5, 
 		xPos: 21,
 		yPos: 10,
 		yType: "bottom",
@@ -1651,11 +1587,8 @@
 	const pad = new shadowSprite({
 		parentDiv: 'plankSprites',
 		name: "pad",
-		imageURL: imagesUrl + "pad.png",
-		maxH: 18, 
-		maxW: 18, 
-		minH: 16, 
-		minW: 16, 
+		imageURL: imagesUrl + "pad.png", 
+		maxW: 20, 
 		xPos: 27,
 		yPos: 5,
 		yType: "bottom",
@@ -1664,35 +1597,33 @@
 		shadowWidth: 65, 
 	});
 
-	const goose = new Goose({
+	const gooseSpec = {
 		name: "goose",
 		imageURL: imagesUrl + "goose.png",
-		maxH: 25,
-		maxW: 20,
-		minH: 22,
-		minW: 18,
+		maxW: 18,
 		xPos: 110, 
 		yPos: 70,
 		shadowImg: imagesUrl + "goose-shadow.png",
 		shadowYOffset: 10, 
 		shadowXOffset: 0, 
 		shadowWidth: 100, 
-	});
+	}
+	let goose;
 
-	const staff = new Staff({
+	//const goose = new Goose(gooseSpec);
+
+	const staffSpec = {
 		name: "staff",
 		imageURL: imagesUrl + "staff.png",
-		maxH: 25,
 		maxW: 40,
-		minH: 22,
-		minW: 18,
 		xPos: 60,
 		yPos: 120,
 		shadowImg: imagesUrl + "staff-shadow.png",
 		shadowYOffset: 70, 
 		shadowXOffset: 3, 
 		shadowWidth: 100, 
-	});
+	}
+	let staff;
 
 	// * ***********************************************************************
 	// *
@@ -1703,10 +1634,7 @@
 	const cloud1 = new Cloud({
 		name: 'cloud1',
 		imageURL: imagesUrl + "cloud1.png",
-		maxH: 15, 
-		maxW: 25, 
-		minH: 14, 
-		minW: 22, 
+		maxW: 30, 
 		xPos: 85,
 		yPos: 65,
 		animSpeed: 65,
@@ -1716,10 +1644,7 @@
 	const cloud2 = new Cloud({
 		name: 'cloud2',
 		imageURL: imagesUrl + "cloud2.png",
-		maxH: 15, 
-		maxW: 15, 
-		minH: 12, 
-		minW: 12, 
+		maxW: 20,  
 		xPos: 59,
 		yPos: 90,
 		animSpeed: 45,
@@ -1729,10 +1654,7 @@
 	const cloud3 = new Cloud({
 		name: 'cloud3',
 		imageURL: imagesUrl + "cloud3.png",
-		maxH: 15, 
 		maxW: 20, 
-		minH: 12, 
-		minW: 16, 
 		xPos: 15,
 		yPos: 80,
 		animSpeed: 55,
@@ -1744,9 +1666,7 @@
 		name: "boat",
 		imageURL: imagesUrl + "boat.png",
 		maxH: 20, 
-		maxW: 20, 
-		minH: 12, 
-		minW: 16, 
+		maxW: 13, 
 		xType: "right",
 		xPos: 25,
 		yType: "bottom",
@@ -1761,6 +1681,7 @@
 	window.addEventListener("load", ()=> { 
 		lineTimelines.centreTL.progress( 0.5 ); //.tweenTo( "middle" );
 		wind.timeline.progress( 0.5 );
+		console.log(pad)
 		padWriting = new Handwriting(pad.width *0.6, pad.height *0.7);
 	}); //end window.load
 

@@ -15,6 +15,10 @@
 		<script>(typeof _ === 'function') || document.write('<script src="<?php echo $config->urls->templates?>scripts/vendor/lodash.js"><\/script>');</script>
 		
 		<script src="//cdnjs.cloudflare.com/ajax/libs/gsap/1.18.0/TweenMax.min.js"></script>
+		<script>(typeof Tweenlite === 'function') || document.write('<script  src="<?php echo $config->urls->templates?>scripts/vendor/TweenMax.min.js"><\/script>');</script>
+
 		<script src="//cdnjs.cloudflare.com/ajax/libs/gsap/latest/utils/Draggable.min.js"></script>
+		<script>(typeof Draggable === 'function') || document.write('<script  src="<?php echo $config->urls->templates?>scripts/vendor/Draggable.min.js"><\/script>');</script>
+
 		<script src="<?php echo $config->urls->templates?>scripts/vendor/jquery.photobox.js"></script>
 		<script defer src="<?php echo $config->urls->templates?>scripts/frontPage.js"></script>
