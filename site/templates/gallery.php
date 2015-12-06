@@ -14,12 +14,10 @@
 		echo "</div>"; //close craftsGallery div		
 	}
 
-	//if (isset($_GET["name"]) {
-        gallery($page);
-    //} else {
-        //Redirect browser to home page as this page not intended to be directly viewable
-	//	header('Location: '.$config->urls->root); 
-    //}
+	//Redirect browser to home page as this page not intended to be directly viewable
+    if($config->ajax) gallery($page);
+    else header('Location: '.$config->urls->root); 
+
 
 	
 ?>

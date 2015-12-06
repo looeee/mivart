@@ -14,4 +14,7 @@
 		<script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
 		<script>(typeof _ === 'function') || document.write('<script src="<?php echo $config->urls->templates?>scripts/vendor/lodash.js"><\/script>');</script>
 		
-		
+		<script src="//cdnjs.cloudflare.com/ajax/libs/gsap/1.18.0/TweenMax.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/gsap/latest/utils/Draggable.min.js"></script>
+		<script src="<?php echo $config->urls->templates?>scripts/vendor/jquery.photobox.js"></script>
+		<script defer src="<?php echo $config->urls->templates?>scripts/frontPage.js"></script>

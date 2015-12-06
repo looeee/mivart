@@ -661,6 +661,18 @@ body {
 .avoidClicks {
   pointer-events: none; }
 
+#line {
+  position: absolute;
+  left: 0;
+  height: 0;
+  -webkit-transform-origin: 0;
+      -ms-transform-origin: 0;
+          transform-origin: 0;
+  width: 150%;
+  border-top: 1px solid black;
+  z-index: -100;
+  opacity: 0; }
+
 #silk, #silk1, #dress, #scarf {
   z-index: 1; }
 
@@ -711,7 +723,10 @@ body {
   /* IE 9 */
   -webkit-transform-origin: 50% 0;
   /* Chrome, Safari, Opera */
-  transform-origin: 50% 0; }
+  transform-origin: 50% 0;
+  -webkit-transform: skew(25deg);
+      -ms-transform: skew(25deg);
+          transform: skew(25deg); }
 
 #sheet {
   z-index: 1; }

@@ -42,19 +42,19 @@
 	// *************************************************************************
 
 	//Return a window height % as a pixel value
-	let yPercentToPx = (y) => WH / 100 * y;
+	const yPercentToPx = (y) => WH / 100 * y;
 
 	//Return a window height percent value from a pixel value
-	let yPxToPercent = (y) => (100 * y)/WH;
+	const yPxToPercent = (y) => (100 * y)/WH;
 
 	//Return a window width % as a pixel value
-	let xPercentToPx = (x) => WW / 100 * x;
+	const xPercentToPx = (x) => WW / 100 * x;
 
-	let randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+	const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
-	let randomFloat = (min, max) => Math.random() * (max - min) + min;
+	const randomFloat = (min, max) => Math.random() * (max - min) + min;
 
-	let animateOpacity = (elem, speed, opacity) => {
+	const animateOpacity = (elem, speed, opacity) => {
 		TweenLite.to(elem, speed, {opacity: opacity});
 	}
 
@@ -211,13 +211,7 @@
 
 	class Line{
 		constructor(lineElem="line", p1={x:0, y:10}, p2={x:100, y:18}){
-			if($('#'+lineElem).length === 0){
-				$body.append('<div id="'+lineElem+'"></div>')
-			}
-
 			this.lineElem = $('#'+lineElem);
-
-			this.lineElem.css({opacity: 0})
 
 			this.p1 = {
 				x: xPercentToPx(p1.x),
@@ -234,14 +228,7 @@
 
 			this.lineElem.css({
 				transform: "rotate(" + this.slopeDegrees + "deg)",
-				position: 'absolute',
 				top: p1.y + "%",
-				left: 0,
-				'transform-origin': '0%',
-				width: "150%",
-				height: 0, 
-				'border-top': '1px solid rgba(0, 0, 0, 1)',
-				'z-index': '-100',
 			});
 
 			//any calculations that need to be done after the images have loaded go here
@@ -372,7 +359,7 @@
 			for(let timeline of this.timelines){
 				let progress = timeline.progress();
 				if( progress != 1 && progress != 0){
-					timeline.play();
+					timeline.reversed(false).play();
 				}
 			}
 			this.centreTL.progress(0).tweenTo("middle");	
@@ -475,7 +462,7 @@
 
 	class ResponsiveSprite{
 		constructor(spec){
-			//if frames not supplied set it to one
+			//if number of frames not specified assume 1 frame
 			if(!spec.frames){ spec.frames = 1}
 
 			//if no parentDiv supplied add sprite to body
@@ -486,15 +473,13 @@
 				$body.append("<div id='" + spec.parentDiv + "'></div>");
 			}
 
-			spec.parentDiv = $("#" + spec.parentDiv);
-
 			//check if the sprite div has already been created in html and if not add it
 			if (!$("#" + spec.name).length) {
 				if(spec.islink){
-					spec.parentDiv.append("<a id='" + spec.name + "'></a>");
+					$("#" + spec.parentDiv).append("<a id='" + spec.name + "'></a>");
 				}
 				else{
-					spec.parentDiv.append("<div id='" + spec.name + "'></div>");
+					$("#" + spec.parentDiv).append("<div id='" + spec.name + "'></div>");
 				}
 			}
 
@@ -565,10 +550,15 @@
 			});
 		}
 
+
 		setBackground(){
-			this.spriteElem.css({
-				background: "url('" + this.spriteImage.src + "') no-repeat 0 0%",
-				"background-size": "100%"
+			//get an resized version of the image that matches the calcualted image width
+			//NOT WORKING FOR GOOSE OR STAFF!
+			$.get( rootUrl, { image: this.name, width: this.width }, (data, resizedURL) => {
+				this.spriteElem.css({
+					background: "url('" + data + "') no-repeat 0 0%",
+					"background-size": "100%"
+				});
 			});
 		}
 
@@ -781,7 +771,6 @@
 	  	loadGallery(page){
 	  		sheetElem.empty();
 	  		$.get( rootUrl + page, function(data) {
-	  			console.log(data);
 				sheetElem.append(data);
 			}).always(function() {
 			    $("#sheetGallery").photobox("a",{ time:0 })
@@ -956,31 +945,46 @@
 		}
 
 		shadow(shadowImg){
-			let shadowMoveAmount = 65;
 			let spriteMid = parseFloat(this.spriteElem.css("left"))/WW*100;
-			this.spriteElem.append("<div id='" + this.name + "-shadow' class='shadow'></div>");
+			this.spriteElem.append("<div id='" + this.name + "Shadow' class='shadow'></div>");
 
-			this.shadow = $("#" + this.name + "-shadow");
-			this.shadow.addClass("shadow");
-			animateOpacity("#" + this.name +"-shadow", 0, 0);
+			let shadowTL = new TimelineMax({paused: true})
+			let shadowTween = TweenMax.fromTo("#" + this.name + "Shadow", 2,
+							{
+								skewX: -60,
+							}, 
+							{
+								skewX: 60,
+								ease: Linear.easeNone,
+							})
+
+			shadowTL.add(shadowTween);
+
+			this.shadow = $("#" + this.name + "Shadow");
+			animateOpacity("#" + this.name +"Shadow", 0, 0);
 
 			$document.on("mousemove", (e) => {
 				let pageXPercent = (e.pageX * 100)/WW;
 				let skew = 0;
 				if (pageXPercent < spriteMid) {
-					skew = (shadowMoveAmount / spriteMid) * (spriteMid - pageXPercent);
+					if(this.rotated){
+						skew = 0.5 - (0.5 / (spriteMid - 100)) * (spriteMid - pageXPercent);
+					}
+					else{
+						skew = 0.5 + (0.5 / spriteMid) * (spriteMid - pageXPercent);
+					}
 				}
 				else{
-					skew = -(shadowMoveAmount / (spriteMid - 100)) * (spriteMid - pageXPercent);
+					if(this.rotated){
+						skew = 0.5 + (0.5 / spriteMid) * (spriteMid - pageXPercent);
+					}
+					else{
+						skew = 0.5 - (0.5 / (spriteMid - 100)) * (spriteMid - pageXPercent);
+					}
 				}
-				if(this.rotated === true){
-					skew = - skew;
-				}
-				this.shadow.css({
-					transform: "skew(" + skew + "deg)"
-				});
-			});
 
+				shadowTL.progress(skew);
+			});
 			this.shadowYOffset = -100 + this.shadowYOffset;
 
 			window.addEventListener("load", () => { 
@@ -994,11 +998,10 @@
 					width: this.shadowWidth + "%",
 					bottom: this.shadowYOffset + "%",
 					left: this.shadowXOffset + "%", 
-					transform: "skew(25deg)",
 				});
 
 				let fadeSpeed = randomFloat(0.2,0,4);
-				animateOpacity("#" + this.name +"-shadow", fadeSpeed, 0.7); 
+				animateOpacity("#" + this.name +"Shadow", fadeSpeed, 0.7); 
 			});
 		}
 	}
@@ -1213,25 +1216,28 @@
 
 			//move the cloud a random amount on mouse over
 			this.spriteElem.off("mousedirection").on("mousedirection", _.debounce( (e) => {
+				let vertical = randomInt(0,1) ? randomInt(20,30) : randomInt(-20,-30);
+				let horizontal = randomInt(30,50);
+
 				let wind = (x, y) => {
 					//set the minimum height of clouds as a % of screen height
 					let height = parseFloat(this.spriteElem.css("bottom"));
 					if( height > (WH/100)*55 ){ y = Math.abs(y); }
 					this.timeline.pause();
 					TweenMax.to('#'+name, 2, {
-							x: x, 
-							y: y, 
-						 	ease: Sine.easeOut, 
-						 	force3D:true,
-						 	onComplete: () => { this.timeline.play();  },
+						x: x, 
+						y: y, 
+					 	ease: Sine.easeOut, 
+					 	force3D:true,
+					 	onComplete: () => { this.timeline.play();  },
 					});
 				}
 
 				if(e.direction === "right"){ 
-					wind(randomFloat(30,50), randomFloat(-20,20));
+					wind(horizontal, vertical);
 				}
 				else{ 
-					wind(randomFloat(-30,-50), randomFloat(-20,20));	
+					wind(-horizontal, vertical);	
 				}
 			}, 2000, true)); //debounce timing
 
@@ -1331,7 +1337,7 @@
 	// *********************************************************************
 	// *SPECS FOR OBJECTS WITH SIMILAR CHARACTERISTICS 
 	// *********************************************************************
-	let bookSpec = {
+	const bookSpec = {
 		imageURL: imagesUrl + "book.png",
 		frames: 1,
 		maxH: 9, 
@@ -1342,7 +1348,7 @@
 		rotate: true,
 	};
 
-	let tshirtSpec = {
+	const tshirtSpec = {
 		frames: 7,
 		imageURL: imagesUrl + "tshirt.png",
 		maxH: 21, 
@@ -1353,7 +1359,7 @@
 		rotate: true,
 	};
 
-	let gourdSpec = {
+	const gourdSpec = {
 		imageURL: imagesUrl + "gourd.png",
 		frames: 1,
 		maxH: 20, 
@@ -1365,7 +1371,7 @@
 		progressMax: 0.81,
 	};
 
-	let silkSpec = {
+	const silkSpec = {
 		imageURL: imagesUrl + "silk.png",
 		frames: 7,
 		link: '#',
@@ -1378,7 +1384,7 @@
 		progressMax: 0.89,
 	};
 
-	let clothingSpec = {
+	const clothingSpec = {
 		rotate: true,
 		frames: 1,
 		maxH: 55, 
@@ -1390,7 +1396,7 @@
 	// *********************************************************************
 	// *SPRITES ON CENTRE SCREEN AT START
 	// *********************************************************************
-	let book = new LineSprite( _.extend({
+	const book = new LineSprite( _.extend({
 		name: "book",
 		xPos: 45,
 		group: "Centre", 
@@ -1399,7 +1405,7 @@
 		progressMax: 0.70,
 	}, bookSpec));
 
-	let tshirt = new LineSprite(_.extend({
+	const tshirt = new LineSprite(_.extend({
 		name: "tshirt",
 		xPos: 55,
 		group: "Centre", 
@@ -1408,14 +1414,14 @@
 		progressMax: 0.75,
 	}, tshirtSpec));
 
-	let gourd = new LineSprite(_.extend({
+	const gourd = new LineSprite(_.extend({
 		name: "gourd",
 		xPos: 70,
 		group: "Centre", 
 		nextGroup: "Crafts",
 	}, gourdSpec));
 
-	let silk = new LineSprite(_.extend({
+	const silk = new LineSprite(_.extend({
 		name: "silk",
 		xPos: 66,
 		group: "Centre", 
@@ -1428,7 +1434,7 @@
 	// * SHEET SPRITE USED TO DISPLY INFORMATION
 	// *********************************************************************
 	
-	let sheet = new LineSprite({
+	const sheet = new LineSprite({
 		name: "sheet",
 		imageURL: imagesUrl + "sheet.png",
 		group: "Sheet",
@@ -1452,7 +1458,7 @@
 	// *********************************************************************
 	// *SPRITES THAT ANIMATE ONTO SCREEN (FROM LEFT) AFTER CLICKING BOOK
 	// *********************************************************************
-	let book1 = new LineSprite(_.extend({
+	const book1 = new LineSprite(_.extend({
 		name: "book1",
 		group: "Books",
 		xPos: 32,
@@ -1460,7 +1466,7 @@
 		progressMax: 0.64,
 	}, bookSpec));
 
-	let book2 = new LineSprite(_.extend({
+	const book2 = new LineSprite(_.extend({
 		name: "book2",
 		group: "Books",
 		xPos: 47,
@@ -1468,7 +1474,7 @@
 		progressMax: 0.70,
 	}, bookSpec));
 
-	let book3 = new LineSprite(_.extend({
+	const book3 = new LineSprite(_.extend({
 		name: "book3",
 		group: "Books",
 		xPos: 62,
@@ -1476,7 +1482,7 @@
 		progressMax: 0.79,
 	}, bookSpec));
 
-	let book4 = new LineSprite(_.extend({
+	const book4 = new LineSprite(_.extend({
 		name: "book4",
 		group: "Books",
 		xPos: 75,
@@ -1488,7 +1494,7 @@
 	// *SPRITES THAT ANIMATE ONTO SCREEN (FROM RIGHT) AFTER CLICKING TSHIRT
 	// *********************************************************************
 
-	let dress = new LineSprite(_.extend({
+	const dress = new LineSprite(_.extend({
 		name: "dress",
 		imageURL: imagesUrl + "dress.png",
 		group: "Clothing",
@@ -1498,7 +1504,7 @@
 		progressMax: 0.70,
 	}, clothingSpec));
 
-	let scarf = new LineSprite(_.extend({
+	const scarf = new LineSprite(_.extend({
 		name: "scarf",
 		imageURL: imagesUrl + "scarf.png",
 		group: "Clothing",
@@ -1512,7 +1518,7 @@
 	// *SPRITE THAT ANIMATEs ONTO SCREEN (FROM LEFT) AFTER CLICKING GOURD
 	// *********************************************************************
 
-	let gourd1 = new LineSprite(_.extend({
+	const gourd1 = new LineSprite(_.extend({
 		name: "gourd1",
 		group: "Crafts",
 		xPos: 70,
@@ -1522,14 +1528,14 @@
 	// *SPRITE THAT ANIMATEs ONTO SCREEN (FROM LEFT) AFTER CLICKING SILK
 	// *********************************************************************
 
-	let silk1 = new LineSprite(_.extend({
+	const silk1 = new LineSprite(_.extend({
 		name: "silk1",
 		xPos: 66,
 		group: "Performance",
 		trigger: "silk1Trigger",
 	}, silkSpec));
 
-	let poi = new LineSprite({
+	const poi = new LineSprite({
 		frames: 7,
 		name: "poi",
 		imageURL: imagesUrl + "poi.png",
@@ -1551,7 +1557,7 @@
 	// *
 	// * ***********************************************************************
 
-	let bucket = new shadowSprite({
+	const bucket = new shadowSprite({
 		parentDiv: 'plankSprites',
 		name: "bucket",
 		imageURL: imagesUrl + "bucket.png",
@@ -1574,7 +1580,7 @@
 		lineTimelines.home();
 	});
 
-	let brushholder = new shadowSprite({
+	const brushholder = new shadowSprite({
 		parentDiv: 'plankSprites',
 		name: "brushholder",
 		imageURL: imagesUrl + "brushholder.png",
@@ -1608,7 +1614,7 @@
 		}
 	});
 
-	let inkwell = new shadowSprite({
+	const inkwell = new shadowSprite({
 		parentDiv: 'plankSprites',
 		name: "inkwell",
 		imageURL: imagesUrl + "inkwell.png",
@@ -1642,7 +1648,7 @@
 		}
 	});
 
-	let pad = new shadowSprite({
+	const pad = new shadowSprite({
 		parentDiv: 'plankSprites',
 		name: "pad",
 		imageURL: imagesUrl + "pad.png",
@@ -1658,7 +1664,7 @@
 		shadowWidth: 65, 
 	});
 
-	let goose = new Goose({
+	const goose = new Goose({
 		name: "goose",
 		imageURL: imagesUrl + "goose.png",
 		maxH: 25,
@@ -1666,14 +1672,14 @@
 		minH: 22,
 		minW: 18,
 		xPos: 110, 
-		yPos: 80,
+		yPos: 70,
 		shadowImg: imagesUrl + "goose-shadow.png",
 		shadowYOffset: 10, 
 		shadowXOffset: 0, 
 		shadowWidth: 100, 
 	});
 
-	let staff = new Staff({
+	const staff = new Staff({
 		name: "staff",
 		imageURL: imagesUrl + "staff.png",
 		maxH: 25,
@@ -1694,7 +1700,7 @@
 	// *
 	// *************************************************************************
 
-	let cloud1 = new Cloud({
+	const cloud1 = new Cloud({
 		name: 'cloud1',
 		imageURL: imagesUrl + "cloud1.png",
 		maxH: 15, 
@@ -1707,7 +1713,7 @@
 		startPos: 24,
 	});
 
-	let cloud2 = new Cloud({
+	const cloud2 = new Cloud({
 		name: 'cloud2',
 		imageURL: imagesUrl + "cloud2.png",
 		maxH: 15, 
@@ -1720,7 +1726,7 @@
 		startPos: 55,
 	});
 
-	let cloud3 = new Cloud({
+	const cloud3 = new Cloud({
 		name: 'cloud3',
 		imageURL: imagesUrl + "cloud3.png",
 		maxH: 15, 
@@ -1733,7 +1739,7 @@
 		startPos: 80,
 	});
 
-	let boat = new Boat({
+	const boat = new Boat({
 		parentDiv: 'boatWrapper',
 		name: "boat",
 		imageURL: imagesUrl + "boat.png",

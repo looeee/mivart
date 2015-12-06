@@ -5,26 +5,6 @@
 	  'upscaling' => false,
 	);
 
-	function sheetGallery($name, $pages) {
-		$galleryPage = $pages->get('name='.$name);
-
-		echo '<div id="'.$name.'Gallery" class="sheetContents">';  
-		if(count($galleryPage->images)) {
-	        foreach($galleryPage->images as $image) {            
-	            echo '<a href="'.$image->width(1280, $options)->url.'">
-	            	<img src="'.$image->height(100, $options)->url.'" title="'.$image->description.'" alt="'.$image->description.'"/>
-	            </a>';
-	        }    
-	     }    
-		echo "</div>"; //close craftsGallery div
-
-		echo "<script>";
-
-		echo '$("#'.$name.'Gallery").photobox("a",{ time:0 });';
-
-		echo "</script>";
-	}
-
 	function biography($pages) {
 		$bioPage = $pages->get('name=biography');
 		echo '<div id="biography" class="sheetContents">';  
@@ -48,4 +28,27 @@
 		echo 	'<iframe width="100%" height="100%" src="https://www.youtube.com/embed/vYJpy7jMAAU?wmode=opaque?rel=0?autoplay=1&html5=1" frameborder="0" allowfullscreen></iframe>';
 		echo '</div>';
 	}
+
+	function resizedImage($page, $name, $width){
+		echo $page->images->get("description=".$name)->width($width, $options)->url;
+
+		//$page->setOutputFormatting(false);
+		//$page->images->add($url); 
+		//$page->save();
+		//echo $page->images->first->url;
+	}
+
+	if( isset($_GET['silks']) ){
+		silksVideo();
+	}
+	elseif( isset($_GET['contact']) ){
+		contact($pages);
+	}
+	elseif( isset($_GET['biography']) ){
+		biography($pages);
+	}
+	elseif( isset($_GET['image']) ){
+		resizedImage($page, $_GET['image'], $_GET['width']);
+	}
+
 ?>

@@ -35,6 +35,17 @@ body {
   pointer-events: none;
 }
 
+#line{
+	position: absolute;
+	left: 0;
+	height: 0;
+	transform-origin: 0;
+	width: 150%;
+	border-top: 1px solid rgba(0, 0, 0, 1);
+	z-index: -100;
+	opacity: 0;
+}
+
 #silk, #silk1, #dress, #scarf{
    z-index: 1;
 }
@@ -88,6 +99,7 @@ body {
   -ms-transform-origin: 50% 0; /* IE 9 */
   -webkit-transform-origin: 50% 0; /* Chrome, Safari, Opera */
   transform-origin: 50% 0;
+  transform: skew(25deg);
 }
 
 #sheet{

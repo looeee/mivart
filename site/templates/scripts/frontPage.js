@@ -255,13 +255,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 			_classCallCheck(this, Line);
 
-			if ($('#' + lineElem).length === 0) {
-				$body.append('<div id="' + lineElem + '"></div>');
-			}
-
 			this.lineElem = $('#' + lineElem);
-
-			this.lineElem.css({ opacity: 0 });
 
 			this.p1 = {
 				x: xPercentToPx(p1.x),
@@ -278,14 +272,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 			this.lineElem.css({
 				transform: "rotate(" + this.slopeDegrees + "deg)",
-				position: 'absolute',
-				top: p1.y + "%",
-				left: 0,
-				'transform-origin': '0%',
-				width: "150%",
-				height: 0,
-				'border-top': '1px solid rgba(0, 0, 0, 1)',
-				'z-index': '-100'
+				top: p1.y + "%"
 			});
 
 			//any calculations that need to be done after the images have loaded go here
@@ -453,7 +440,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 						var progress = timeline.progress();
 						if (progress != 1 && progress != 0) {
-							timeline.play();
+							timeline.reversed(false).play();
 						}
 					}
 				} catch (err) {
@@ -587,7 +574,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		function ResponsiveSprite(spec) {
 			_classCallCheck(this, ResponsiveSprite);
 
-			//if frames not supplied set it to one
+			//if number of frames not specified assume 1 frame
 			if (!spec.frames) {
 				spec.frames = 1;
 			}
@@ -602,14 +589,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				$body.append("<div id='" + spec.parentDiv + "'></div>");
 			}
 
-			spec.parentDiv = $("#" + spec.parentDiv);
-
 			//check if the sprite div has already been created in html and if not add it
 			if (!$("#" + spec.name).length) {
 				if (spec.islink) {
-					spec.parentDiv.append("<a id='" + spec.name + "'></a>");
+					$("#" + spec.parentDiv).append("<a id='" + spec.name + "'></a>");
 				} else {
-					spec.parentDiv.append("<div id='" + spec.name + "'></div>");
+					$("#" + spec.parentDiv).append("<div id='" + spec.name + "'></div>");
 				}
 			}
 
@@ -688,9 +673,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		}, {
 			key: "setBackground",
 			value: function setBackground() {
-				this.spriteElem.css({
-					background: "url('" + this.spriteImage.src + "') no-repeat 0 0%",
-					"background-size": "100%"
+				var _this3 = this;
+
+				//get an resized version of the image that matches the calcualted image width
+				//NOT WORKING FOR GOOSE OR STAFF!
+				$.get(rootUrl, { image: this.name, width: this.width }, function (data, resizedURL) {
+					_this3.spriteElem.css({
+						background: "url('" + data + "') no-repeat 0 0%",
+						"background-size": "100%"
+					});
 				});
 			}
 		}, {
@@ -772,72 +763,72 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 			//set variables
 
-			var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(LineSprite).call(this, spec));
+			var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(LineSprite).call(this, spec));
 
-			_this3.frames = spec.frames;
-			_this3.trigger = spec.trigger || spec.name; //allow setting of a different element as trigger
-			_this3.group = spec.group;
-			_this3.nextGroup = spec.nextGroup || "Sheet";
-			_this3.progressMin = spec.progressMin || 0.26;
-			_this3.progressMax = spec.progressMax || 0.72;
+			_this4.frames = spec.frames;
+			_this4.trigger = spec.trigger || spec.name; //allow setting of a different element as trigger
+			_this4.group = spec.group;
+			_this4.nextGroup = spec.nextGroup || "Sheet";
+			_this4.progressMin = spec.progressMin || 0.26;
+			_this4.progressMax = spec.progressMax || 0.72;
 
-			switch (_this3.group) {
+			switch (_this4.group) {
 				case "Books":
-					_this3.timeline = lineTimelines.booksTL;
+					_this4.timeline = lineTimelines.booksTL;
 					break;
 				case "Crafts":
-					_this3.timeline = lineTimelines.craftsTL;
+					_this4.timeline = lineTimelines.craftsTL;
 					break;
 				case "Clothing":
-					_this3.timeline = lineTimelines.clothingTL;
+					_this4.timeline = lineTimelines.clothingTL;
 					break;
 				case "Performance":
-					_this3.timeline = lineTimelines.performanceTL;
+					_this4.timeline = lineTimelines.performanceTL;
 					break;
 				case "Sheet":
-					_this3.timeline = lineTimelines.sheetTL;
+					_this4.timeline = lineTimelines.sheetTL;
 					break;
 				default:
-					_this3.timeline = lineTimelines.centreTL;
+					_this4.timeline = lineTimelines.centreTL;
 			}
 
 			//set the the timeline for the next group of sprites
-			switch (_this3.nextGroup) {
+			switch (_this4.nextGroup) {
 				case "Sheet":
-					_this3.nextTimeline = lineTimelines.sheetTL;
+					_this4.nextTimeline = lineTimelines.sheetTL;
 					break;
 				case "Books":
-					_this3.nextTimeline = lineTimelines.booksTL;
+					_this4.nextTimeline = lineTimelines.booksTL;
 					break;
 				case "Crafts":
-					_this3.nextTimeline = lineTimelines.craftsTL;
+					_this4.nextTimeline = lineTimelines.craftsTL;
 					break;
 				case "Clothing":
-					_this3.nextTimeline = lineTimelines.clothingTL;
+					_this4.nextTimeline = lineTimelines.clothingTL;
 					break;
 				case "Performance":
-					_this3.nextTimeline = lineTimelines.performanceTL;
+					_this4.nextTimeline = lineTimelines.performanceTL;
 					break;
 				case "Home":
-					_this3.nextTimeline = lineTimelines.centreTL;
+					_this4.nextTimeline = lineTimelines.centreTL;
 					break;
 			}
 
 			//hide the sprite until it has been positioned
-			animateOpacity("#" + _this3.name, 0, 0);
+			animateOpacity("#" + _this4.name, 0, 0);
 
-			wind.addTween(_this3);
+			wind.addTween(_this4);
 
-			_this3.makeDraggable();
+			_this4.makeDraggable();
 
 			//any calculations that need to be done after the image has loaded go here
 			window.addEventListener("load", function () {
-				_this3.width = _this3.spriteElem.width();
-				_this3.setPosition(spec);
-				lineTimelines.addTween(_this3);
-				_this3.xPos = _this3.xPos + _this3.width / 2;
+				_this4.width = _this4.spriteElem.width();
+				_this4.setPosition(spec);
+				lineTimelines.addTween(_this4);
+				_this4.xPos = _this4.xPos + _this4.width / 2;
 			});
-			return _this3;
+			return _this4;
 		}
 
 		_createClass(LineSprite, [{
@@ -925,7 +916,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			value: function loadGallery(page) {
 				sheetElem.empty();
 				$.get(rootUrl + page, function (data) {
-					console.log(data);
 					sheetElem.append(data);
 				}).always(function () {
 					$("#sheetGallery").photobox("a", { time: 0 });
@@ -1089,75 +1079,85 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 			spec.xType = "left";
 
-			var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(shadowSprite).call(this, spec));
+			var _this5 = _possibleConstructorReturn(this, Object.getPrototypeOf(shadowSprite).call(this, spec));
 
-			_this4.setPosition(spec);
+			_this5.setPosition(spec);
 
-			_this4.shadowYOffset = spec.shadowYOffset || 5;
-			_this4.shadowXOffset = spec.shadowXOffset || 0;
-			_this4.shadowWidth = spec.shadowWidth || 100;
+			_this5.shadowYOffset = spec.shadowYOffset || 5;
+			_this5.shadowXOffset = spec.shadowXOffset || 0;
+			_this5.shadowWidth = spec.shadowWidth || 100;
 
 			if (spec.shadowImg) {
-				_this4.shadow(spec.shadowImg);
+				_this5.shadow(spec.shadowImg);
 			}
 
-			_this4.rotated = false;
+			_this5.rotated = false;
 
 			//fade in the sprite after everything has loaded
 			window.addEventListener("load", function () {
 				var fadeSpeed = randomFloat(0.2, 0.4);
-				animateOpacity("#" + _this4.name, fadeSpeed, 1);
+				animateOpacity("#" + _this5.name, fadeSpeed, 1);
 			});
-			return _this4;
+			return _this5;
 		}
 
 		_createClass(shadowSprite, [{
 			key: "shadow",
 			value: function shadow(shadowImg) {
-				var _this5 = this;
+				var _this6 = this;
 
-				var shadowMoveAmount = 65;
 				var spriteMid = parseFloat(this.spriteElem.css("left")) / WW * 100;
-				this.spriteElem.append("<div id='" + this.name + "-shadow' class='shadow'></div>");
+				this.spriteElem.append("<div id='" + this.name + "Shadow' class='shadow'></div>");
 
-				this.shadow = $("#" + this.name + "-shadow");
-				this.shadow.addClass("shadow");
-				animateOpacity("#" + this.name + "-shadow", 0, 0);
+				var shadowTL = new TimelineMax({ paused: true });
+				var shadowTween = TweenMax.fromTo("#" + this.name + "Shadow", 2, {
+					skewX: -60
+				}, {
+					skewX: 60,
+					ease: Linear.easeNone
+				});
+
+				shadowTL.add(shadowTween);
+
+				this.shadow = $("#" + this.name + "Shadow");
+				animateOpacity("#" + this.name + "Shadow", 0, 0);
 
 				$document.on("mousemove", function (e) {
 					var pageXPercent = e.pageX * 100 / WW;
 					var skew = 0;
 					if (pageXPercent < spriteMid) {
-						skew = shadowMoveAmount / spriteMid * (spriteMid - pageXPercent);
+						if (_this6.rotated) {
+							skew = 0.5 - 0.5 / (spriteMid - 100) * (spriteMid - pageXPercent);
+						} else {
+							skew = 0.5 + 0.5 / spriteMid * (spriteMid - pageXPercent);
+						}
 					} else {
-						skew = -(shadowMoveAmount / (spriteMid - 100)) * (spriteMid - pageXPercent);
+						if (_this6.rotated) {
+							skew = 0.5 + 0.5 / spriteMid * (spriteMid - pageXPercent);
+						} else {
+							skew = 0.5 - 0.5 / (spriteMid - 100) * (spriteMid - pageXPercent);
+						}
 					}
-					if (_this5.rotated === true) {
-						skew = -skew;
-					}
-					_this5.shadow.css({
-						transform: "skew(" + skew + "deg)"
-					});
-				});
 
+					shadowTL.progress(skew);
+				});
 				this.shadowYOffset = -100 + this.shadowYOffset;
 
 				window.addEventListener("load", function () {
-					var width = parseFloat(_this5.spriteElem.css("width"));
+					var width = parseFloat(_this6.spriteElem.css("width"));
 					//slightly more accurate calculation of spriteMid now that we know the width
-					spriteMid = (parseFloat(_this5.spriteElem.css("left")) + width / 2) / WW * 100;
+					spriteMid = (parseFloat(_this6.spriteElem.css("left")) + width / 2) / WW * 100;
 
-					_this5.shadow.css({
+					_this6.shadow.css({
 						background: "url('" + shadowImg + "') 0 0% / contain no-repeat",
-						height: _this5.height + "px",
-						width: _this5.shadowWidth + "%",
-						bottom: _this5.shadowYOffset + "%",
-						left: _this5.shadowXOffset + "%",
-						transform: "skew(25deg)"
+						height: _this6.height + "px",
+						width: _this6.shadowWidth + "%",
+						bottom: _this6.shadowYOffset + "%",
+						left: _this6.shadowXOffset + "%"
 					});
 
 					var fadeSpeed = randomFloat(0.2, 0, 4);
-					animateOpacity("#" + _this5.name + "-shadow", fadeSpeed, 0.7);
+					animateOpacity("#" + _this6.name + "Shadow", fadeSpeed, 0.7);
 				});
 			}
 		}]);
@@ -1188,11 +1188,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			spec.originalName = spec.name;
 			spec.name = spec.name + "Wrapper";
 
-			var _this6 = _possibleConstructorReturn(this, Object.getPrototypeOf(movingShadowSprite).call(this, spec));
+			var _this7 = _possibleConstructorReturn(this, Object.getPrototypeOf(movingShadowSprite).call(this, spec));
 
-			_this6.spriteElem.css({ background: "" });
+			_this7.spriteElem.css({ background: "" });
 
-			_this6.spriteElem.append("<div id='" + spec.originalName + "'></div>");
+			_this7.spriteElem.append("<div id='" + spec.originalName + "'></div>");
 
 			$("#" + spec.originalName).css({
 				position: 'relative',
@@ -1200,11 +1200,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				left: 0,
 				width: 'inherit',
 				height: 'inherit',
-				background: "url('" + _this6.spriteImage.src + "') no-repeat 0 0%",
+				background: "url('" + _this7.spriteImage.src + "') no-repeat 0 0%",
 				"background-size": "100%"
 			});
 
-			return _this6;
+			return _this7;
 		}
 
 		return movingShadowSprite;
@@ -1224,15 +1224,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		function Goose(spec) {
 			_classCallCheck(this, Goose);
 
-			var _this7 = _possibleConstructorReturn(this, Object.getPrototypeOf(Goose).call(this, spec));
+			var _this8 = _possibleConstructorReturn(this, Object.getPrototypeOf(Goose).call(this, spec));
 
-			_this7.left = xPercentToPx(spec.xPos);
-			_this7.top = yPercentToPx(spec.yPos);
+			_this8.left = xPercentToPx(spec.xPos);
+			_this8.top = yPercentToPx(spec.yPos);
 
-			_this7.buildTimeline();
+			_this8.buildTimeline();
 
-			_this7.rotated = false;
-			return _this7;
+			_this8.rotated = false;
+			return _this8;
 		}
 
 		_createClass(Goose, [{
@@ -1273,13 +1273,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		}, {
 			key: "animate",
 			value: function animate() {
-				var _this8 = this;
+				var _this9 = this;
 
 				if (this.timeline.reversed()) {
 					this.rotated = false;
 					TweenMax.to(this.spriteElem, 0.6, { rotationY: 0, ease: Quad.easeInOut });
 					setTimeout(function () {
-						_this8.timeline.play();
+						_this9.timeline.play();
 					}, 300);
 				} else if (this.timeline.progress() === 0) {
 					this.rotated = false;
@@ -1288,7 +1288,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					this.rotated = true;
 					TweenMax.to(this.spriteElem, 0.6, { rotationY: 180, ease: Quad.easeInOut });
 					setTimeout(function () {
-						_this8.timeline.reverse();
+						_this9.timeline.reverse();
 					}, 300);
 				}
 			}
@@ -1311,10 +1311,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		function Staff(spec) {
 			_classCallCheck(this, Staff);
 
-			var _this9 = _possibleConstructorReturn(this, Object.getPrototypeOf(Staff).call(this, spec));
+			var _this10 = _possibleConstructorReturn(this, Object.getPrototypeOf(Staff).call(this, spec));
 
-			_this9.buildTimeline();
-			return _this9;
+			_this10.buildTimeline();
+			return _this10;
 		}
 
 		_createClass(Staff, [{
@@ -1377,24 +1377,24 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 			//fade in the sprite after everything has loaded
 
-			var _this10 = _possibleConstructorReturn(this, Object.getPrototypeOf(Cloud).call(this, spec));
+			var _this11 = _possibleConstructorReturn(this, Object.getPrototypeOf(Cloud).call(this, spec));
 
 			window.addEventListener("load", function () {
 				var fadeSpeed = randomFloat(0.2, 0.4);
-				animateOpacity("#" + _this10.name, fadeSpeed, 0.7);
+				animateOpacity("#" + _this11.name, fadeSpeed, 0.7);
 			});
 
-			_this10.setPosition(spec);
+			_this11.setPosition(spec);
 
-			_this10.yPos = parseFloat(_this10.spriteElem.css("bottom"));
-			_this10.animate(spec.animSpeed, spec.name, spec.startPos);
-			return _this10;
+			_this11.yPos = parseFloat(_this11.spriteElem.css("bottom"));
+			_this11.animate(spec.animSpeed, spec.name, spec.startPos);
+			return _this11;
 		}
 
 		_createClass(Cloud, [{
 			key: "animate",
 			value: function animate(speed, name, startPos) {
-				var _this11 = this;
+				var _this12 = this;
 
 				this.timeline = new TimelineMax();
 				var crossScreen = TweenMax.fromTo('#' + name, speed, { left: WW * 6 / 5, y: 0 }, { left: -WW * 1 / 5, repeat: -1, ease: Linear.easeNone, force3D: true });
@@ -1403,28 +1403,31 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 				//move the cloud a random amount on mouse over
 				this.spriteElem.off("mousedirection").on("mousedirection", _.debounce(function (e) {
+					var vertical = randomInt(0, 1) ? randomInt(20, 30) : randomInt(-20, -30);
+					var horizontal = randomInt(30, 50);
+
 					var wind = function wind(x, y) {
 						//set the minimum height of clouds as a % of screen height
-						var height = parseFloat(_this11.spriteElem.css("bottom"));
+						var height = parseFloat(_this12.spriteElem.css("bottom"));
 						if (height > WH / 100 * 55) {
 							y = Math.abs(y);
 						}
-						_this11.timeline.pause();
+						_this12.timeline.pause();
 						TweenMax.to('#' + name, 2, {
 							x: x,
 							y: y,
 							ease: Sine.easeOut,
 							force3D: true,
 							onComplete: function onComplete() {
-								_this11.timeline.play();
+								_this12.timeline.play();
 							}
 						});
 					};
 
 					if (e.direction === "right") {
-						wind(randomFloat(30, 50), randomFloat(-20, 20));
+						wind(horizontal, vertical);
 					} else {
-						wind(randomFloat(-30, -50), randomFloat(-20, 20));
+						wind(-horizontal, vertical);
 					}
 				}, 2000, true)); //debounce timing
 			}
@@ -1445,18 +1448,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		function Boat(spec) {
 			_classCallCheck(this, Boat);
 
-			var _this12 = _possibleConstructorReturn(this, Object.getPrototypeOf(Boat).call(this, spec));
+			var _this13 = _possibleConstructorReturn(this, Object.getPrototypeOf(Boat).call(this, spec));
 
-			_this12.setPosition(spec);
-			_this12.clipPath();
-			_this12.animate();
+			_this13.setPosition(spec);
+			_this13.clipPath();
+			_this13.animate();
 
 			//fade in the sprite after everything has loaded
 			window.addEventListener("load", function () {
 				var fadeSpeed = randomFloat(0.2, 0.4);
-				animateOpacity("#" + _this12.name, fadeSpeed, 1);
+				animateOpacity("#" + _this13.name, fadeSpeed, 1);
 			});
-			return _this12;
+			return _this13;
 		}
 
 		_createClass(Boat, [{
@@ -1872,7 +1875,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		minH: 22,
 		minW: 18,
 		xPos: 110,
-		yPos: 80,
+		yPos: 70,
 		shadowImg: imagesUrl + "goose-shadow.png",
 		shadowYOffset: 10,
 		shadowXOffset: 0,
