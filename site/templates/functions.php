@@ -50,6 +50,10 @@
 		echo "</div>";		
 	}
 
+	function background($page, $width, $height){
+		echo $page->background->size($width, $height)->url;
+	}
+
 	if( isset($_GET['silks']) ){
 		silksVideo();
 	}
@@ -64,6 +68,9 @@
 	}
 	elseif( isset($_GET['thumbWidth']) ){
 		gallery($pages, $_GET['name'], $_GET['width'], $_GET['thumbWidth'] );
+	}
+	elseif( isset($_GET['background']) ){
+		background($page, $_GET['width'], $_GET['height'] );
 	}
 
 ?>

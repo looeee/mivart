@@ -87,6 +87,21 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 	// * ***********************************************************************
 	// *
+	// *   GET BACKGROUND IMAGE BASED ON PAGE WIDTH
+	// *
+	// *************************************************************************
+	var background = function background() {
+		$.get(rootUrl, { background: "y", width: WW, height: WH }, function (data) {
+			$("#background").css({
+				background: "url(" + data + ") 0 no-repeat fixed"
+			});
+		});
+	};
+
+	background();
+
+	// * ***********************************************************************
+	// *
 	// *   MOUSE DIRECTION PLUGIN
 	// *   Based on Hasin Hayder's original [hasin@leevio.com | http://hasin.me]
 	// *
@@ -313,7 +328,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				paused: true,
 				onComplete: this.onComplete,
 				onReverseComplete: this.onComplete,
-				onStart: this.onStart
+				onStart: this.onStart,
+				onReverseStart: this.onStart
 			};
 
 			this.centreTL = new TimelineMax(options);
@@ -335,7 +351,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				paused: true,
 				onComplete: this.sheetComplete,
 				onReverseComplete: this.sheetComplete,
-				onStart: this.onStart
+				onStart: this.onStart,
+				onReverseStart: this.onStart
 			});
 			this.sheetTL.add("middle", config.wlAnimSpeed / 2);
 
@@ -687,7 +704,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 				//get an resized version of the image that matches the calcualted image width
 				//images must have a description set in Processwire that matches the sprites name
-				$.get(rootUrl, { image: this.name, width: this.width }, function (data, test) {
+				$.get(rootUrl, { image: this.name, width: this.width }, function (data) {
 					_this2.spriteImage = _this2.selectImage(data, function (w, h) {
 						_this2.spriteElem.css({
 							background: "url('" + data + "') no-repeat 0 0%",

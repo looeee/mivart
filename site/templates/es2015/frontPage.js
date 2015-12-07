@@ -34,7 +34,7 @@
 		}, 180);
 	}
 	*/
-  
+  	
 	// * ***********************************************************************
 	// *
 	// *   HELPER FUNCTIONS
@@ -59,6 +59,21 @@
 	const animateOpacity = (elem, speed, opacity) => {
 		TweenLite.to(elem, speed, {opacity: opacity});
 	}
+
+	// * ***********************************************************************
+	// *
+	// *   GET BACKGROUND IMAGE BASED ON PAGE WIDTH
+	// *
+	// *************************************************************************
+	let background = () => {
+		$.get( rootUrl, { background: "y", width: WW, height: WH }, (data) => {
+			$("#background").css({
+				background: "url(" + data + ") 0 no-repeat fixed",
+			});
+		}); 
+	}
+
+	background();
 
 	// * ***********************************************************************
 	// *
@@ -259,6 +274,7 @@
 				onComplete: this.onComplete, 
 				onReverseComplete: this.onComplete,
 				onStart: this.onStart,
+				onReverseStart: this.onStart,
 			}
 
 			this.centreTL = new TimelineMax(options);
@@ -281,6 +297,7 @@
 				onComplete: this.sheetComplete, 
 				onReverseComplete: this.sheetComplete,
 				onStart: this.onStart,
+				onReverseStart: this.onStart,
 			});
 			this.sheetTL.add("middle", config.wlAnimSpeed/2);
 
@@ -522,7 +539,7 @@
 		setBackground(){
 			//get an resized version of the image that matches the calcualted image width
 			//images must have a description set in Processwire that matches the sprites name
-			$.get( rootUrl, { image: this.name, width: this.width }, (data, test) => {
+			$.get( rootUrl, { image: this.name, width: this.width }, ( data ) => {
 				this.spriteImage = this.selectImage(data, (w, h) => {
 					this.spriteElem.css({
 						background: "url('" + data + "') no-repeat 0 0%",
@@ -1217,7 +1234,7 @@
 			
 			this.animate();
 
-			window.addEventListener("load", ()=> { 
+			window.addEventListener("load", () => { 
 				this.clipPath();
 				this.spriteElem.fadeIn(1000);
 			});
