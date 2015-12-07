@@ -548,6 +548,11 @@
 						width: w + "px"
 					});
 					this.height = h/(this.frames);
+
+					//simple hack to get clipPath to run at the right time for boat
+					if(typeof this.clipPath === "function") {
+						this.clipPath();
+					}
 				});
 			}); 
 		}
@@ -1235,7 +1240,6 @@
 			this.animate();
 
 			window.addEventListener("load", () => { 
-				this.clipPath();
 				this.spriteElem.fadeIn(1000);
 			});
 		}

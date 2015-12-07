@@ -713,6 +713,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 							width: w + "px"
 						});
 						_this2.height = h / _this2.frames;
+
+						//simple hack to get clipPath to run at the right time for boat
+						if (typeof _this2.clipPath === "function") {
+							_this2.clipPath();
+						}
 					});
 				});
 			}
@@ -1471,7 +1476,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			_this12.animate();
 
 			window.addEventListener("load", function () {
-				_this12.clipPath();
 				_this12.spriteElem.fadeIn(1000);
 			});
 			return _this12;
