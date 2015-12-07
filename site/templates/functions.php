@@ -31,11 +31,23 @@
 
 	function resizedImage($page, $name, $width){
 		echo $page->images->get("description=".$name)->size($width, 0, $options)->url;
+	}
 
-		//$page->setOutputFormatting(false);
-		//$page->images->add($url); 
-		//$page->save();
-		//echo $page->images->first->url;
+	function gallery($pages, $name, $width, $thumbWidth ) {
+		$page = $pages->get('name='.$name);
+		//maximum width 1280px
+		if($width >1280) { $width = 1280; }
+
+		echo '<div id="sheetGallery" class="sheetContents">';  
+		
+		if(count($page->images)) {
+	        foreach($page->images as $image) {            
+	            echo '<a href="'.$image->width($width, $options)->url.'">
+	            	<img src="'.$image->size($thumbWidth, $thumbWidth, $options)->url.'" title="'.$image->description.'" alt="'.$image->description.'"/>
+	            </a>';
+	        }    
+	     }    
+		echo "</div>";		
 	}
 
 	if( isset($_GET['silks']) ){
@@ -48,7 +60,10 @@
 		biography($pages);
 	}
 	elseif( isset($_GET['image']) ){
-		resizedImage($page, $_GET['image'], $_GET['width']);
+		resizedImage( $page, $_GET['image'], $_GET['width'] );
+	}
+	elseif( isset($_GET['thumbWidth']) ){
+		gallery($pages, $_GET['name'], $_GET['width'], $_GET['thumbWidth'] );
 	}
 
 ?>

@@ -691,16 +691,16 @@
 	  	sheetContents(){
 	    	switch( this.name ) {
 	    		case "book1":
-	    			this.loadGallery("books/book1");
+	    			this.loadGallery("book1");
 	    	        break;
 	    	    case "book2":
-	    			this.loadGallery("books/book2");
+	    			this.loadGallery("book2");
 	    	        break;
 	    	    case "book3":
-	    			this.loadGallery("books/book3");
+	    			this.loadGallery("book3");
 	    	        break;
 	    	    case "book4":
-	    			this.loadGallery("books/book4");
+	    			this.loadGallery("book4");
 	    	        break;
 	    	    case "gourd1":
 	    			this.loadGallery("crafts");
@@ -722,12 +722,18 @@
 
 	  	//empty the sheet then load a gallery with ajax
 	  	loadGallery(page){
+	  		//clear any previous galleries
 	  		sheetElem.empty();
-	  		$.get( rootUrl + page, function(data) {
+	  		
+	  		$.get( rootUrl , {
+	  			name: page,
+	  			width: parseInt(WW, 10), 
+	  			thumbWidth: parseInt(sheetElem.width()/7, 10),
+	  		}, (data) => {
 				sheetElem.append(data);
-			}).always(function() {
-			    $("#sheetGallery").photobox("a",{ time:0 })
-			});
+				$("#sheetGallery").photobox("a",{ time:0 })
+			}); 
+
 	  	}
 	  	
 	  	//note: "this" refers to the draggable event here, pass sprites "this" as "sprite"
@@ -1681,7 +1687,6 @@
 	window.addEventListener("load", ()=> { 
 		lineTimelines.centreTL.progress( 0.5 ); //.tweenTo( "middle" );
 		wind.timeline.progress( 0.5 );
-		console.log(pad)
 		padWriting = new Handwriting(pad.width *0.6, pad.height *0.7);
 	}); //end window.load
 
