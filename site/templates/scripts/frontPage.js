@@ -281,8 +281,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 			//any calculations that need to be done after the images have loaded go here
 			window.addEventListener("load", function () {
-				var fadeSpeed = randomFloat(0.2, 0.4);
-				animateOpacity("#line", fadeSpeed, 1);
+				animateOpacity("#line", 0.2, 1);
 			});
 		}
 
@@ -347,16 +346,65 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			key: "onComplete",
 			value: function onComplete() {
 				wind.tweenTo(3);
+				var _iteratorNormalCompletion = true;
+				var _didIteratorError = false;
+				var _iteratorError = undefined;
+
+				try {
+					for (var _iterator = this.getChildren()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+						var child = _step.value;
+
+						child.target.hide();
+					}
+				} catch (err) {
+					_didIteratorError = true;
+					_iteratorError = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion && _iterator.return) {
+							_iterator.return();
+						}
+					} finally {
+						if (_didIteratorError) {
+							throw _iteratorError;
+						}
+					}
+				}
 			}
 		}, {
 			key: "sheetComplete",
 			value: function sheetComplete() {
 				wind.tweenTo(3);
 				sheetElem.empty();
+				sheetElem.hide();
 			}
 		}, {
 			key: "onStart",
 			value: function onStart() {
+				var _iteratorNormalCompletion2 = true;
+				var _didIteratorError2 = false;
+				var _iteratorError2 = undefined;
+
+				try {
+					for (var _iterator2 = this.getChildren()[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+						var child = _step2.value;
+
+						child.target.show();
+					}
+				} catch (err) {
+					_didIteratorError2 = true;
+					_iteratorError2 = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion2 && _iterator2.return) {
+							_iterator2.return();
+						}
+					} finally {
+						if (_didIteratorError2) {
+							throw _iteratorError2;
+						}
+					}
+				}
 
 				if (this.reversed()) {
 					wind.tweenTo(0);
@@ -402,13 +450,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		}, {
 			key: "bringSheetOnscreen",
 			value: function bringSheetOnscreen() {
-				var _iteratorNormalCompletion = true;
-				var _didIteratorError = false;
-				var _iteratorError = undefined;
+				var _iteratorNormalCompletion3 = true;
+				var _didIteratorError3 = false;
+				var _iteratorError3 = undefined;
 
 				try {
-					for (var _iterator = this.timelines[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-						var timeline = _step.value;
+					for (var _iterator3 = this.timelines[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+						var timeline = _step3.value;
 
 						var progress = timeline.progress();
 						if (progress != 1 && progress != 0) {
@@ -416,16 +464,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 						}
 					}
 				} catch (err) {
-					_didIteratorError = true;
-					_iteratorError = err;
+					_didIteratorError3 = true;
+					_iteratorError3 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion && _iterator.return) {
-							_iterator.return();
+						if (!_iteratorNormalCompletion3 && _iterator3.return) {
+							_iterator3.return();
 						}
 					} finally {
-						if (_didIteratorError) {
-							throw _iteratorError;
+						if (_didIteratorError3) {
+							throw _iteratorError3;
 						}
 					}
 				}
@@ -435,13 +483,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		}, {
 			key: "home",
 			value: function home() {
-				var _iteratorNormalCompletion2 = true;
-				var _didIteratorError2 = false;
-				var _iteratorError2 = undefined;
+				var _iteratorNormalCompletion4 = true;
+				var _didIteratorError4 = false;
+				var _iteratorError4 = undefined;
 
 				try {
-					for (var _iterator2 = this.timelines[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-						var timeline = _step2.value;
+					for (var _iterator4 = this.timelines[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+						var timeline = _step4.value;
 
 						var progress = timeline.progress();
 						if (progress != 1 && progress != 0) {
@@ -449,16 +497,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 						}
 					}
 				} catch (err) {
-					_didIteratorError2 = true;
-					_iteratorError2 = err;
+					_didIteratorError4 = true;
+					_iteratorError4 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion2 && _iterator2.return) {
-							_iterator2.return();
+						if (!_iteratorNormalCompletion4 && _iterator4.return) {
+							_iterator4.return();
 						}
 					} finally {
-						if (_didIteratorError2) {
-							throw _iteratorError2;
+						if (_didIteratorError4) {
+							throw _iteratorError4;
 						}
 					}
 				}
@@ -604,9 +652,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				}
 			}
 
-			animateOpacity("#" + this.name, 0, 0); //hide the sprite until the image has loaded
-
 			this.spriteElem = $("#" + spec.name);
+
+			//start with all sprites hidden until needed.
+			this.spriteElem.hide();
+
 			this.name = spec.name;
 
 			//convert the percentage heights to pixels
@@ -765,17 +815,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					break;
 			}
 
-			//hide the sprite until it has been positioned
-			animateOpacity("#" + _this3.name, 0, 0);
-
 			wind.addTween(_this3);
 
 			_this3.makeDraggable();
 
+			_this3.setPosition(spec);
+
 			//any calculations that need to be done after the image has loaded go here
 			window.addEventListener("load", function () {
+				if (_this3.group === "Centre") {
+					_this3.spriteElem.fadeIn(600);
+				}
 				_this3.width = _this3.spriteElem.width();
-				_this3.setPosition(spec);
 				lineTimelines.addTween(_this3);
 				_this3.xPos = _this3.xPos + _this3.width / 2;
 			});
@@ -815,10 +866,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					top: point.y,
 					left: point.x
 				});
-
-				//now that the sprite has been positioned show it
-				var fadeSpeed = randomInt(0.2, 0.4);
-				animateOpacity("#" + this.name, fadeSpeed, 1);
 
 				this.xPos = point.x;
 				this.yPos = point.y;
@@ -1054,12 +1101,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			}
 
 			_this4.rotated = false;
-
-			//fade in the sprite after everything has loaded
-			window.addEventListener("load", function () {
-				var fadeSpeed = randomFloat(0.2, 0.4);
-				animateOpacity("#" + _this4.name, fadeSpeed, 1);
-			});
 			return _this4;
 		}
 
@@ -1082,7 +1123,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				shadowTL.add(shadowTween);
 
 				this.shadow = $("#" + this.name + "Shadow");
-				animateOpacity("#" + this.name + "Shadow", 0, 0);
 
 				$document.on("mousemove", function (e) {
 					var pageXPercent = e.pageX * 100 / WW;
@@ -1106,6 +1146,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				this.shadowYOffset = -100 + this.shadowYOffset;
 
 				window.addEventListener("load", function () {
+
+					_this5.spriteElem.fadeIn(800);
+
 					var width = parseFloat(_this5.spriteElem.css("width"));
 					//slightly more accurate calculation of spriteMid now that we know the width
 					spriteMid = (parseFloat(_this5.spriteElem.css("left")) + width / 2) / WW * 100;
@@ -1117,9 +1160,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 						bottom: _this5.shadowYOffset + "%",
 						left: _this5.shadowXOffset + "%"
 					});
-
-					var fadeSpeed = randomFloat(0.2, 0, 4);
-					animateOpacity("#" + _this5.name + "Shadow", fadeSpeed, 0.7);
 				});
 			}
 		}]);
@@ -1337,19 +1377,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 			$('#clouds').css({ width: '100%' });
 
-			//fade in the sprite after everything has loaded
-
 			var _this10 = _possibleConstructorReturn(this, Object.getPrototypeOf(Cloud).call(this, spec));
-
-			window.addEventListener("load", function () {
-				var fadeSpeed = randomFloat(0.2, 0.4);
-				animateOpacity("#" + _this10.name, fadeSpeed, 0.7);
-			});
 
 			_this10.setPosition(spec);
 
 			_this10.yPos = parseFloat(_this10.spriteElem.css("bottom"));
 			_this10.animate(spec.animSpeed, spec.name, spec.startPos);
+
+			window.addEventListener("load", function () {
+				_this10.spriteElem.fadeIn(1500);
+			});
 			return _this10;
 		}
 
@@ -1416,11 +1453,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 			_this12.animate();
 
-			//fade in the sprite after everything has loaded
 			window.addEventListener("load", function () {
-				var fadeSpeed = randomFloat(0.2, 0.4);
-				animateOpacity("#" + _this12.name, fadeSpeed, 1);
 				_this12.clipPath();
+				_this12.spriteElem.fadeIn(1000);
 			});
 			return _this12;
 		}

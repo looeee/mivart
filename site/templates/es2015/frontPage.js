@@ -235,8 +235,7 @@
 
 			//any calculations that need to be done after the images have loaded go here
 			window.addEventListener("load", ()=> { 
-				let fadeSpeed = randomFloat(0.2,0.4);
-				animateOpacity("#line", fadeSpeed,1);
+				animateOpacity("#line", 0.2, 1);
 			});
 		}
 
@@ -297,15 +296,21 @@
 
 		onComplete(){
 			wind.tweenTo(3);
+			for(let child of this.getChildren()){
+				child.target.hide();
+			}
 		}
 
 		sheetComplete(){
 			wind.tweenTo(3);
 			sheetElem.empty();
+			sheetElem.hide();
 		}
 
 		onStart(){
-
+			for(let child of this.getChildren()){
+				child.target.show();
+			}
 			if(this.reversed()){
 				wind.tweenTo(0);
 			}
@@ -487,9 +492,11 @@
 				}
 			}
 
-			animateOpacity("#" + this.name, 0, 0); //hide the sprite until the image has loaded
-
 			this.spriteElem = $("#" + spec.name);
+
+			//start with all sprites hidden until needed. 
+	    	this.spriteElem.hide();
+
 			this.name = spec.name;
 
 			//convert the percentage heights to pixels
@@ -631,17 +638,18 @@
 	    	       	break;
 	    	}
 
-	    	//hide the sprite until it has been positioned
-	    	animateOpacity("#" + this.name, 0, 0);
-
 			wind.addTween( this );
 
 			this.makeDraggable();
+
+			this.setPosition(spec);
 	    	
 	    	//any calculations that need to be done after the image has loaded go here
 			window.addEventListener("load", ()=> { 
+				if(this.group === "Centre"){
+	    	    	this.spriteElem.fadeIn(600);
+	    	    }
 				this.width = this.spriteElem.width();
-				this.setPosition(spec);
 				lineTimelines.addTween( this );
 				this.xPos = this.xPos + this.width/2;
 			});
@@ -679,10 +687,6 @@
 				left: point.x,
 			});
 				
-			//now that the sprite has been positioned show it
-			let fadeSpeed = randomInt(0.2,0.4);
-			animateOpacity("#" + this.name, fadeSpeed , 1);
-
 			this.xPos = point.x;
 			this.yPos = point.y;
 	  	}
@@ -901,12 +905,6 @@
 			if(spec.shadowImg) { this.shadow(spec.shadowImg); }
 
 			this.rotated = false;
-
-			//fade in the sprite after everything has loaded
-			window.addEventListener("load", ()=> { 
-				let fadeSpeed = randomFloat(0.2,0.4);
-				animateOpacity("#" + this.name, fadeSpeed, 1);
-			});
 		}
 
 		shadow(shadowImg){
@@ -926,7 +924,6 @@
 			shadowTL.add(shadowTween);
 
 			this.shadow = $("#" + this.name + "Shadow");
-			animateOpacity("#" + this.name +"Shadow", 0, 0);
 
 			$document.on("mousemove", (e) => {
 				let pageXPercent = (e.pageX * 100)/WW;
@@ -953,6 +950,9 @@
 			this.shadowYOffset = -100 + this.shadowYOffset;
 
 			window.addEventListener("load", () => { 
+
+				this.spriteElem.fadeIn(800);
+
 				let width = parseFloat(this.spriteElem.css("width"));
 				//slightly more accurate calculation of spriteMid now that we know the width
 				spriteMid = (parseFloat(this.spriteElem.css("left")) + width/2)/WW*100;
@@ -964,9 +964,6 @@
 					bottom: this.shadowYOffset + "%",
 					left: this.shadowXOffset + "%", 
 				});
-
-				let fadeSpeed = randomFloat(0.2,0,4);
-				animateOpacity("#" + this.name +"Shadow", fadeSpeed, 0.7); 
 			});
 		}
 	}
@@ -1085,7 +1082,7 @@
 		}
 	}
 
-		// * *******************************************************************
+	// * *******************************************************************
 	// *
 	// *   	STAFF CLASS extends MOVING SHADOW SPRITE CLASS 
 	// *
@@ -1159,16 +1156,14 @@
 			$('#clouds').css({width: '100%'})
 			super(spec);
 
-			//fade in the sprite after everything has loaded
-			window.addEventListener("load", ()=> { 
-				let fadeSpeed = randomFloat(0.2,0.4);
-				animateOpacity("#" + this.name, fadeSpeed, 0.7);
-			});
-
 			this.setPosition(spec);
 
 			this.yPos = parseFloat(this.spriteElem.css("bottom"));
 			this.animate(spec.animSpeed, spec.name, spec.startPos);
+
+			window.addEventListener("load", ()=> { 
+				this.spriteElem.fadeIn(1500);
+			});
 		}
 
 		animate(speed, name, startPos){
@@ -1222,11 +1217,9 @@
 			
 			this.animate();
 
-			//fade in the sprite after everything has loaded
 			window.addEventListener("load", ()=> { 
-				let fadeSpeed = randomFloat(0.2,0.4);
-				animateOpacity("#" + this.name, fadeSpeed, 1);
 				this.clipPath();
+				this.spriteElem.fadeIn(1000);
 			});
 		}
 
