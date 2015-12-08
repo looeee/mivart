@@ -65,15 +65,15 @@
 	// *   GET BACKGROUND IMAGE BASED ON PAGE WIDTH
 	// *
 	// *************************************************************************
-	let background = () => {
+	( () => {
+		$("#background").hide();
 		$.get( rootUrl, { background: "y", width: WW, height: WH }, (data) => {
 			$("#background").css({
 				background: "url(" + data + ") 0 no-repeat fixed",
 			});
+			$("#background").fadeIn(5000);
 		}); 
-	}
-
-	background();
+	})();
 
 	// * ***********************************************************************
 	// *
@@ -274,7 +274,6 @@
 				onComplete: this.onComplete, 
 				onReverseComplete: this.onComplete,
 				onStart: this.onStart,
-				onReverseStart: this.onStart,
 			}
 
 			this.centreTL = new TimelineMax(options);
@@ -297,7 +296,6 @@
 				onComplete: this.sheetComplete, 
 				onReverseComplete: this.sheetComplete,
 				onStart: this.onStart,
-				onReverseStart: this.onStart,
 			});
 			this.sheetTL.add("middle", config.wlAnimSpeed/2);
 
@@ -511,9 +509,6 @@
 
 			this.spriteElem = $("#" + spec.name);
 
-			//start with all sprites hidden until needed. 
-	    	this.spriteElem.hide();
-
 			this.name = spec.name;
 
 			//convert the percentage heights to pixels
@@ -522,6 +517,10 @@
 
 			this.width = spec.maxW; //and the maxW as a percentage of screen width
 
+			if(spec.originalName){
+				this.originalName = spec.originalName;
+				this.spriteElem = $("#" + spec.originalName );
+			}
 			this.setBackground();
 		}
 
@@ -549,9 +548,15 @@
 					});
 					this.height = h/(this.frames);
 
+
 					//simple hack to get clipPath to run at the right time for boat
 					if(typeof this.clipPath === "function") {
 						this.clipPath();
+					}
+
+					//another simple hack to get the padwriting in the write place 
+					if(this.name === "pad"){
+						padWriting = new Handwriting(this.width *0.6, this.height *0.7);
 					}
 				});
 			}); 
@@ -668,9 +673,6 @@
 	    	
 	    	//any calculations that need to be done after the image has loaded go here
 			window.addEventListener("load", ()=> { 
-				if(this.group === "Centre"){
-	    	    	this.spriteElem.fadeIn(600);
-	    	    }
 				this.width = this.spriteElem.width();
 				lineTimelines.addTween( this );
 				this.xPos = this.xPos + this.width/2;
@@ -859,6 +861,10 @@
 					sprite.timeline.reverse();
 					//set the next group to the end of its timeline then reverse to the middle
 					sprite.nextTimeline.progress(1).tweenTo("middle");
+					//show the objects
+					for(let child of sprite.nextTimeline.getChildren()){
+						child.target.show();
+					}
 					animateOpacity("#infoRight", 0.2, 0);
 					sprite.animateSecondary();
 				}
@@ -873,15 +879,9 @@
 
 		animateSecondary(){
 			if(this.nextGroup === "Performance" || this.group === "Performance"){
-				if(typeof staff === 'undefined'){
-					staff = new Staff(staffSpec);
-				}
 				staff.animate();
 			}
-			else if(this.nextGroup === "Crafts" || this.group === "Crafts"){
-				if(typeof goose === 'undefined'){
-					goose = new Goose(gooseSpec);
-				}		
+			else if(this.nextGroup === "Crafts" || this.group === "Crafts"){		
 				goose.animate();
 			}
 		}
@@ -927,6 +927,7 @@
 			if(spec.shadowImg) { this.shadow(spec.shadowImg); }
 
 			this.rotated = false;
+
 		}
 
 		shadow(shadowImg){
@@ -935,15 +936,10 @@
 
 			let shadowTL = new TimelineMax({paused: true})
 			let shadowTween = TweenMax.fromTo("#" + this.name + "Shadow", 2,
-							{
-								skewX: -60,
-							}, 
-							{
-								skewX: 60,
-								ease: Linear.easeNone,
-							})
+				{ skewX: -60, }, 
+				{ skewX: 60, ease: Linear.easeNone,	});
 
-			shadowTL.add(shadowTween);
+			shadowTL.add(shadowTween)
 
 			this.shadow = $("#" + this.name + "Shadow");
 
@@ -972,16 +968,13 @@
 			this.shadowYOffset = -100 + this.shadowYOffset;
 
 			window.addEventListener("load", () => { 
-
-				this.spriteElem.fadeIn(800);
-
 				let width = parseFloat(this.spriteElem.css("width"));
 				//slightly more accurate calculation of spriteMid now that we know the width
 				spriteMid = (parseFloat(this.spriteElem.css("left")) + width/2)/WW*100;
 
 				this.shadow.css({
 					background: "url('" + shadowImg + "') 0 0% / contain no-repeat",
-					height: this.height + "px",
+					//height: this.height + "px",
 					width: this.shadowWidth + "%",
 					bottom: this.shadowYOffset + "%",
 					left: this.shadowXOffset + "%", 
@@ -992,50 +985,12 @@
 
 	// * ***********************************************************************
 	// *
-	// *   	MOVING SHADOW SPRITE CLASS extends SHADOW SPRITE CLASS
-	// *
-	// *	When the sprite moves it breaks the z-index so the shadow appears on 
-	// * 	top - create a wrapper element, move this and put the sprite image
-	// * 	in a sub element
-	// *
-	// * ***********************************************************************
-
-	class movingShadowSprite extends shadowSprite{
-		constructor(spec){
-			spec.parentDiv = 'plankSprites';
-			spec.xType = "left";
-			spec.yType= "top";
-
-			spec.originalName = spec.name;
-			spec.name = spec.name + "Wrapper";
-
-			super(spec);
-
-			this.spriteElem.css({background: ""});
-
-			this.spriteElem.append("<div id='" + spec.originalName + "'></div>");
-
-			$( "#" + spec.originalName ).css({
-				position: 'relative',
-			    top: '-100%',
-			    left: 0,
-			    width: 'inherit',
-			    height: 'inherit',
-				//background: "url('" + this.spriteImage.src + "') no-repeat 0 0%",
-				"background-size": "100%",
-			});
-
-		}
-	}
-
-	// * ***********************************************************************
-	// *
 	// *   	GOOSE CLASS extends MOVING SHADOW SPRITE CLASS 
 	// *
 	// *	Define animation functions for goose
 	// *
 	// *************************************************************************
-	class Goose extends movingShadowSprite{
+	class Goose extends shadowSprite{
 		constructor(spec){
 			super(spec);
 
@@ -1182,10 +1137,6 @@
 
 			this.yPos = parseFloat(this.spriteElem.css("bottom"));
 			this.animate(spec.animSpeed, spec.name, spec.startPos);
-
-			window.addEventListener("load", ()=> { 
-				this.spriteElem.fadeIn(1500);
-			});
 		}
 
 		animate(speed, name, startPos){
@@ -1238,10 +1189,6 @@
 			this.setPosition(spec);
 			
 			this.animate();
-
-			window.addEventListener("load", () => { 
-				this.spriteElem.fadeIn(1000);
-			});
 		}
 
 		clipPath(){
@@ -1628,9 +1575,7 @@
 		shadowXOffset: 0, 
 		shadowWidth: 100, 
 	}
-	let goose;
-
-	//const goose = new Goose(gooseSpec);
+	const goose = new Goose(gooseSpec);;
 
 	const staffSpec = {
 		name: "staff",
@@ -1643,7 +1588,7 @@
 		shadowXOffset: 3, 
 		shadowWidth: 100, 
 	}
-	let staff;
+	const staff = new Staff(staffSpec);
 
 	// * ***********************************************************************
 	// *
@@ -1701,7 +1646,6 @@
 	window.addEventListener("load", ()=> { 
 		lineTimelines.centreTL.progress( 0.5 ); //.tweenTo( "middle" );
 		wind.timeline.progress( 0.5 );
-		padWriting = new Handwriting(pad.width *0.6, pad.height *0.7);
 	}); //end window.load
 
 })();

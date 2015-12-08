@@ -695,7 +695,7 @@ body {
   z-index: -100;
   -webkit-filter: opacity(90%) blur(0.8px);
   filter: blur(0.8px);
-  opacity: 0.75; }
+  opacity: 0.85; }
 
 #boatWrapper {
   -webkit-clip-path: url(#boatClip);
@@ -713,6 +713,7 @@ body {
           transform-origin: 50% 50%; }
 
 .shadow {
+  height: 100%;
   position: relative;
   z-index: -1;
   -webkit-filter: blur(1px);

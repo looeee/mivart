@@ -24,6 +24,9 @@
 	<div id="plankSprites">
 		<div id="pad">
 		</div>
+
+		<div id="gooseWrapper"></div>
+		<div id="staffWrapper"></div>
 	</div>
 
 	<div id="boatWrapper"></div>

@@ -22,3 +22,5 @@
 2015-12-07 10:05:56	admin	http://vps222373.ovh.net/mivart/	Parse Error: 	syntax error, unexpected 'echo' (T_ECHO) (line 54 of /var/www/html/mivart/site/templates/functions.php)
 2015-12-07 10:05:56	admin	http://vps222373.ovh.net/mivart/	Parse Error: 	syntax error, unexpected 'echo' (T_ECHO) (line 54 of /var/www/html/mivart/site/templates/functions.php)
 2015-12-07 10:06:01	admin	http://vps222373.ovh.net/mivart/	Error: 	Call to a member function get() on null (line 54 of /var/www/html/mivart/site/templates/functions.php)
+2015-12-07 16:17:56	admin	http://vps222373.ovh.net/mivart/	Error: 	Call to a member function size() on boolean (line 33 of /var/www/html/mivart/site/templates/functions.php)
+2015-12-07 16:18:01	admin	http://vps222373.ovh.net/mivart/	Error: 	Call to a member function size() on boolean (line 33 of /var/www/html/mivart/site/templates/functions.php)

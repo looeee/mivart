@@ -90,15 +90,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	// *   GET BACKGROUND IMAGE BASED ON PAGE WIDTH
 	// *
 	// *************************************************************************
-	var background = function background() {
+	(function () {
+		$("#background").hide();
 		$.get(rootUrl, { background: "y", width: WW, height: WH }, function (data) {
 			$("#background").css({
 				background: "url(" + data + ") 0 no-repeat fixed"
 			});
+			$("#background").fadeIn(5000);
 		});
-	};
-
-	background();
+	})();
 
 	// * ***********************************************************************
 	// *
@@ -328,8 +328,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				paused: true,
 				onComplete: this.onComplete,
 				onReverseComplete: this.onComplete,
-				onStart: this.onStart,
-				onReverseStart: this.onStart
+				onStart: this.onStart
 			};
 
 			this.centreTL = new TimelineMax(options);
@@ -351,8 +350,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				paused: true,
 				onComplete: this.sheetComplete,
 				onReverseComplete: this.sheetComplete,
-				onStart: this.onStart,
-				onReverseStart: this.onStart
+				onStart: this.onStart
 			});
 			this.sheetTL.add("middle", config.wlAnimSpeed / 2);
 
@@ -671,9 +669,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 			this.spriteElem = $("#" + spec.name);
 
-			//start with all sprites hidden until needed.
-			this.spriteElem.hide();
-
 			this.name = spec.name;
 
 			//convert the percentage heights to pixels
@@ -682,6 +677,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 			this.width = spec.maxW; //and the maxW as a percentage of screen width
 
+			if (spec.originalName) {
+				this.originalName = spec.originalName;
+				this.spriteElem = $("#" + spec.originalName);
+			}
 			this.setBackground();
 		}
 
@@ -717,6 +716,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 						//simple hack to get clipPath to run at the right time for boat
 						if (typeof _this2.clipPath === "function") {
 							_this2.clipPath();
+						}
+
+						//another simple hack to get the padwriting in the write place
+						if (_this2.name === "pad") {
+							padWriting = new Handwriting(_this2.width * 0.6, _this2.height * 0.7);
 						}
 					});
 				});
@@ -845,9 +849,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 			//any calculations that need to be done after the image has loaded go here
 			window.addEventListener("load", function () {
-				if (_this3.group === "Centre") {
-					_this3.spriteElem.fadeIn(600);
-				}
 				_this3.width = _this3.spriteElem.width();
 				lineTimelines.addTween(_this3);
 				_this3.xPos = _this3.xPos + _this3.width / 2;
@@ -1046,6 +1047,32 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 						sprite.timeline.reverse();
 						//set the next group to the end of its timeline then reverse to the middle
 						sprite.nextTimeline.progress(1).tweenTo("middle");
+						//show the objects
+						var _iteratorNormalCompletion5 = true;
+						var _didIteratorError5 = false;
+						var _iteratorError5 = undefined;
+
+						try {
+							for (var _iterator5 = sprite.nextTimeline.getChildren()[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+								var child = _step5.value;
+
+								child.target.show();
+							}
+						} catch (err) {
+							_didIteratorError5 = true;
+							_iteratorError5 = err;
+						} finally {
+							try {
+								if (!_iteratorNormalCompletion5 && _iterator5.return) {
+									_iterator5.return();
+								}
+							} finally {
+								if (_didIteratorError5) {
+									throw _iteratorError5;
+								}
+							}
+						}
+
 						animateOpacity("#infoRight", 0.2, 0);
 						sprite.animateSecondary();
 					} else {
@@ -1060,14 +1087,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			key: "animateSecondary",
 			value: function animateSecondary() {
 				if (this.nextGroup === "Performance" || this.group === "Performance") {
-					if (typeof staff === 'undefined') {
-						staff = new Staff(staffSpec);
-					}
 					staff.animate();
 				} else if (this.nextGroup === "Crafts" || this.group === "Crafts") {
-					if (typeof goose === 'undefined') {
-						goose = new Goose(gooseSpec);
-					}
 					goose.animate();
 				}
 			}
@@ -1123,6 +1144,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			}
 
 			_this4.rotated = false;
+
 			return _this4;
 		}
 
@@ -1135,12 +1157,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				this.spriteElem.append("<div id='" + this.name + "Shadow' class='shadow'></div>");
 
 				var shadowTL = new TimelineMax({ paused: true });
-				var shadowTween = TweenMax.fromTo("#" + this.name + "Shadow", 2, {
-					skewX: -60
-				}, {
-					skewX: 60,
-					ease: Linear.easeNone
-				});
+				var shadowTween = TweenMax.fromTo("#" + this.name + "Shadow", 2, { skewX: -60 }, { skewX: 60, ease: Linear.easeNone });
 
 				shadowTL.add(shadowTween);
 
@@ -1168,16 +1185,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				this.shadowYOffset = -100 + this.shadowYOffset;
 
 				window.addEventListener("load", function () {
-
-					_this5.spriteElem.fadeIn(800);
-
 					var width = parseFloat(_this5.spriteElem.css("width"));
 					//slightly more accurate calculation of spriteMid now that we know the width
 					spriteMid = (parseFloat(_this5.spriteElem.css("left")) + width / 2) / WW * 100;
 
 					_this5.shadow.css({
 						background: "url('" + shadowImg + "') 0 0% / contain no-repeat",
-						height: _this5.height + "px",
+						//height: this.height + "px",
 						width: _this5.shadowWidth + "%",
 						bottom: _this5.shadowYOffset + "%",
 						left: _this5.shadowXOffset + "%"
@@ -1191,72 +1205,27 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 	// * ***********************************************************************
 	// *
-	// *   	MOVING SHADOW SPRITE CLASS extends SHADOW SPRITE CLASS
-	// *
-	// *	When the sprite moves it breaks the z-index so the shadow appears on
-	// * 	top - create a wrapper element, move this and put the sprite image
-	// * 	in a sub element
-	// *
-	// * ***********************************************************************
-
-	var movingShadowSprite = (function (_shadowSprite) {
-		_inherits(movingShadowSprite, _shadowSprite);
-
-		function movingShadowSprite(spec) {
-			_classCallCheck(this, movingShadowSprite);
-
-			spec.parentDiv = 'plankSprites';
-			spec.xType = "left";
-			spec.yType = "top";
-
-			spec.originalName = spec.name;
-			spec.name = spec.name + "Wrapper";
-
-			var _this6 = _possibleConstructorReturn(this, Object.getPrototypeOf(movingShadowSprite).call(this, spec));
-
-			_this6.spriteElem.css({ background: "" });
-
-			_this6.spriteElem.append("<div id='" + spec.originalName + "'></div>");
-
-			$("#" + spec.originalName).css({
-				position: 'relative',
-				top: '-100%',
-				left: 0,
-				width: 'inherit',
-				height: 'inherit',
-				//background: "url('" + this.spriteImage.src + "') no-repeat 0 0%",
-				"background-size": "100%"
-			});
-
-			return _this6;
-		}
-
-		return movingShadowSprite;
-	})(shadowSprite);
-
-	// * ***********************************************************************
-	// *
 	// *   	GOOSE CLASS extends MOVING SHADOW SPRITE CLASS
 	// *
 	// *	Define animation functions for goose
 	// *
 	// *************************************************************************
 
-	var Goose = (function (_movingShadowSprite) {
-		_inherits(Goose, _movingShadowSprite);
+	var Goose = (function (_shadowSprite) {
+		_inherits(Goose, _shadowSprite);
 
 		function Goose(spec) {
 			_classCallCheck(this, Goose);
 
-			var _this7 = _possibleConstructorReturn(this, Object.getPrototypeOf(Goose).call(this, spec));
+			var _this6 = _possibleConstructorReturn(this, Object.getPrototypeOf(Goose).call(this, spec));
 
-			_this7.left = xPercentToPx(spec.xPos);
-			_this7.top = yPercentToPx(spec.yPos);
+			_this6.left = xPercentToPx(spec.xPos);
+			_this6.top = yPercentToPx(spec.yPos);
 
-			_this7.buildTimeline();
+			_this6.buildTimeline();
 
-			_this7.rotated = false;
-			return _this7;
+			_this6.rotated = false;
+			return _this6;
 		}
 
 		_createClass(Goose, [{
@@ -1297,13 +1266,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		}, {
 			key: "animate",
 			value: function animate() {
-				var _this8 = this;
+				var _this7 = this;
 
 				if (this.timeline.reversed()) {
 					this.rotated = false;
 					TweenMax.to(this.spriteElem, 0.6, { rotationY: 0, ease: Quad.easeInOut });
 					setTimeout(function () {
-						_this8.timeline.play();
+						_this7.timeline.play();
 					}, 300);
 				} else if (this.timeline.progress() === 0) {
 					this.rotated = false;
@@ -1312,14 +1281,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					this.rotated = true;
 					TweenMax.to(this.spriteElem, 0.6, { rotationY: 180, ease: Quad.easeInOut });
 					setTimeout(function () {
-						_this8.timeline.reverse();
+						_this7.timeline.reverse();
 					}, 300);
 				}
 			}
 		}]);
 
 		return Goose;
-	})(movingShadowSprite);
+	})(shadowSprite);
 
 	// * *******************************************************************
 	// *
@@ -1329,16 +1298,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	// *
 	// *************************************************************************
 
-	var Staff = (function (_movingShadowSprite2) {
-		_inherits(Staff, _movingShadowSprite2);
+	var Staff = (function (_movingShadowSprite) {
+		_inherits(Staff, _movingShadowSprite);
 
 		function Staff(spec) {
 			_classCallCheck(this, Staff);
 
-			var _this9 = _possibleConstructorReturn(this, Object.getPrototypeOf(Staff).call(this, spec));
+			var _this8 = _possibleConstructorReturn(this, Object.getPrototypeOf(Staff).call(this, spec));
 
-			_this9.buildTimeline();
-			return _this9;
+			_this8.buildTimeline();
+			return _this8;
 		}
 
 		_createClass(Staff, [{
@@ -1399,23 +1368,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 			$('#clouds').css({ width: '100%' });
 
-			var _this10 = _possibleConstructorReturn(this, Object.getPrototypeOf(Cloud).call(this, spec));
+			var _this9 = _possibleConstructorReturn(this, Object.getPrototypeOf(Cloud).call(this, spec));
 
-			_this10.setPosition(spec);
+			_this9.setPosition(spec);
 
-			_this10.yPos = parseFloat(_this10.spriteElem.css("bottom"));
-			_this10.animate(spec.animSpeed, spec.name, spec.startPos);
-
-			window.addEventListener("load", function () {
-				_this10.spriteElem.fadeIn(1500);
-			});
-			return _this10;
+			_this9.yPos = parseFloat(_this9.spriteElem.css("bottom"));
+			_this9.animate(spec.animSpeed, spec.name, spec.startPos);
+			return _this9;
 		}
 
 		_createClass(Cloud, [{
 			key: "animate",
 			value: function animate(speed, name, startPos) {
-				var _this11 = this;
+				var _this10 = this;
 
 				this.timeline = new TimelineMax();
 				var crossScreen = TweenMax.fromTo('#' + name, speed, { left: WW * 6 / 5, y: 0 }, { left: -WW * 1 / 5, repeat: -1, ease: Linear.easeNone, force3D: true });
@@ -1429,18 +1394,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 					var wind = function wind(x, y) {
 						//set the minimum height of clouds as a % of screen height
-						var height = parseFloat(_this11.spriteElem.css("bottom"));
+						var height = parseFloat(_this10.spriteElem.css("bottom"));
 						if (height > WH / 100 * 55) {
 							y = Math.abs(y);
 						}
-						_this11.timeline.pause();
+						_this10.timeline.pause();
 						TweenMax.to('#' + name, 2, {
 							x: x,
 							y: y,
 							ease: Sine.easeOut,
 							force3D: true,
 							onComplete: function onComplete() {
-								_this11.timeline.play();
+								_this10.timeline.play();
 							}
 						});
 					};
@@ -1469,16 +1434,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		function Boat(spec) {
 			_classCallCheck(this, Boat);
 
-			var _this12 = _possibleConstructorReturn(this, Object.getPrototypeOf(Boat).call(this, spec));
+			var _this11 = _possibleConstructorReturn(this, Object.getPrototypeOf(Boat).call(this, spec));
 
-			_this12.setPosition(spec);
+			_this11.setPosition(spec);
 
-			_this12.animate();
-
-			window.addEventListener("load", function () {
-				_this12.spriteElem.fadeIn(1000);
-			});
-			return _this12;
+			_this11.animate();
+			return _this11;
 		}
 
 		_createClass(Boat, [{
@@ -1870,9 +1831,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		shadowXOffset: 0,
 		shadowWidth: 100
 	};
-	var goose = undefined;
-
-	//const goose = new Goose(gooseSpec);
+	var goose = new Goose(gooseSpec);;
 
 	var staffSpec = {
 		name: "staff",
@@ -1885,7 +1844,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		shadowXOffset: 3,
 		shadowWidth: 100
 	};
-	var staff = undefined;
+	var staff = new Staff(staffSpec);
 
 	// * ***********************************************************************
 	// *
@@ -1943,7 +1902,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	window.addEventListener("load", function () {
 		lineTimelines.centreTL.progress(0.5); //.tweenTo( "middle" );
 		wind.timeline.progress(0.5);
-		padWriting = new Handwriting(pad.width * 0.6, pad.height * 0.7);
 	}); //end window.load
 })();
 
