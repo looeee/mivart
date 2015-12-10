@@ -511,16 +511,16 @@
 			this.name = spec.name;
 
 			//convert the percentage heights to pixels
-			spec.maxH = yPercentToPx(spec.maxH);
 			spec.maxW = xPercentToPx(spec.maxW);
 
 			this.width = spec.maxW; //and the maxW as a percentage of screen width
 
-			if(spec.originalName){
-				this.originalName = spec.originalName;
-				this.spriteElem = $("#" + spec.originalName );
-			}
-			this.setBackground();
+			//if(spec.originalName){
+			//	this.originalName = spec.originalName;
+			//	this.spriteElem = $("#" + spec.originalName );
+			//}
+
+			this.setBackground(spec);
 		}
 
 		selectImage(imageURL, callback) {
@@ -534,7 +534,7 @@
 			return img;
 		}
 
-		setBackground(){
+		setBackground(spec){
 			//get an resized version of the image that matches the calcualted image width
 			//images must have a description set in Processwire that matches the sprites name
 			$.get( rootUrl, { image: this.name, width: this.width }, ( data ) => {
@@ -549,22 +549,12 @@
 
 					this.width = w;
 
-					//make LineSprite draggable
-					if(typeof this.makeDraggable === "function") {
-						this.makeDraggable()					}
-
-					//simple hack to get clipPath to run at the right time for boat
-					if(typeof this.clipPath === "function") {
-						this.clipPath();
-					}
-
-					//another simple hack to get the padwriting in the write place 
-					if(this.name === "pad"){
-						padWriting = new Handwriting(this.width *0.6, this.height *0.7);
-					}
-
-					
+					this.setPosition(spec);
 					this.spriteElem.fadeIn(2000);
+
+					if(typeof this.afterImageLoad === "function") {
+						this.afterImageLoad();				
+					}		
 				})
 			});
 		}
@@ -673,17 +663,15 @@
 	    	}
 
 			wind.addTween( this );
+	  	}
 
-			this.setPosition(spec);
-	    	
-	    	//any calculations that need to be done after the image has loaded go here
-			window.addEventListener("load", ()=> { 
-				lineTimelines.addTween( this );
-				this.xPos = this.xPos + this.width/2;
-			});
+	  	//anything that needs to be done after the ajax image load goes here
+	  	afterImageLoad(){
+	  		this.makeDraggable();
 	  	}
 
 	  	setPosition(spec){
+	  		console.log(spec.name, spec.xPos)
 	  		let xPos = xPercentToPx(spec.xPos);
 
 	  		//if it's animated via frames set it to the middle frame
@@ -700,8 +688,9 @@
 				});
 			}
 
-	  		let heightPercent = this.spriteElem.height()/100;
+	  		let heightPercent = this.height/100;
 			this.offset = heightPercent*spec.offset;
+
 
 			//calculate the point on the line
 			let point = {
@@ -715,8 +704,10 @@
 				left: point.x,
 			});
 				
-			this.xPos = point.x;
+			this.xPos = point.x
 			this.yPos = point.y;
+
+			lineTimelines.addTween( this );
 	  	}
 
 	  	//Display information on the sheet
@@ -771,10 +762,13 @@
 	  	//note: "this" refers to the draggable event here, pass sprites "this" as "sprite"
 	  	onDrag( sprite ){
 			return function(){
+				//difference between start and current point in drag
 				let change = sprite.xPos - this.pointerX;
-				let mid = parseInt(sprite.spriteElem[0].style.left, 10) +  sprite.width/2;
-  
-				sprite.direction = this.pointerX - mid;
+				
+				sprite.direction = this.pointerX - sprite.mid;
+
+				//current middle of the sprite
+				sprite.mid = parseInt(sprite.spriteElem[0].style.left, 10) +  sprite.width/2;
 
 				//add wind effect as we drag the sprite
 				//need to make the wind time line universal for all sprites
@@ -796,8 +790,8 @@
 
 				//set the progress of the washing line as we drag the sprite
 				let progress = (change > 0 ) 
-								? 0.5 + ( change/mid/2 ) * mid/WW
-								: 0.5 + ( change/(WW-mid)/2 ) * ( 1 - mid/WW );
+								? 0.5 + ( change/sprite.mid/2 ) * sprite.mid/WW
+								: 0.5 + ( change/(WW-sprite.mid)/2 ) * ( 1 - sprite.mid/WW );
 				sprite.timeline.progress( progress ); 	
 
 				//show the next page divs if dragged far enough
@@ -890,6 +884,7 @@
 		}
 
 		makeDraggable(){
+			this.xPos = this.xPos + this.width/2;
 			this.direction = 0;
 			this.endX = this.xPos;
 			this.startX = this.xPos;
@@ -920,8 +915,6 @@
 			spec.xType = "left";
 
 			super(spec);
-
-			this.setPosition(spec);
 
 			this.shadowYOffset = spec.shadowYOffset || 5;
 			this.shadowXOffset = spec.shadowXOffset || 0;
@@ -988,7 +981,23 @@
 
 	// * ***********************************************************************
 	// *
-	// *   	GOOSE CLASS extends MOVING SHADOW SPRITE CLASS 
+	// *   	Pad CLASS extends SHADOW SPRITE CLASS 
+	// *
+	// *	Define animation functions for goose
+	// *
+	// *************************************************************************
+	class Pad extends ShadowSprite{
+		constructor(spec){
+			super(spec);
+		}
+
+		afterImageLoad(){
+			padWriting = new Handwriting(this.width *0.6, this.height *0.7);
+		}
+	}
+	// * ***********************************************************************
+	// *
+	// *   	GOOSE CLASS extends SHADOW SPRITE CLASS 
 	// *
 	// *	Define animation functions for goose
 	// *
@@ -1064,7 +1073,7 @@
 
 	// * *******************************************************************
 	// *
-	// *   	STAFF CLASS extends MOVING SHADOW SPRITE CLASS 
+	// *   	STAFF CLASS extends SHADOW SPRITE CLASS 
 	// *
 	// *	Define animation functions for staff
 	// *
@@ -1116,7 +1125,7 @@
 			}				
 		}
 	}
-	
+
 	// * ***********************************************************************
 	// *
 	// *   	CLOUDS CLASS extends RESPONSIVE SPRITE CLASS
@@ -1133,10 +1142,7 @@
 			spec.yType = "bottom";
 			spec.parentDiv = 'clouds';
 
-			$('#clouds').css({width: '100%'})
 			super(spec);
-
-			this.setPosition(spec);
 
 			this.yPos = parseFloat(this.spriteElem.css("bottom"));
 			this.animate(spec.animSpeed, spec.name, spec.startPos);
@@ -1189,10 +1195,13 @@
 	class Boat extends ResponsiveSprite{
 		constructor(spec){
 			super(spec);
-			this.setPosition(spec);
-			
 			this.animate();
 		}
+
+		//anything that needs to be done after the ajax image load goes here
+	  	afterImageLoad(){
+	  		this.clipPath();
+	  	}
 
 		clipPath(){
 			let clipPathElem = $("#boatClipPath");
@@ -1554,7 +1563,7 @@
 		}
 	});
 
-	const pad = new ShadowSprite({
+	const pad = new Pad({
 		parentDiv: 'plankSprites',
 		name: "pad",
 		imageURL: imagesUrl + "pad.png", 

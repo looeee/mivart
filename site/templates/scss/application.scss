@@ -68,7 +68,7 @@ body {
 }
 
 #clouds > div {
-  z-index: -100;
+  z-index: -150;
   -webkit-filter:  opacity(90%) blur(0.8px); 
   filter: blur(0.8px);
   opacity: 0.85;
@@ -86,10 +86,6 @@ body {
 
 #staff{
   transform-origin: 50% 50%;
-}
-
-#inkwell, #bucket, #brushholder{
-
 }
 
 .sprite{

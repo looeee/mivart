@@ -673,16 +673,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			this.name = spec.name;
 
 			//convert the percentage heights to pixels
-			spec.maxH = yPercentToPx(spec.maxH);
 			spec.maxW = xPercentToPx(spec.maxW);
 
 			this.width = spec.maxW; //and the maxW as a percentage of screen width
 
-			if (spec.originalName) {
-				this.originalName = spec.originalName;
-				this.spriteElem = $("#" + spec.originalName);
-			}
-			this.setBackground();
+			//if(spec.originalName){
+			//	this.originalName = spec.originalName;
+			//	this.spriteElem = $("#" + spec.originalName );
+			//}
+
+			this.setBackground(spec);
 		}
 
 		_createClass(ResponsiveSprite, [{
@@ -699,7 +699,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			}
 		}, {
 			key: "setBackground",
-			value: function setBackground() {
+			value: function setBackground(spec) {
 				var _this2 = this;
 
 				//get an resized version of the image that matches the calcualted image width
@@ -716,22 +716,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 						_this2.width = w;
 
-						//make LineSprite draggable
-						if (typeof _this2.makeDraggable === "function") {
-							_this2.makeDraggable();
-						}
-
-						//simple hack to get clipPath to run at the right time for boat
-						if (typeof _this2.clipPath === "function") {
-							_this2.clipPath();
-						}
-
-						//another simple hack to get the padwriting in the write place
-						if (_this2.name === "pad") {
-							padWriting = new Handwriting(_this2.width * 0.6, _this2.height * 0.7);
-						}
-
+						_this2.setPosition(spec);
 						_this2.spriteElem.fadeIn(2000);
+
+						if (typeof _this2.afterImageLoad === "function") {
+							_this2.afterImageLoad();
+						}
 					});
 				});
 			}
@@ -852,20 +842,20 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			}
 
 			wind.addTween(_this3);
-
-			_this3.setPosition(spec);
-
-			//any calculations that need to be done after the image has loaded go here
-			window.addEventListener("load", function () {
-				lineTimelines.addTween(_this3);
-				_this3.xPos = _this3.xPos + _this3.width / 2;
-			});
 			return _this3;
 		}
 
+		//anything that needs to be done after the ajax image load goes here
+
 		_createClass(LineSprite, [{
+			key: "afterImageLoad",
+			value: function afterImageLoad() {
+				this.makeDraggable();
+			}
+		}, {
 			key: "setPosition",
 			value: function setPosition(spec) {
+				console.log(spec.name, spec.xPos);
 				var xPos = xPercentToPx(spec.xPos);
 
 				//if it's animated via frames set it to the middle frame
@@ -882,7 +872,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					});
 				}
 
-				var heightPercent = this.spriteElem.height() / 100;
+				var heightPercent = this.height / 100;
 				this.offset = heightPercent * spec.offset;
 
 				//calculate the point on the line
@@ -899,6 +889,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 				this.xPos = point.x;
 				this.yPos = point.y;
+
+				lineTimelines.addTween(this);
 			}
 
 			//Display information on the sheet
@@ -961,10 +953,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			key: "onDrag",
 			value: function onDrag(sprite) {
 				return function () {
+					//difference between start and current point in drag
 					var change = sprite.xPos - this.pointerX;
-					var mid = parseInt(sprite.spriteElem[0].style.left, 10) + sprite.width / 2;
 
-					sprite.direction = this.pointerX - mid;
+					sprite.direction = this.pointerX - sprite.mid;
+
+					//current middle of the sprite
+					sprite.mid = parseInt(sprite.spriteElem[0].style.left, 10) + sprite.width / 2;
 
 					//add wind effect as we drag the sprite
 					//need to make the wind time line universal for all sprites
@@ -983,7 +978,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					}, 100);
 
 					//set the progress of the washing line as we drag the sprite
-					var progress = change > 0 ? 0.5 + change / mid / 2 * mid / WW : 0.5 + change / (WW - mid) / 2 * (1 - mid / WW);
+					var progress = change > 0 ? 0.5 + change / sprite.mid / 2 * sprite.mid / WW : 0.5 + change / (WW - sprite.mid) / 2 * (1 - sprite.mid / WW);
 					sprite.timeline.progress(progress);
 
 					//show the next page divs if dragged far enough
@@ -1103,6 +1098,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		}, {
 			key: "makeDraggable",
 			value: function makeDraggable() {
+				this.xPos = this.xPos + this.width / 2;
 				this.direction = 0;
 				this.endX = this.xPos;
 				this.startX = this.xPos;
@@ -1140,8 +1136,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			spec.xType = "left";
 
 			var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(ShadowSprite).call(this, spec));
-
-			_this4.setPosition(spec);
 
 			_this4.shadowYOffset = spec.shadowYOffset || 5;
 			_this4.shadowXOffset = spec.shadowXOffset || 0;
@@ -1213,27 +1207,53 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 	// * ***********************************************************************
 	// *
-	// *   	GOOSE CLASS extends MOVING SHADOW SPRITE CLASS
+	// *   	Pad CLASS extends SHADOW SPRITE CLASS
 	// *
 	// *	Define animation functions for goose
 	// *
 	// *************************************************************************
 
-	var Goose = (function (_ShadowSprite) {
-		_inherits(Goose, _ShadowSprite);
+	var Pad = (function (_ShadowSprite) {
+		_inherits(Pad, _ShadowSprite);
+
+		function Pad(spec) {
+			_classCallCheck(this, Pad);
+
+			return _possibleConstructorReturn(this, Object.getPrototypeOf(Pad).call(this, spec));
+		}
+
+		_createClass(Pad, [{
+			key: "afterImageLoad",
+			value: function afterImageLoad() {
+				padWriting = new Handwriting(this.width * 0.6, this.height * 0.7);
+			}
+		}]);
+
+		return Pad;
+	})(ShadowSprite);
+	// * ***********************************************************************
+	// *
+	// *   	GOOSE CLASS extends SHADOW SPRITE CLASS
+	// *
+	// *	Define animation functions for goose
+	// *
+	// *************************************************************************
+
+	var Goose = (function (_ShadowSprite2) {
+		_inherits(Goose, _ShadowSprite2);
 
 		function Goose(spec) {
 			_classCallCheck(this, Goose);
 
-			var _this6 = _possibleConstructorReturn(this, Object.getPrototypeOf(Goose).call(this, spec));
+			var _this7 = _possibleConstructorReturn(this, Object.getPrototypeOf(Goose).call(this, spec));
 
-			_this6.left = xPercentToPx(spec.xPos);
-			_this6.top = yPercentToPx(spec.yPos);
+			_this7.left = xPercentToPx(spec.xPos);
+			_this7.top = yPercentToPx(spec.yPos);
 
-			_this6.buildTimeline();
+			_this7.buildTimeline();
 
-			_this6.rotated = false;
-			return _this6;
+			_this7.rotated = false;
+			return _this7;
 		}
 
 		_createClass(Goose, [{
@@ -1274,13 +1294,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		}, {
 			key: "animate",
 			value: function animate() {
-				var _this7 = this;
+				var _this8 = this;
 
 				if (this.timeline.reversed()) {
 					this.rotated = false;
 					TweenMax.to(this.spriteElem, 0.6, { rotationY: 0, ease: Quad.easeInOut });
 					setTimeout(function () {
-						_this7.timeline.play();
+						_this8.timeline.play();
 					}, 300);
 				} else if (this.timeline.progress() === 0) {
 					this.rotated = false;
@@ -1289,7 +1309,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					this.rotated = true;
 					TweenMax.to(this.spriteElem, 0.6, { rotationY: 180, ease: Quad.easeInOut });
 					setTimeout(function () {
-						_this7.timeline.reverse();
+						_this8.timeline.reverse();
 					}, 300);
 				}
 			}
@@ -1300,22 +1320,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 	// * *******************************************************************
 	// *
-	// *   	STAFF CLASS extends MOVING SHADOW SPRITE CLASS
+	// *   	STAFF CLASS extends SHADOW SPRITE CLASS
 	// *
 	// *	Define animation functions for staff
 	// *
 	// *************************************************************************
 
-	var Staff = (function (_ShadowSprite2) {
-		_inherits(Staff, _ShadowSprite2);
+	var Staff = (function (_ShadowSprite3) {
+		_inherits(Staff, _ShadowSprite3);
 
 		function Staff(spec) {
 			_classCallCheck(this, Staff);
 
-			var _this8 = _possibleConstructorReturn(this, Object.getPrototypeOf(Staff).call(this, spec));
+			var _this9 = _possibleConstructorReturn(this, Object.getPrototypeOf(Staff).call(this, spec));
 
-			_this8.buildTimeline();
-			return _this8;
+			_this9.buildTimeline();
+			return _this9;
 		}
 
 		_createClass(Staff, [{
@@ -1374,21 +1394,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			spec.yType = "bottom";
 			spec.parentDiv = 'clouds';
 
-			$('#clouds').css({ width: '100%' });
+			var _this10 = _possibleConstructorReturn(this, Object.getPrototypeOf(Cloud).call(this, spec));
 
-			var _this9 = _possibleConstructorReturn(this, Object.getPrototypeOf(Cloud).call(this, spec));
-
-			_this9.setPosition(spec);
-
-			_this9.yPos = parseFloat(_this9.spriteElem.css("bottom"));
-			_this9.animate(spec.animSpeed, spec.name, spec.startPos);
-			return _this9;
+			_this10.yPos = parseFloat(_this10.spriteElem.css("bottom"));
+			_this10.animate(spec.animSpeed, spec.name, spec.startPos);
+			return _this10;
 		}
 
 		_createClass(Cloud, [{
 			key: "animate",
 			value: function animate(speed, name, startPos) {
-				var _this10 = this;
+				var _this11 = this;
 
 				this.timeline = new TimelineMax();
 				var crossScreen = TweenMax.fromTo('#' + name, speed, { left: WW * 6 / 5, y: 0 }, { left: -WW * 1 / 5, repeat: -1, ease: Linear.easeNone, force3D: true });
@@ -1402,18 +1418,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 					var wind = function wind(x, y) {
 						//set the minimum height of clouds as a % of screen height
-						var height = parseFloat(_this10.spriteElem.css("bottom"));
+						var height = parseFloat(_this11.spriteElem.css("bottom"));
 						if (height > WH / 100 * 55) {
 							y = Math.abs(y);
 						}
-						_this10.timeline.pause();
+						_this11.timeline.pause();
 						TweenMax.to('#' + name, 2, {
 							x: x,
 							y: y,
 							ease: Sine.easeOut,
 							force3D: true,
 							onComplete: function onComplete() {
-								_this10.timeline.play();
+								_this11.timeline.play();
 							}
 						});
 					};
@@ -1442,15 +1458,20 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		function Boat(spec) {
 			_classCallCheck(this, Boat);
 
-			var _this11 = _possibleConstructorReturn(this, Object.getPrototypeOf(Boat).call(this, spec));
+			var _this12 = _possibleConstructorReturn(this, Object.getPrototypeOf(Boat).call(this, spec));
 
-			_this11.setPosition(spec);
-
-			_this11.animate();
-			return _this11;
+			_this12.animate();
+			return _this12;
 		}
 
+		//anything that needs to be done after the ajax image load goes here
+
 		_createClass(Boat, [{
+			key: "afterImageLoad",
+			value: function afterImageLoad() {
+				this.clipPath();
+			}
+		}, {
 			key: "clipPath",
 			value: function clipPath() {
 				var clipPathElem = $("#boatClipPath");
@@ -1815,7 +1836,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			}
 	});
 
-	var pad = new ShadowSprite({
+	var pad = new Pad({
 		parentDiv: 'plankSprites',
 		name: "pad",
 		imageURL: imagesUrl + "pad.png",
