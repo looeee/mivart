@@ -562,8 +562,11 @@
 					if(this.name === "pad"){
 						padWriting = new Handwriting(this.width *0.6, this.height *0.7);
 					}
-				});
-			}); 
+
+					
+					this.spriteElem.fadeIn(2000);
+				})
+			});
 		}
 
 		setPosition(spec){
@@ -1649,11 +1652,11 @@
     	setTimeout( () => {
     		lineTimelines.centreTL.tweenTo( "middle" );
     	}, 2000);
-    	
-		//wind.timeline.progress( 0.5 );
 
-		console.log(washingLine.lineElem)
+		//wind.timeline.progress( 0.5 );
 		washingLine.lineElem.fadeIn(3000);
+
+		/*
 		bucket.spriteElem.fadeIn(4000);
 		inkwell.spriteElem.fadeIn(4000);
 		brushholder.spriteElem.fadeIn(4000);
@@ -1662,6 +1665,7 @@
 		cloud2.spriteElem.fadeIn(4000);
 		cloud3.spriteElem.fadeIn(4000);
 		boat.spriteElem.fadeIn(4000);
+		*/
 	}
 
 

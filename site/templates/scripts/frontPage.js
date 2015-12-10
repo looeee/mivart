@@ -730,6 +730,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 						if (_this2.name === "pad") {
 							padWriting = new Handwriting(_this2.width * 0.6, _this2.height * 0.7);
 						}
+
+						_this2.spriteElem.fadeIn(2000);
 					});
 				});
 			}
@@ -1913,17 +1915,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		}, 2000);
 
 		//wind.timeline.progress( 0.5 );
-
-		console.log(washingLine.lineElem);
 		washingLine.lineElem.fadeIn(3000);
-		bucket.spriteElem.fadeIn(4000);
-		inkwell.spriteElem.fadeIn(4000);
-		brushholder.spriteElem.fadeIn(4000);
-		pad.spriteElem.fadeIn(4000);
-		cloud1.spriteElem.fadeIn(4000);
-		cloud2.spriteElem.fadeIn(4000);
-		cloud3.spriteElem.fadeIn(4000);
-		boat.spriteElem.fadeIn(4000);
+
+		/*
+  bucket.spriteElem.fadeIn(4000);
+  inkwell.spriteElem.fadeIn(4000);
+  brushholder.spriteElem.fadeIn(4000);
+  pad.spriteElem.fadeIn(4000);
+  cloud1.spriteElem.fadeIn(4000);
+  cloud2.spriteElem.fadeIn(4000);
+  cloud3.spriteElem.fadeIn(4000);
+  boat.spriteElem.fadeIn(4000);
+  */
 	};
 })();
 
