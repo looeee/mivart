@@ -41,7 +41,7 @@ body {
 	width: 150%;
 	border-top: 1px solid rgba(0, 0, 0, 1);
 	z-index: -100;
-	opacity: 0;
+	display: none;
 }
 
 #silk, #silk1, #dress, #scarf{
@@ -49,11 +49,15 @@ body {
 }
 #silkTrigger, #silk1Trigger{
   position: relative;
-  display: block;
+  //display: block;
   margin-left: 31%;
   margin-top: 2%;
   height: 95%;
   width: 25%;
+}
+
+#staff{
+  display: none;
 }
 
 #gourd, #gourd1{
@@ -86,6 +90,10 @@ body {
 
 #inkwell, #bucket, #brushholder{
 
+}
+
+.sprite{
+  display: none;
 }
 
 .shadow{

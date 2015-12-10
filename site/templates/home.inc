@@ -6,11 +6,11 @@
 	<div id="line"></div>
 	<div id="lineSprites">
 
-	  	<div id="silk">
+	  	<div id="silk" class="sprite">
 	    	<div id="silkTrigger"></div>
 	  	</div>
 
-		<div id="silk1">
+		<div id="silk1" class="sprite">
 			<div id="silk1Trigger"></div>
 		</div>
 	
@@ -22,7 +22,7 @@
 	<div id="clouds"></div>
 
 	<div id="plankSprites">
-		<div id="pad">
+		<div id="pad" class="sprite">
 		</div>
 
 		<div id="gooseWrapper"></div>

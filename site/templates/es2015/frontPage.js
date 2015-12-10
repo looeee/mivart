@@ -12,8 +12,6 @@
 	const $body = $("body");
 	const $document = $(document);
 
-	const padInfo = $("#padInfo");
-
 	//sheet info elements
 	const sheetElem = $("#sheet");
 	const biography = $("#biography");
@@ -247,11 +245,6 @@
 				transform: "rotate(" + this.slopeDegrees + "deg)",
 				top: p1.y + "%",
 			});
-
-			//any calculations that need to be done after the images have loaded go here
-			window.addEventListener("load", ()=> { 
-				animateOpacity("#line", 0.2, 1);
-			});
 		}
 
 		//return y value for given x value
@@ -274,6 +267,7 @@
 				onComplete: this.onComplete, 
 				onReverseComplete: this.onComplete,
 				onStart: this.onStart,
+				onUpdate: this.onUpdate,
 			}
 
 			this.centreTL = new TimelineMax(options);
@@ -323,15 +317,30 @@
 		}
 
 		onStart(){
-			for(let child of this.getChildren()){
-				child.target.show();
-			}
 			if(this.reversed()){
 				wind.tweenTo(0);
 			}
 			else{
 				wind.tweenTo(6);
 			}
+		}
+
+		onUpdate(){
+			for(let child of this.getChildren()){
+				//if the object is offscreen to the left, hide it
+				if( parseInt(child.target[0].style.left,10) + child.target[0].clientWidth < 0 ){
+					child.target[0].style.display = "none";
+				}
+				//if the object is offscreen to the right, hide it
+				else if(parseInt(child.target[0].style.left,10) > WW){
+					child.target[0].style.display = "none";
+				}
+				//if the object is onscreen, show it
+				else{
+					child.target[0].style.display = "block";
+				}
+			}
+			
 		}
 
 		// add movement tween for a sprite on it's correct timeline
@@ -412,11 +421,6 @@
 			}
 
 			this.gusts();
-
-			//any calculations that need to be done after the images have loaded go here
-			window.addEventListener("load", ()=> { 
-				
-			});
 		}
 
 		//gusts to left or right at random intervals
@@ -499,12 +503,7 @@
 
 			//check if the sprite div has already been created in html and if not add it
 			if (!$("#" + spec.name).length) {
-				if(spec.islink){
-					$("#" + spec.parentDiv).append("<a id='" + spec.name + "'></a>");
-				}
-				else{
-					$("#" + spec.parentDiv).append("<div id='" + spec.name + "'></div>");
-				}
+				$("#" + spec.parentDiv).append("<div class='sprite' id='" + spec.name + "'></div>");
 			}
 
 			this.spriteElem = $("#" + spec.name);
@@ -548,6 +547,11 @@
 					});
 					this.height = h/(this.frames);
 
+					this.width = w;
+
+					//make LineSprite draggable
+					if(typeof this.makeDraggable === "function") {
+						this.makeDraggable()					}
 
 					//simple hack to get clipPath to run at the right time for boat
 					if(typeof this.clipPath === "function") {
@@ -667,13 +671,10 @@
 
 			wind.addTween( this );
 
-			this.makeDraggable();
-
 			this.setPosition(spec);
 	    	
 	    	//any calculations that need to be done after the image has loaded go here
 			window.addEventListener("load", ()=> { 
-				this.width = this.spriteElem.width();
 				lineTimelines.addTween( this );
 				this.xPos = this.xPos + this.width/2;
 			});
@@ -768,10 +769,9 @@
 	  	onDrag( sprite ){
 			return function(){
 				let change = sprite.xPos - this.pointerX;
+				let mid = parseInt(sprite.spriteElem[0].style.left, 10) +  sprite.width/2;
   
-				sprite.direction = this.pointerX 
-								- (parseFloat(sprite.spriteElem.css("left")) 
-								+ sprite.width/2);
+				sprite.direction = this.pointerX - mid;
 
 				//add wind effect as we drag the sprite
 				//need to make the wind time line universal for all sprites
@@ -793,8 +793,8 @@
 
 				//set the progress of the washing line as we drag the sprite
 				let progress = (change > 0 ) 
-								? 0.5 + ( change/this.pointerX/2 ) * this.pointerX/WW
-								: 0.5 + ( change/(WW-this.pointerX)/2 ) * ( 1 - this.pointerX/WW );
+								? 0.5 + ( change/mid/2 ) * mid/WW
+								: 0.5 + ( change/(WW-mid)/2 ) * ( 1 - mid/WW );
 				sprite.timeline.progress( progress ); 	
 
 				//show the next page divs if dragged far enough
@@ -872,7 +872,7 @@
 					wind.tweenTo(3);
 					//restart the gusts
 					wind.gusts();
-					sprite.endX = parseFloat(sprite.spriteElem.css("left")) + sprite.width/2;
+					sprite.endX = parseFloat(sprite.spriteElem[0].style.left ) + sprite.width/2;
 				}
 			}
 		}
@@ -904,7 +904,7 @@
 	// *
 	// *   	SHADOW SPRITE CLASS extends RESPONSIVE SPRITE CLASS
 	// *
-	// *   	let shadowSpriteSpec ={
+	// *   	let ShadowSpriteSpec ={
 	// *		...as for ResponsiveSprite spec
 	// * 		shadowImg: imageURL 
 	// *		shadowYOffset: 5 //fine tuning for base of shadow
@@ -912,7 +912,7 @@
 	// *
 	// *************************************************************************
 
-	class shadowSprite extends ResponsiveSprite{
+	class ShadowSprite extends ResponsiveSprite{
 		constructor(spec){
 			spec.xType = "left";
 
@@ -990,7 +990,7 @@
 	// *	Define animation functions for goose
 	// *
 	// *************************************************************************
-	class Goose extends shadowSprite{
+	class Goose extends ShadowSprite{
 		constructor(spec){
 			super(spec);
 
@@ -1067,7 +1067,7 @@
 	// *
 	// *************************************************************************
 
-	class Staff extends movingShadowSprite{
+	class Staff extends ShadowSprite{
 		constructor(spec){
 			super(spec);
 
@@ -1469,7 +1469,7 @@
 	// *
 	// * ***********************************************************************
 
-	const bucket = new shadowSprite({
+	const bucket = new ShadowSprite({
 		parentDiv: 'plankSprites',
 		name: "bucket",
 		imageURL: imagesUrl + "bucket.png",
@@ -1489,7 +1489,7 @@
 		lineTimelines.home();
 	});
 
-	const brushholder = new shadowSprite({
+	const brushholder = new ShadowSprite({
 		parentDiv: 'plankSprites',
 		name: "brushholder",
 		imageURL: imagesUrl + "brushholder.png",
@@ -1520,7 +1520,7 @@
 		}
 	});
 
-	const inkwell = new shadowSprite({
+	const inkwell = new ShadowSprite({
 		parentDiv: 'plankSprites',
 		name: "inkwell",
 		imageURL: imagesUrl + "inkwell.png",
@@ -1529,9 +1529,9 @@
 		yPos: 10,
 		yType: "bottom",
 		shadowImg: imagesUrl + "inkwell-shadow.png",
-		shadowYOffset: 5, 
+		shadowYOffset: 15, 
 		shadowXOffset: 10, 
-		shadowWidth: 65, 
+		shadowWidth: 90, 
 	});
 	inkwell.spriteElem.hover(
 		() => { padWriting.write("Contact"); }
@@ -1551,7 +1551,7 @@
 		}
 	});
 
-	const pad = new shadowSprite({
+	const pad = new ShadowSprite({
 		parentDiv: 'plankSprites',
 		name: "pad",
 		imageURL: imagesUrl + "pad.png", 
@@ -1565,6 +1565,7 @@
 	});
 
 	const gooseSpec = {
+		parentDiv: 'gooseWrapper',
 		name: "goose",
 		imageURL: imagesUrl + "goose.png",
 		maxW: 18,
@@ -1578,10 +1579,11 @@
 	const goose = new Goose(gooseSpec);;
 
 	const staffSpec = {
+		parentDiv: 'staffWrapper',
 		name: "staff",
 		imageURL: imagesUrl + "staff.png",
 		maxW: 40,
-		xPos: 60,
+		xPos: 120,
 		yPos: 120,
 		shadowImg: imagesUrl + "staff-shadow.png",
 		shadowYOffset: 70, 
@@ -1643,9 +1645,24 @@
 	// *   FINAL SETUP
 	// *
 	// *************************************************************************
-	window.addEventListener("load", ()=> { 
-		lineTimelines.centreTL.progress( 0.5 ); //.tweenTo( "middle" );
-		wind.timeline.progress( 0.5 );
-	}); //end window.load
+	window.onload = function(e){ 
+    	setTimeout( () => {
+    		lineTimelines.centreTL.tweenTo( "middle" );
+    	}, 2000);
+    	
+		//wind.timeline.progress( 0.5 );
+
+		console.log(washingLine.lineElem)
+		washingLine.lineElem.fadeIn(3000);
+		bucket.spriteElem.fadeIn(4000);
+		inkwell.spriteElem.fadeIn(4000);
+		brushholder.spriteElem.fadeIn(4000);
+		pad.spriteElem.fadeIn(4000);
+		cloud1.spriteElem.fadeIn(4000);
+		cloud2.spriteElem.fadeIn(4000);
+		cloud3.spriteElem.fadeIn(4000);
+		boat.spriteElem.fadeIn(4000);
+	}
+
 
 })();

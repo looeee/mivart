@@ -670,18 +670,20 @@ body {
   width: 150%;
   border-top: 1px solid black;
   z-index: -100;
-  opacity: 0; }
+  display: none; }
 
 #silk, #silk1, #dress, #scarf {
   z-index: 1; }
 
 #silkTrigger, #silk1Trigger {
   position: relative;
-  display: block;
   margin-left: 31%;
   margin-top: 2%;
   height: 95%;
   width: 25%; }
+
+#staff {
+  display: none; }
 
 #gourd, #gourd1 {
   z-index: 2;
@@ -711,6 +713,9 @@ body {
   -webkit-transform-origin: 50% 50%;
       -ms-transform-origin: 50% 50%;
           transform-origin: 50% 50%; }
+
+.sprite {
+  display: none; }
 
 .shadow {
   height: 100%;
