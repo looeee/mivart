@@ -66,9 +66,19 @@
 	elseif( isset($_GET['image']) ){
 		resizedImage( $page, $_GET['image'], $_GET['width'] );
 	}
-	elseif( isset($_GET['thumbWidth']) ){
-		gallery($pages, $_GET['name'], $_GET['width'], $_GET['thumbWidth'] );
+
+	elseif( isset($_GET['name']) ){
+		if($_GET['name'] == "contact"){
+			contact($pages);
+		}
+		else if($_GET['name'] == "biography"){
+			biography($pages);
+		}
+		else{
+			gallery($pages, $_GET['name'], $_GET['width'], $_GET['thumbWidth'] );
+		}
 	}
+
 	elseif( isset($_GET['background']) ){
 		background($page, $_GET['width'], $_GET['height'] );
 	}

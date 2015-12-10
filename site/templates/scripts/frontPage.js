@@ -855,7 +855,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		}, {
 			key: "setPosition",
 			value: function setPosition(spec) {
-				console.log(spec.name, spec.xPos);
 				var xPos = xPercentToPx(spec.xPos);
 
 				//if it's animated via frames set it to the middle frame
@@ -891,60 +890,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				this.yPos = point.y;
 
 				lineTimelines.addTween(this);
-			}
-
-			//Display information on the sheet
-
-		}, {
-			key: "sheetContents",
-			value: function sheetContents() {
-				switch (this.name) {
-					case "book1":
-						this.loadGallery("book1");
-						break;
-					case "book2":
-						this.loadGallery("book2");
-						break;
-					case "book3":
-						this.loadGallery("book3");
-						break;
-					case "book4":
-						this.loadGallery("book4");
-						break;
-					case "gourd1":
-						this.loadGallery("crafts");
-						break;
-					case "poi":
-						this.loadGallery("performance");
-						break;
-					case "silks1":
-						silksVideo.show();
-						break;
-					case "dress":
-						this.loadGallery("clothing");
-						break;
-					case "scarf":
-						this.loadGallery("clothing");
-						break;
-				}
-			}
-
-			//empty the sheet then load a gallery with ajax
-
-		}, {
-			key: "loadGallery",
-			value: function loadGallery(page) {
-				//clear any previous galleries
-				sheetElem.empty();
-
-				$.get(rootUrl, {
-					name: page,
-					width: parseInt(WW, 10),
-					thumbWidth: parseInt(sheetElem.width() / 7, 10)
-				}, function (data) {
-					sheetElem.append(data);
-					$("#sheetGallery").photobox("a", { time: 0 });
-				});
 			}
 
 			//note: "this" refers to the draggable event here, pass sprites "this" as "sprite"
@@ -1033,7 +978,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					if (p > sprite.progressMax || isNaN(p)) {
 						//show the sheet contents for this sprite if relevant
 						if (sprite.nextGroup === "Sheet") {
-							sprite.sheetContents();
+							sheet.sheetContents(sprite.name);
 						}
 						//moving left
 						sprite.timeline.play();
@@ -1044,7 +989,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					} else if (p < sprite.progressMin) {
 						//show the sheet contents for this sprite if relevant
 						if (sprite.nextGroup === "Sheet") {
-							sprite.sheetContents();
+							sheet.sheetContents(sprite.name);
 						}
 						//moving right
 						sprite.timeline.reverse();
@@ -1117,6 +1062,100 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 	// * ***********************************************************************
 	// *
+	// *   	SHEET CLASS extends LINE SPRITE CLASS
+	// *
+	// *************************************************************************
+
+	var Sheet = (function (_LineSprite) {
+		_inherits(Sheet, _LineSprite);
+
+		function Sheet(spec) {
+			_classCallCheck(this, Sheet);
+
+			return _possibleConstructorReturn(this, Object.getPrototypeOf(Sheet).call(this, spec));
+		}
+
+		//Display information on the sheet
+
+		_createClass(Sheet, [{
+			key: "sheetContents",
+			value: function sheetContents(name) {
+				switch (name) {
+					case "book1":
+						this.loadGallery("book1");
+						break;
+					case "book2":
+						this.loadGallery("book2");
+						break;
+					case "book3":
+						this.loadGallery("book3");
+						break;
+					case "book4":
+						this.loadGallery("book4");
+						break;
+					case "gourd1":
+						this.loadGallery("crafts");
+						break;
+					case "poi":
+						this.loadGallery("performance");
+						break;
+					case "silks1":
+						silksVideo.show();
+						break;
+					case "dress":
+						this.loadGallery("clothing");
+						break;
+					case "scarf":
+						this.loadGallery("clothing");
+						break;
+					case "contact":
+						this.loadPage("contact");
+						break;
+					case "biography":
+						this.loadPage("biography");
+						break;
+				}
+			}
+
+			//empty the sheet then load a gallery with ajax
+
+		}, {
+			key: "loadPage",
+			value: function loadPage(page) {
+				$(".sheetContents").fadeOut(500);
+				//clear any previous galleries
+				sheetElem.empty();
+
+				$.get(rootUrl, { name: page }, function (data) {
+					sheetElem.append(data);
+					$(".sheetContents").fadeIn(500);
+				});
+			}
+
+			//empty the sheet then load a gallery with ajax
+
+		}, {
+			key: "loadGallery",
+			value: function loadGallery(page) {
+				//clear any previous galleries
+				sheetElem.empty();
+
+				$.get(rootUrl, {
+					name: page,
+					width: parseInt(WW, 10),
+					thumbWidth: parseInt(sheetElem.width() / 7, 10)
+				}, function (data) {
+					sheetElem.append(data);
+					$("#sheetGallery").photobox("a", { time: 0 });
+				});
+			}
+		}]);
+
+		return Sheet;
+	})(LineSprite);
+
+	// * ***********************************************************************
+	// *
 	// *   	SHADOW SPRITE CLASS extends RESPONSIVE SPRITE CLASS
 	// *
 	// *   	let ShadowSpriteSpec ={
@@ -1135,25 +1174,25 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 			spec.xType = "left";
 
-			var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(ShadowSprite).call(this, spec));
+			var _this5 = _possibleConstructorReturn(this, Object.getPrototypeOf(ShadowSprite).call(this, spec));
 
-			_this4.shadowYOffset = spec.shadowYOffset || 5;
-			_this4.shadowXOffset = spec.shadowXOffset || 0;
-			_this4.shadowWidth = spec.shadowWidth || 100;
+			_this5.shadowYOffset = spec.shadowYOffset || 5;
+			_this5.shadowXOffset = spec.shadowXOffset || 0;
+			_this5.shadowWidth = spec.shadowWidth || 100;
 
 			if (spec.shadowImg) {
-				_this4.shadow(spec.shadowImg);
+				_this5.shadow(spec.shadowImg);
 			}
 
-			_this4.rotated = false;
+			_this5.rotated = false;
 
-			return _this4;
+			return _this5;
 		}
 
 		_createClass(ShadowSprite, [{
 			key: "shadow",
 			value: function shadow(shadowImg) {
-				var _this5 = this;
+				var _this6 = this;
 
 				var spriteMid = parseFloat(this.spriteElem.css("left")) / WW * 100;
 				this.spriteElem.append("<div id='" + this.name + "Shadow' class='shadow'></div>");
@@ -1169,13 +1208,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					var pageXPercent = e.pageX * 100 / WW;
 					var skew = 0;
 					if (pageXPercent < spriteMid) {
-						if (_this5.rotated) {
+						if (_this6.rotated) {
 							skew = 0.5 - 0.5 / (spriteMid - 100) * (spriteMid - pageXPercent);
 						} else {
 							skew = 0.5 + 0.5 / spriteMid * (spriteMid - pageXPercent);
 						}
 					} else {
-						if (_this5.rotated) {
+						if (_this6.rotated) {
 							skew = 0.5 + 0.5 / spriteMid * (spriteMid - pageXPercent);
 						} else {
 							skew = 0.5 - 0.5 / (spriteMid - 100) * (spriteMid - pageXPercent);
@@ -1187,16 +1226,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				this.shadowYOffset = -100 + this.shadowYOffset;
 
 				window.addEventListener("load", function () {
-					var width = parseFloat(_this5.spriteElem.css("width"));
+					var width = parseFloat(_this6.spriteElem.css("width"));
 					//slightly more accurate calculation of spriteMid now that we know the width
-					spriteMid = (parseFloat(_this5.spriteElem.css("left")) + width / 2) / WW * 100;
+					spriteMid = (parseFloat(_this6.spriteElem.css("left")) + width / 2) / WW * 100;
 
-					_this5.shadow.css({
+					_this6.shadow.css({
 						background: "url('" + shadowImg + "') 0 0% / contain no-repeat",
 						//height: this.height + "px",
-						width: _this5.shadowWidth + "%",
-						bottom: _this5.shadowYOffset + "%",
-						left: _this5.shadowXOffset + "%"
+						width: _this6.shadowWidth + "%",
+						bottom: _this6.shadowYOffset + "%",
+						left: _this6.shadowXOffset + "%"
 					});
 				});
 			}
@@ -1245,15 +1284,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		function Goose(spec) {
 			_classCallCheck(this, Goose);
 
-			var _this7 = _possibleConstructorReturn(this, Object.getPrototypeOf(Goose).call(this, spec));
+			var _this8 = _possibleConstructorReturn(this, Object.getPrototypeOf(Goose).call(this, spec));
 
-			_this7.left = xPercentToPx(spec.xPos);
-			_this7.top = yPercentToPx(spec.yPos);
+			_this8.left = xPercentToPx(spec.xPos);
+			_this8.top = yPercentToPx(spec.yPos);
 
-			_this7.buildTimeline();
+			_this8.buildTimeline();
 
-			_this7.rotated = false;
-			return _this7;
+			_this8.rotated = false;
+			return _this8;
 		}
 
 		_createClass(Goose, [{
@@ -1294,13 +1333,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		}, {
 			key: "animate",
 			value: function animate() {
-				var _this8 = this;
+				var _this9 = this;
 
 				if (this.timeline.reversed()) {
 					this.rotated = false;
 					TweenMax.to(this.spriteElem, 0.6, { rotationY: 0, ease: Quad.easeInOut });
 					setTimeout(function () {
-						_this8.timeline.play();
+						_this9.timeline.play();
 					}, 300);
 				} else if (this.timeline.progress() === 0) {
 					this.rotated = false;
@@ -1309,7 +1348,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					this.rotated = true;
 					TweenMax.to(this.spriteElem, 0.6, { rotationY: 180, ease: Quad.easeInOut });
 					setTimeout(function () {
-						_this8.timeline.reverse();
+						_this9.timeline.reverse();
 					}, 300);
 				}
 			}
@@ -1332,10 +1371,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		function Staff(spec) {
 			_classCallCheck(this, Staff);
 
-			var _this9 = _possibleConstructorReturn(this, Object.getPrototypeOf(Staff).call(this, spec));
+			var _this10 = _possibleConstructorReturn(this, Object.getPrototypeOf(Staff).call(this, spec));
 
-			_this9.buildTimeline();
-			return _this9;
+			_this10.buildTimeline();
+			return _this10;
 		}
 
 		_createClass(Staff, [{
@@ -1394,17 +1433,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			spec.yType = "bottom";
 			spec.parentDiv = 'clouds';
 
-			var _this10 = _possibleConstructorReturn(this, Object.getPrototypeOf(Cloud).call(this, spec));
+			var _this11 = _possibleConstructorReturn(this, Object.getPrototypeOf(Cloud).call(this, spec));
 
-			_this10.yPos = parseFloat(_this10.spriteElem.css("bottom"));
-			_this10.animate(spec.animSpeed, spec.name, spec.startPos);
-			return _this10;
+			_this11.yPos = parseFloat(_this11.spriteElem.css("bottom"));
+			_this11.animate(spec.animSpeed, spec.name, spec.startPos);
+			return _this11;
 		}
 
 		_createClass(Cloud, [{
 			key: "animate",
 			value: function animate(speed, name, startPos) {
-				var _this11 = this;
+				var _this12 = this;
 
 				this.timeline = new TimelineMax();
 				var crossScreen = TweenMax.fromTo('#' + name, speed, { left: WW * 6 / 5, y: 0 }, { left: -WW * 1 / 5, repeat: -1, ease: Linear.easeNone, force3D: true });
@@ -1418,18 +1457,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 					var wind = function wind(x, y) {
 						//set the minimum height of clouds as a % of screen height
-						var height = parseFloat(_this11.spriteElem.css("bottom"));
+						var height = parseFloat(_this12.spriteElem.css("bottom"));
 						if (height > WH / 100 * 55) {
 							y = Math.abs(y);
 						}
-						_this11.timeline.pause();
+						_this12.timeline.pause();
 						TweenMax.to('#' + name, 2, {
 							x: x,
 							y: y,
 							ease: Sine.easeOut,
 							force3D: true,
 							onComplete: function onComplete() {
-								_this11.timeline.play();
+								_this12.timeline.play();
 							}
 						});
 					};
@@ -1458,10 +1497,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		function Boat(spec) {
 			_classCallCheck(this, Boat);
 
-			var _this12 = _possibleConstructorReturn(this, Object.getPrototypeOf(Boat).call(this, spec));
+			var _this13 = _possibleConstructorReturn(this, Object.getPrototypeOf(Boat).call(this, spec));
 
-			_this12.animate();
-			return _this12;
+			_this13.animate();
+			return _this13;
 		}
 
 		//anything that needs to be done after the ajax image load goes here
@@ -1643,7 +1682,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		frames: 1,
 		maxW: 53
 	};
-	var sheet = new LineSprite(sheetSpec);
+	var sheet = new Sheet(sheetSpec);
 
 	$("#sheetContents").css({
 		transform: 'rotate(-' + washingLine.slopeDegrees + 'deg)'
@@ -1794,14 +1833,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		var p = lineTimelines.sheetTL.progress();
 		//sheet is onscreen
 		if (p < sheet.progressMax && p > sheet.progressMin) {
-			var sheetDivs = $("#sheet").children("div");
-			sheetDivs.fadeOut();
-			biography.fadeIn();
+			sheet.sheetContents("biography");
 		}
 		//sheet is offscreen
 		else {
 				lineTimelines.bringSheetOnscreen();
-				biography.show();
+				sheet.sheetContents("biography");
 			}
 	});
 
@@ -1825,14 +1862,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		var p = lineTimelines.sheetTL.progress();
 		//sheet is onscreen
 		if (p < sheet.progressMax && p > sheet.progressMin) {
-			var sheetDivs = $("#sheet").children("div");
-			sheetDivs.fadeOut();
-			contact.fadeIn();
+			sheet.sheetContents("contact");
 		}
 		//sheet is offscreen
 		else {
 				lineTimelines.bringSheetOnscreen();
-				contact.show();
+				sheet.sheetContents("contact");
 			}
 	});
 
@@ -1933,21 +1968,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	window.onload = function (e) {
 		setTimeout(function () {
 			lineTimelines.centreTL.tweenTo("middle");
-		}, 2000);
+		}, 3000);
 
-		//wind.timeline.progress( 0.5 );
 		washingLine.lineElem.fadeIn(3000);
-
-		/*
-  bucket.spriteElem.fadeIn(4000);
-  inkwell.spriteElem.fadeIn(4000);
-  brushholder.spriteElem.fadeIn(4000);
-  pad.spriteElem.fadeIn(4000);
-  cloud1.spriteElem.fadeIn(4000);
-  cloud2.spriteElem.fadeIn(4000);
-  cloud3.spriteElem.fadeIn(4000);
-  boat.spriteElem.fadeIn(4000);
-  */
 	};
 })();
 

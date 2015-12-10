@@ -671,7 +671,6 @@
 	  	}
 
 	  	setPosition(spec){
-	  		console.log(spec.name, spec.xPos)
 	  		let xPos = xPercentToPx(spec.xPos);
 
 	  		//if it's animated via frames set it to the middle frame
@@ -708,55 +707,6 @@
 			this.yPos = point.y;
 
 			lineTimelines.addTween( this );
-	  	}
-
-	  	//Display information on the sheet
-	  	sheetContents(){
-	    	switch( this.name ) {
-	    		case "book1":
-	    			this.loadGallery("book1");
-	    	        break;
-	    	    case "book2":
-	    			this.loadGallery("book2");
-	    	        break;
-	    	    case "book3":
-	    			this.loadGallery("book3");
-	    	        break;
-	    	    case "book4":
-	    			this.loadGallery("book4");
-	    	        break;
-	    	    case "gourd1":
-	    			this.loadGallery("crafts");
-	    	        break;
-	    	    case "poi":
-	    			this.loadGallery("performance");
-	    	        break;
-	    	    case "silks1":
-	    			silksVideo.show();
-	    	        break;
-	    	    case "dress":
-	    			this.loadGallery("clothing");
-	    	        break;
-	    	    case "scarf":
-	    			this.loadGallery("clothing");
-	    	        break;
-	    	}
-	  	}
-
-	  	//empty the sheet then load a gallery with ajax
-	  	loadGallery(page){
-	  		//clear any previous galleries
-	  		sheetElem.empty();
-	  		
-	  		$.get( rootUrl , {
-	  			name: page,
-	  			width: parseInt(WW, 10), 
-	  			thumbWidth: parseInt(sheetElem.width()/7, 10),
-	  		}, (data) => {
-				sheetElem.append(data);
-				$("#sheetGallery").photobox("a",{ time:0 })
-			}); 
-
 	  	}
 	  	
 	  	//note: "this" refers to the draggable event here, pass sprites "this" as "sprite"
@@ -843,7 +793,7 @@
 
 				if(p > sprite.progressMax || isNaN(p)){
 					//show the sheet contents for this sprite if relevant
-					if(sprite.nextGroup === "Sheet"){sprite.sheetContents();}
+					if(sprite.nextGroup === "Sheet"){sheet.sheetContents( sprite.name );}
 					//moving left
 					sprite.timeline.play();
 					//set the next group to the start of its timeline then play to the middle
@@ -853,7 +803,7 @@
 				}
 				else if( p < sprite.progressMin ){
 					//show the sheet contents for this sprite if relevant
-					if(sprite.nextGroup === "Sheet"){sprite.sheetContents();}
+					if(sprite.nextGroup === "Sheet"){sheet.sheetContents( sprite.name );}
 					//moving right
 					sprite.timeline.reverse();
 					//set the next group to the end of its timeline then reverse to the middle
@@ -896,6 +846,86 @@
 				trigger: "#"+ this.trigger,
 			});
 		}
+	}
+
+	// * ***********************************************************************
+	// *
+	// *   	SHEET CLASS extends LINE SPRITE CLASS
+	// *
+	// *************************************************************************
+
+	class Sheet extends LineSprite{
+		constructor( spec ){
+			super( spec );
+		}
+
+		//Display information on the sheet
+	  	sheetContents( name ){
+	    	switch( name ) {
+	    		case "book1":
+	    			this.loadGallery("book1");
+	    	        break;
+	    	    case "book2":
+	    			this.loadGallery("book2");
+	    	        break;
+	    	    case "book3":
+	    			this.loadGallery("book3");
+	    	        break;
+	    	    case "book4":
+	    			this.loadGallery("book4");
+	    	        break;
+	    	    case "gourd1":
+	    			this.loadGallery("crafts");
+	    	        break;
+	    	    case "poi":
+	    			this.loadGallery("performance");
+	    	        break;
+	    	    case "silks1":
+	    			silksVideo.show();
+	    	        break;
+	    	    case "dress":
+	    			this.loadGallery("clothing");
+	    	        break;
+	    	    case "scarf":
+	    			this.loadGallery("clothing");
+	    	        break;
+	    	    case "contact":
+	    	    	this.loadPage("contact");
+	    	    	break;
+	    	    case "biography":
+	    	    	this.loadPage("biography");
+	    	    	break;
+	    	}
+	  	}
+
+	  	//empty the sheet then load a gallery with ajax
+	  	loadPage(page){
+	  		$(".sheetContents").fadeOut(500);
+	  		//clear any previous galleries
+	  		sheetElem.empty();
+	  		
+	  		$.get( rootUrl , { name: page, }, (data) => {
+				sheetElem.append(data);
+				$(".sheetContents").fadeIn(500);
+			}); 
+
+	  	}
+
+	  	//empty the sheet then load a gallery with ajax
+	  	loadGallery(page){
+	  		//clear any previous galleries
+	  		sheetElem.empty();
+	  		
+	  		$.get( rootUrl , {
+	  			name: page,
+	  			width: parseInt(WW, 10), 
+	  			thumbWidth: parseInt(sheetElem.width()/7, 10),
+	  		}, (data) => {
+				sheetElem.append(data);
+				$("#sheetGallery").photobox("a",{ time:0 })
+			}); 
+
+	  	}
 	}
 
 	// * ***********************************************************************
@@ -1370,7 +1400,7 @@
 		frames: 1,
 		maxW: 53, 
 	};
-	const sheet = new LineSprite(sheetSpec);
+	const sheet = new Sheet(sheetSpec);
 
 	$("#sheetContents").css({ 
 		transform: 'rotate(-' + washingLine.slopeDegrees + 'deg)',
@@ -1521,14 +1551,12 @@
 		let p = lineTimelines.sheetTL.progress();
 		//sheet is onscreen
 		if( p < sheet.progressMax &&  p > sheet.progressMin ){
-			let sheetDivs = $("#sheet").children("div");
-			sheetDivs.fadeOut();
-			biography.fadeIn();
+			sheet.sheetContents("biography");
 		}
 		//sheet is offscreen
 		else{
-			lineTimelines.bringSheetOnscreen();
-			biography.show();
+			lineTimelines.bringSheetOnscreen();	
+			sheet.sheetContents("biography");
 		}
 	});
 
@@ -1552,14 +1580,12 @@
 		let p = lineTimelines.sheetTL.progress();
 		//sheet is onscreen
 		if( p < sheet.progressMax &&  p > sheet.progressMin ){
-			let sheetDivs = $("#sheet").children("div");
-			sheetDivs.fadeOut();
-			contact.fadeIn();
+			sheet.sheetContents("contact");
 		}
 		//sheet is offscreen
 		else{
-			lineTimelines.bringSheetOnscreen();
-			contact.show();
+			lineTimelines.bringSheetOnscreen();	
+			sheet.sheetContents("contact");
 		}
 	});
 
@@ -1660,21 +1686,9 @@
 	window.onload = function(e){ 
     	setTimeout( () => {
     		lineTimelines.centreTL.tweenTo( "middle" );
-    	}, 2000);
+    	}, 3000);
 
-		//wind.timeline.progress( 0.5 );
 		washingLine.lineElem.fadeIn(3000);
-
-		/*
-		bucket.spriteElem.fadeIn(4000);
-		inkwell.spriteElem.fadeIn(4000);
-		brushholder.spriteElem.fadeIn(4000);
-		pad.spriteElem.fadeIn(4000);
-		cloud1.spriteElem.fadeIn(4000);
-		cloud2.spriteElem.fadeIn(4000);
-		cloud3.spriteElem.fadeIn(4000);
-		boat.spriteElem.fadeIn(4000);
-		*/
 	}
 
 
