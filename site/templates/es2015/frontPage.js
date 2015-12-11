@@ -394,7 +394,14 @@
 					timeline.reversed(false).play();
 				}
 			}
-			this.centreTL.progress(0).tweenTo("middle");	
+			this.centreTL.progress(0).tweenTo("middle");
+			//bring goose and staff offscreen
+			if( staff.timeline.progress() != 0 ){
+				staff.animate();
+			}
+			if( goose.timeline.progress() != 0 ){
+				goose.animate();
+			}	
 		}
 	}
 
@@ -961,7 +968,7 @@
 		}
 
 		shadow(shadowImg){
-			let spriteMid = parseFloat(this.spriteElem[0].style.left)/WW*100;
+			let spriteMid = parseFloat(this.spriteElem[0].style.left +this.width/2)/WW*100;
 			this.spriteElem.append("<div id='" + this.name + "Shadow' class='shadow'></div>");
 
 			let shadowTL = new TimelineMax({paused: true})
@@ -974,7 +981,7 @@
 			this.shadow = $("#" + this.name + "Shadow");
 
 			$document.on("mousemove", (e) => {
-				spriteMid = parseFloat(this.spriteElem[0].style.left)/WW*100;
+				spriteMid = parseFloat(this.spriteElem[0].style.left + this.width/2)/WW*100;
 				let pageXPercent = (e.pageX * 100)/WW;
 				let skew = 0;
 				if (pageXPercent < spriteMid) {
@@ -993,7 +1000,6 @@
 						skew = 0.5 - (0.5 / (spriteMid - 100)) * (spriteMid - pageXPercent);
 					}
 				}
-				console.log(this.width);
 				shadowTL.progress(skew);
 			});
 			this.shadowYOffset = -100 + this.shadowYOffset;
@@ -1001,11 +1007,11 @@
 			$.get( rootUrl, { image: this.name+"Shadow", width: this.width }, ( data ) => {
 				this.shadow.css({
 					background: "url('" + data + "') 0 0% / contain no-repeat",
-					//height: this.height + "px",
 					width: this.shadowWidth + "%",
 					bottom: this.shadowYOffset + "%",
 					left: this.shadowXOffset + "%", 
 				});
+				animateOpacity("#" + this.name + "Shadow", 5, 0.7 );
 			});
 
 			
@@ -1139,12 +1145,12 @@
 				ease:Linear.easeNone, 
 			});
 
-			let rotate = TweenMax.fromTo(this.spriteElem, animSpeed, 
-				{rotation: -4},
-				{rotation: 4, ease: Sine.easeInOut,}
-			);
+			//let rotate = TweenMax.fromTo(this.spriteElem, animSpeed, 
+			//	{rotation: -4},
+			//	{rotation: 4, ease: Sine.easeInOut,}
+			//);
 
-			this.timeline.add(move, 0).add(rotate, 0);
+			this.timeline.add(move, 0)//.add(rotate, 0);
 		}
 
 		animate(){

@@ -535,6 +535,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				}
 
 				this.centreTL.progress(0).tweenTo("middle");
+				//bring goose and staff offscreen
+				if (staff.timeline.progress() != 0) {
+					staff.animate();
+				}
+				if (goose.timeline.progress() != 0) {
+					goose.animate();
+				}
 			}
 		}]);
 
@@ -1197,7 +1204,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			value: function shadow(shadowImg) {
 				var _this6 = this;
 
-				var spriteMid = parseFloat(this.spriteElem[0].style.left) / WW * 100;
+				var spriteMid = parseFloat(this.spriteElem[0].style.left + this.width / 2) / WW * 100;
 				this.spriteElem.append("<div id='" + this.name + "Shadow' class='shadow'></div>");
 
 				var shadowTL = new TimelineMax({ paused: true });
@@ -1208,7 +1215,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				this.shadow = $("#" + this.name + "Shadow");
 
 				$document.on("mousemove", function (e) {
-					spriteMid = parseFloat(_this6.spriteElem[0].style.left) / WW * 100;
+					spriteMid = parseFloat(_this6.spriteElem[0].style.left + _this6.width / 2) / WW * 100;
 					var pageXPercent = e.pageX * 100 / WW;
 					var skew = 0;
 					if (pageXPercent < spriteMid) {
@@ -1224,7 +1231,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 							skew = 0.5 - 0.5 / (spriteMid - 100) * (spriteMid - pageXPercent);
 						}
 					}
-					console.log(_this6.width);
 					shadowTL.progress(skew);
 				});
 				this.shadowYOffset = -100 + this.shadowYOffset;
@@ -1232,11 +1238,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				$.get(rootUrl, { image: this.name + "Shadow", width: this.width }, function (data) {
 					_this6.shadow.css({
 						background: "url('" + data + "') 0 0% / contain no-repeat",
-						//height: this.height + "px",
 						width: _this6.shadowWidth + "%",
 						bottom: _this6.shadowYOffset + "%",
 						left: _this6.shadowXOffset + "%"
 					});
+					animateOpacity("#" + _this6.name + "Shadow", 5, 0.7);
 				});
 			}
 		}]);
@@ -1392,9 +1398,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					ease: Linear.easeNone
 				});
 
-				var rotate = TweenMax.fromTo(this.spriteElem, animSpeed, { rotation: -4 }, { rotation: 4, ease: Sine.easeInOut });
+				//let rotate = TweenMax.fromTo(this.spriteElem, animSpeed,
+				//	{rotation: -4},
+				//	{rotation: 4, ease: Sine.easeInOut,}
+				//);
 
-				this.timeline.add(move, 0).add(rotate, 0);
+				this.timeline.add(move, 0); //.add(rotate, 0);
 			}
 		}, {
 			key: "animate",
