@@ -720,7 +720,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 						_this2.spriteElem.fadeIn(2000);
 
 						if (typeof _this2.afterImageLoad === "function") {
-							_this2.afterImageLoad();
+							_this2.afterImageLoad(spec);
 						}
 					});
 				});
@@ -1180,21 +1180,24 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			_this5.shadowXOffset = spec.shadowXOffset || 0;
 			_this5.shadowWidth = spec.shadowWidth || 100;
 
-			if (spec.shadowImg) {
-				_this5.shadow(spec.shadowImg);
-			}
-
 			_this5.rotated = false;
 
 			return _this5;
 		}
 
 		_createClass(ShadowSprite, [{
+			key: "afterImageLoad",
+			value: function afterImageLoad(spec) {
+				if (spec.shadowImg) {
+					this.shadow(spec.shadowImg);
+				}
+			}
+		}, {
 			key: "shadow",
 			value: function shadow(shadowImg) {
 				var _this6 = this;
 
-				var spriteMid = parseFloat(this.spriteElem.css("left")) / WW * 100;
+				var spriteMid = parseFloat(this.spriteElem[0].style.left) / WW * 100;
 				this.spriteElem.append("<div id='" + this.name + "Shadow' class='shadow'></div>");
 
 				var shadowTL = new TimelineMax({ paused: true });
@@ -1205,6 +1208,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				this.shadow = $("#" + this.name + "Shadow");
 
 				$document.on("mousemove", function (e) {
+					spriteMid = parseFloat(_this6.spriteElem[0].style.left) / WW * 100;
 					var pageXPercent = e.pageX * 100 / WW;
 					var skew = 0;
 					if (pageXPercent < spriteMid) {
@@ -1220,18 +1224,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 							skew = 0.5 - 0.5 / (spriteMid - 100) * (spriteMid - pageXPercent);
 						}
 					}
-
+					console.log(_this6.width);
 					shadowTL.progress(skew);
 				});
 				this.shadowYOffset = -100 + this.shadowYOffset;
 
-				window.addEventListener("load", function () {
-					var width = parseFloat(_this6.spriteElem.css("width"));
-					//slightly more accurate calculation of spriteMid now that we know the width
-					spriteMid = (parseFloat(_this6.spriteElem.css("left")) + width / 2) / WW * 100;
-
+				$.get(rootUrl, { image: this.name + "Shadow", width: this.width }, function (data) {
 					_this6.shadow.css({
-						background: "url('" + shadowImg + "') 0 0% / contain no-repeat",
+						background: "url('" + data + "') 0 0% / contain no-repeat",
 						//height: this.height + "px",
 						width: _this6.shadowWidth + "%",
 						bottom: _this6.shadowYOffset + "%",

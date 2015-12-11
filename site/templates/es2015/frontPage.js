@@ -553,7 +553,7 @@
 					this.spriteElem.fadeIn(2000);
 
 					if(typeof this.afterImageLoad === "function") {
-						this.afterImageLoad();				
+						this.afterImageLoad(spec);				
 					}		
 				})
 			});
@@ -950,14 +950,18 @@
 			this.shadowXOffset = spec.shadowXOffset || 0;
 			this.shadowWidth = spec.shadowWidth || 100;
 
-			if(spec.shadowImg) { this.shadow(spec.shadowImg); }
-
 			this.rotated = false;
 
 		}
 
+		afterImageLoad(spec){
+			if(spec.shadowImg) { 
+				this.shadow(spec.shadowImg); 
+			}
+		}
+
 		shadow(shadowImg){
-			let spriteMid = parseFloat(this.spriteElem.css("left"))/WW*100;
+			let spriteMid = parseFloat(this.spriteElem[0].style.left)/WW*100;
 			this.spriteElem.append("<div id='" + this.name + "Shadow' class='shadow'></div>");
 
 			let shadowTL = new TimelineMax({paused: true})
@@ -970,6 +974,7 @@
 			this.shadow = $("#" + this.name + "Shadow");
 
 			$document.on("mousemove", (e) => {
+				spriteMid = parseFloat(this.spriteElem[0].style.left)/WW*100;
 				let pageXPercent = (e.pageX * 100)/WW;
 				let skew = 0;
 				if (pageXPercent < spriteMid) {
@@ -988,24 +993,23 @@
 						skew = 0.5 - (0.5 / (spriteMid - 100)) * (spriteMid - pageXPercent);
 					}
 				}
-
+				console.log(this.width);
 				shadowTL.progress(skew);
 			});
 			this.shadowYOffset = -100 + this.shadowYOffset;
 
-			window.addEventListener("load", () => { 
-				let width = parseFloat(this.spriteElem.css("width"));
-				//slightly more accurate calculation of spriteMid now that we know the width
-				spriteMid = (parseFloat(this.spriteElem.css("left")) + width/2)/WW*100;
-
+			$.get( rootUrl, { image: this.name+"Shadow", width: this.width }, ( data ) => {
 				this.shadow.css({
-					background: "url('" + shadowImg + "') 0 0% / contain no-repeat",
+					background: "url('" + data + "') 0 0% / contain no-repeat",
 					//height: this.height + "px",
 					width: this.shadowWidth + "%",
 					bottom: this.shadowYOffset + "%",
 					left: this.shadowXOffset + "%", 
 				});
 			});
+
+			
+
 		}
 	}
 
